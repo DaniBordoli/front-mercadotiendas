@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
-import { useStore } from '../stores';
 import { Loading } from '../components/molecules/Loading';
 
 function CreateShop() {
   const navigate = useNavigate();
-  const { createShop, isLoading, error, clearError } = useStore();
+  const { createShop, isLoading, error, clearError } = useAuthStore();
   const [initialLoading, setInitialLoading] = useState(true);
   const [values, setValues] = useState({
     shopName: '',
@@ -26,12 +26,16 @@ function CreateShop() {
   }, [clearError]);
 
   const handleSubmit = async (values: Record<string, string>) => {
-    await createShop({
-      shopName: values.shopName,
-      category: values.category,
-      address: values.address
-    });
-    navigate('/dashboard');
+    try {
+      await createShop({
+        shopName: values.shopName,
+        category: values.category,
+        address: values.address
+      });
+      navigate('/dashboard');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const fields = [

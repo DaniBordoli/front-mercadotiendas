@@ -1,106 +1,82 @@
-import { StateCreator } from 'zustand';
+import { create } from 'zustand';
+import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
 import { LoginCredentials, RegisterData, CreateShopData, User } from '../../types/auth';
 
-export interface AuthSlice {
+export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  token: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   createShop: (data: CreateShopData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  setToken: (token: string) => void;
+  clearToken: () => void;
 }
 
-const initialState = {
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  isAuthenticated: false,
+  isAuthenticated: !!getStorageItem('token'),
   isLoading: false,
   error: null,
-};
-
-export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
-  ...initialState,
+  token: getStorageItem('token'),
 
   login: async (credentials: LoginCredentials) => {
+    set({ isLoading: true, error: null });
     try {
-      set({ isLoading: true, error: null });
+      // Simular una llamada a la API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      set({
-        user: {
-          id: '1',
-          email: credentials.email,
-          name: 'Test User',
-        },
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      const token = 'fake-jwt-token';
+      setStorageItem('token', token);
+      set({ isAuthenticated: true, token, isLoading: false });
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'An error occurred during login',
-        isLoading: false,
-      });
+      set({ error: 'Invalid credentials', isLoading: false });
     }
   },
 
   register: async (data: RegisterData) => {
+    set({ isLoading: true, error: null });
     try {
-      set({ isLoading: true, error: null });
-
-      if (data.password !== data.confirmPassword) {
-        throw new Error('Passwords do not match');
-      }
-
+      // Simular una llamada a la API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      set({
-        user: {
-          id: '1',
-          email: data.email,
-          name: 'New User',
-        },
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      const token = 'fake-jwt-token';
+      setStorageItem('token', token);
+      set({ isAuthenticated: true, token, isLoading: false });
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'An error occurred during registration',
-        isLoading: false,
-      });
+      set({ error: 'Registration failed', isLoading: false });
     }
   },
 
   createShop: async (data: CreateShopData) => {
+    set({ isLoading: true, error: null });
     try {
-      set({ isLoading: true, error: null });
+      // Simular una llamada a la API
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      set((state) => ({
-        user: state.user ? {
-          ...state.user,
-          shop: {
-            name: data.shopName,
-            category: data.category,
-            address: data.address
-          }
-        } : null,
-        isLoading: false
-      }));
+      set({ isLoading: false });
     } catch (error) {
-      set({
-        error: error instanceof Error ? error.message : 'An error occurred while creating the shop',
-        isLoading: false,
-      });
+      set({ error: 'Failed to create shop', isLoading: false });
     }
   },
 
   logout: () => {
-    set(initialState);
+    removeStorageItem('token');
+    set({ token: null, isAuthenticated: false, user: null });
   },
 
   clearError: () => {
     set({ error: null });
   },
-});
+
+  setToken: (token: string) => {
+    setStorageItem('token', token);
+    set({ token, isAuthenticated: true });
+  },
+
+  clearToken: () => {
+    removeStorageItem('token');
+    set({ token: null, isAuthenticated: false });
+  }
+}));

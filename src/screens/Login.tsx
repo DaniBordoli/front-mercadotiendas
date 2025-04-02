@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../stores';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
-import { useStore } from '../stores';
 import { Loading } from '../components/molecules/Loading';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, isLoading, error, isAuthenticated, clearError } = useStore();
+  const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
   const [initialLoading, setInitialLoading] = useState(true);
   const [values, setValues] = useState({
     email: '',

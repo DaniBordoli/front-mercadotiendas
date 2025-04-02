@@ -4,11 +4,8 @@ import Login from '../screens/Login';
 import CreateShop from '../screens/CreateShop';
 import Dashboard from '../screens/Dashboard';
 
-export const routes = [
-  {
-    path: '/',
-    element: <Navigate to="/login" replace />
-  },
+// Rutas públicas (no requieren autenticación)
+export const publicRoutes = [
   {
     path: '/register',
     element: <Register />
@@ -16,7 +13,11 @@ export const routes = [
   {
     path: '/login',
     element: <Login />
-  },
+  }
+];
+
+// Rutas privadas (requieren autenticación)
+export const privateRoutes = [
   {
     path: '/createshop',
     element: <CreateShop />
@@ -24,5 +25,17 @@ export const routes = [
   {
     path: '/dashboard',
     element: <Dashboard />
+  }
+];
+
+// Rutas de redirección
+export const redirectRoutes = [
+  {
+    path: '/',
+    element: <Navigate to="/login" replace />
+  },
+  {
+    path: '*',
+    element: <Navigate to="/login" replace />
   }
 ];
