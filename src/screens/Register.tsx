@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
-import { useStore } from '../stores';
+import { useAuthStore } from '../stores'; 
 import { Loading } from '../components/molecules/Loading';
 
 function Register() {
   const navigate = useNavigate();
-  const { register, isLoading, error, isAuthenticated, clearError } = useStore();
+  const { register, isLoading, error, isAuthenticated, clearError } = useAuthStore();
   const [initialLoading, setInitialLoading] = useState(true);
   const [values, setValues] = useState({
     email: '',

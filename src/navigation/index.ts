@@ -1,2 +1,2 @@
 export { AppRouter } from './AppRouter';
-export { routes } from './routes';
+export { privateRoutes, publicRoutes, redirectRoutes } from './routes';
