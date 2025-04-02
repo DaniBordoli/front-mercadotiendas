@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 import Register from '../screens/Register';
 import Login from '../screens/Login';
 import CreateShop from '../screens/CreateShop';
+import Dashboard from '../screens/Dashboard';
 
 export const routes = [
   {
@@ -19,5 +20,9 @@ export const routes = [
   {
     path: '/createshop',
     element: <CreateShop />
+  },
+  {
+    path: '/dashboard',
+    element: <Dashboard />
   }
 ];
