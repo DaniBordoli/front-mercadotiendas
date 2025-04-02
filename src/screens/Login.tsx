@@ -1,40 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import CenteredBox from '../components/atoms/CenteredBox';
+import { useNavigate } from 'react-router-dom';
+import { CenteredBox } from '../components/templates/CenteredBox';
+import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
-import InputField from '../components/atoms/InputField';
-import Button from '../components/atoms/Button';
-import { Link } from 'react-router-dom';
-import Loading from '../components/atoms/Loading';
+import { useStore } from '../stores';
+import { Loading } from '../components/molecules/Loading';
 
 function Login() {
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { login, isLoading, error, isAuthenticated, clearError } = useStore();
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [values, setValues] = useState({
+    email: '',
+    password: ''
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 900); 
+    const timer = setTimeout(() => setInitialLoading(false), 900);
     return () => clearTimeout(timer);
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+    return () => clearError();
+  }, [isAuthenticated, navigate, clearError]);
+
+  const handleSubmit = async (values: Record<string, string>) => {
+    await login({
+      email: values.email,
+      password: values.password
+    });
+  };
+
+  const fields = [
+    {
+      type: 'email' as const,
+      name: 'email',
+      label: 'Email',
+      placeholder: 'Email*',
+      required: true,
+      autoComplete: 'email'
+    },
+    {
+      type: 'password' as const,
+      name: 'password',
+      label: 'Password',
+      placeholder: 'Password*',
+      required: true,
+      autoComplete: 'current-password'
+    }
+  ];
+
+  if (initialLoading) {
     return <Loading />;
   }
 
   return (
-    <CenteredBox width="400px" height="540px">
-      <div className="flex flex-col items-center mt-24">
-        <div className="flex items-center">
+    <CenteredBox height="520px">
+      <div className="flex flex-col items-center mt-4">
+        <div className="flex items-center mb-8">
           <span className="text-green-500 text-3xl mr-2">
             <FaStore size={28} color="skyblue" />
           </span>
-          <h1 className="text-2xl font-bold text-sky-500">Mercado tienda</h1>
+          <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
         </div>
-        <h2 className="text-2xl font-semibold my-6">Te damos la bienvenida</h2>
-        <p className="text-center text-[14px] mb-6">Inicia sesión en tu MercadoTienda</p>
-        <InputField type="email" placeholder="Email*" />
-        <Button>Iniciar sesión</Button>
+
+        <h2 className="text-2xl font-semibold mb-6">Welcome back!</h2>
+        <p className="text-center text-gray-600 text-sm mb-8">
+          Sign in to your MercadoTiendas account
+        </p>
+
+        <Form
+          fields={fields}
+          values={values}
+          onChange={(name, value) => {
+            clearError();
+            setValues(prev => ({ ...prev, [name]: value }));
+          }}
+          onSubmit={handleSubmit}
+          errors={error ? { email: error } : {}}
+          submitText="Sign In"
+          loading={isLoading}
+        />
+
+        <p className="mt-6 text-sm text-gray-600">
+          Don't have an account?{' '}
+          <button
+            onClick={() => navigate('/register')}
+            className="text-sky-500 hover:text-sky-600 font-medium"
+          >
+            Sign up
+          </button>
+        </p>
       </div>
-      <Link to="/register">
-        <h1 className='text-[14px] font-bold text-sky-500 ml-4 mt-4'>Crear una MercadoTienda</h1>
-      </Link>
     </CenteredBox>
   );
 }
