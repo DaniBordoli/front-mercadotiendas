@@ -4,6 +4,8 @@ import Login from '../screens/Login';
 import CreateShop from '../screens/CreateShop';
 import Dashboard from '../screens/Dashboard';
 import InfoTienda from '../screens/InfoTienda';
+import ResetPassword from '../screens/ResetPassword';
+import VerifyPassword from '../screens/VerifyPassword';
 
 // Rutas públicas (no requieren autenticación)
 export const publicRoutes = [
@@ -14,6 +16,16 @@ export const publicRoutes = [
   {
     path: '/login',
     element: <Login />
+  }
+  ,
+  {
+    path: '/reset-password',
+    element: <ResetPassword />
+  }
+  ,
+  {
+    path: '/email-verification',
+    element: <VerifyPassword />
   }
 ];
 
