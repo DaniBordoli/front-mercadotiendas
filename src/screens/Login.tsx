@@ -84,6 +84,12 @@ function Login() {
           submitText="Sign In"
           loading={isLoading}
         />
+        <p
+          className="text-sky-500 font-semibold text-sm mt-2 cursor-pointer"
+          onClick={() => navigate('/reset-password')}
+        >
+          Forgot your password?
+        </p>
 
         <p className="mt-6 text-sm text-gray-600">
           Don't have an account?{' '}
