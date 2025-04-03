@@ -11,4 +11,6 @@ export interface InputFieldProps {
   error?: string;
   label?: string;
   autoComplete?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
