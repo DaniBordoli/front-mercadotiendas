@@ -11,9 +11,14 @@ import { MdHelp } from "react-icons/md";
 export const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isStoreOn, setIsStoreOn] = useState(false); 
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
+  const toggleStore = () => {
+    setIsStoreOn(!isStoreOn); 
   };
 
   return (
@@ -27,11 +32,15 @@ export const Sidebar: React.FC = () => {
         lorem.ipsum.com.ar
       </div>
       <div className="p-2 flex items-center justify-between">
-        <span className="text-sky-500 text-sm font-bold bg-[#a2daf2] rounded-md px-4 py-1 inline-block">
-          Tienda Apagada
+        <span
+          className={`text-sm font-bold rounded-md px-4 py-1 inline-block ${
+            isStoreOn ? 'text-sky-500 bg-[#a2daf2]' : 'text-[#ff0000] bg-[#ffcccc]'
+          }`}
+        >
+          {isStoreOn ? 'Tienda Encendida' : 'Tienda Apagada'}
         </span>
         <label className="relative inline-flex items-center cursor-pointer ml-4">
-          <input type="checkbox" className="sr-only peer" />
+          <input type="checkbox" className="sr-only peer" checked={isStoreOn} onChange={toggleStore} />
           <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-sky-500 peer-checked:bg-sky-500"></div>
           <div className="absolute w-5 h-5 bg-white rounded-full left-1 top-0.5 peer-checked:translate-x-5 transition-transform"></div>
         </label>
@@ -51,9 +60,15 @@ export const Sidebar: React.FC = () => {
         <div
           className={`overflow-hidden transition-all duration-100 ${openDropdown === 'miTienda' ? 'max-h-96' : 'max-h-0'}`}
         >
-          <div className="space-y-2">
-            <div className="text-sm cursor-pointer px-4">Submenu 1</div>
-            <div className="text-sm cursor-pointer px-4">Submenu 2</div>
+          <div className="space-y-8">
+            <div className="text-sm cursor-pointer px-4">Diseño</div>
+            <div className="text-sm cursor-pointer px-4">Informacion de mi tienda</div>
+            <div className="text-sm cursor-pointer px-4">Activar formulario de contacto</div>
+            <div className="text-sm cursor-pointer px-4">Agregar redes sociales</div>
+            <div className="text-sm cursor-pointer px-4">Añadir chat a mi tienda</div>
+            <div className="text-sm cursor-pointer px-4">Editar páginas</div>
+            <div className="text-sm cursor-pointer px-4">Crear blog</div>
+            <div className="text-sm cursor-pointer px-4">Apagar temporalmente</div>
           </div>
         </div>
 

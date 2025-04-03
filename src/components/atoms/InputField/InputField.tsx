@@ -13,7 +13,9 @@ export const InputField: React.FC<InputFieldProps> = ({
   id,
   error,
   label,
-  autoComplete
+  autoComplete,
+  onFocus,
+  onBlur
 }) => {
   const baseStyles = "w-full h-10 sm:h-12 px-3 sm:px-4 py-2 border rounded-lg transition-all duration-200 focus:outline-none text-sm sm:text-base";
   const stateStyles = error
@@ -39,6 +41,8 @@ export const InputField: React.FC<InputFieldProps> = ({
           name={name}
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
+          onFocus={onFocus}
+          onBlur={onBlur}
           placeholder={placeholder}
           disabled={disabled}
           required={required}

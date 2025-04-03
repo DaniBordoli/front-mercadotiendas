@@ -3,6 +3,7 @@ import Register from '../screens/Register';
 import Login from '../screens/Login';
 import CreateShop from '../screens/CreateShop';
 import Dashboard from '../screens/Dashboard';
+import InfoTienda from '../screens/InfoTienda';
 
 // Rutas públicas (no requieren autenticación)
 export const publicRoutes = [
@@ -25,6 +26,10 @@ export const privateRoutes = [
   {
     path: '/dashboard',
     element: <Dashboard />
+  },
+  {
+    path: '/informacion-tienda',
+    element: <InfoTienda />
   }
 ];
 
