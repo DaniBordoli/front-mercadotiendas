@@ -68,13 +68,20 @@ export const getProfile = async (token: string) => {
 
 export const loginWithGoogle = async (token: string) => {
   try {
-    const response = await fetch(`${API_URL}/auth/google`, {
+    console.log('Attempting Google login with token:', token.substring(0, 20) + '...');
+    console.log('API URL:', API_URL);
+    const response = await fetch(`${API_URL}/auth/google/verify-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ token }),
     });
+    console.log('Response status:', response.status);
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error response:', errorData);
+    }
     return handleResponse(response);
   } catch (error) {
     console.error('Error during Google login:', error);
