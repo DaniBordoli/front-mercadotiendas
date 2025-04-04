@@ -21,7 +21,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend para obtener nuestro JWT
-      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/google`;
+      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/google/verify-token`;
+      console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -36,12 +37,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error(responseData.message || 'Google sign in failed');
       }
       
-      if (!responseData.success || !responseData.data || !responseData.data.data) {
+      if (!responseData.success || !responseData.data) {
         console.error('Estructura de respuesta inesperada:', responseData);
         throw new Error('Respuesta inválida del servidor');
       }
       
-      const { token, user } = responseData.data.data;
+      const { token, user } = responseData.data;
       setStorageItem('token', token);
       set({
         isAuthenticated: true,
@@ -68,7 +69,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend
-      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/firebase`;
+      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/firebase/verify-token`;
+      console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -82,12 +84,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error(responseData.message || 'Invalid credentials');
       }
       
-      if (!responseData.success || !responseData.data || !responseData.data.data) {
+      if (!responseData.success || !responseData.data) {
         console.error('Estructura de respuesta inesperada:', responseData);
         throw new Error('Respuesta inválida del servidor');
       }
       
-      const { token, user } = responseData.data.data;
+      const { token, user } = responseData.data;
       
       setStorageItem('token', token);
       set({
@@ -112,7 +114,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend
-      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/firebase`;
+      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/firebase/verify-token`;
+      console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -131,12 +134,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error(responseData.message || 'Registration failed');
       }
       
-      if (!responseData.success || !responseData.data || !responseData.data.data) {
+      if (!responseData.success || !responseData.data) {
         console.error('Estructura de respuesta inesperada:', responseData);
         throw new Error('Respuesta inválida del servidor');
       }
       
-      const { token, user } = responseData.data.data;
+      const { token, user } = responseData.data;
       
       setStorageItem('token', token);
       set({
@@ -163,14 +166,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('No hay token de autenticación');
       }
       
-      const apiUrl = `${process.env.REACT_APP_API_URL}/users/profile`;
+      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/shops`;
+      console.log('Sending request to:', apiUrl);
+      console.log('Data being sent:', data);
       const response = await fetch(apiUrl, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ shop: data }),
+        body: JSON.stringify(data),
       });
       const responseData = await response.json();
       if (!response.ok) {
