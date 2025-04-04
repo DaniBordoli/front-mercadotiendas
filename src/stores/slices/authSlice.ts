@@ -3,6 +3,7 @@ import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/s
 import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
+import { API_URL } from '../../services/api';
 
 
 
@@ -21,7 +22,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend para obtener nuestro JWT
-      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/google/verify-token`;
+      const apiUrl = `${API_URL}/auth/google/verify-token`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
