@@ -1,6 +1,6 @@
 import { LoginCredentials, RegisterData, User, CreateShopData } from '../types/auth';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const API_URL = process.env.REACT_APP_API_URL_DEV;
 
 const handleResponse = async (response: Response) => {
   const data = await response.json();
