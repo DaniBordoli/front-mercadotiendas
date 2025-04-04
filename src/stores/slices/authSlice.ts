@@ -70,7 +70,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend
-      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/firebase/verify-token`;
+      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -115,7 +115,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const idToken = await result.user.getIdToken();
       
       // Enviar el token de Firebase al backend
-      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/auth/firebase/verify-token`;
+      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -167,7 +167,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('No hay token de autenticación');
       }
       
-      const apiUrl = `${process.env.REACT_APP_API_URL_DEV}/shops`;
+      const apiUrl = `${API_URL}/shops`;
       console.log('Sending request to:', apiUrl);
       console.log('Data being sent:', data);
       const response = await fetch(apiUrl, {
