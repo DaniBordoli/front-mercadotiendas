@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores';
+import { useAuthRedirect } from '../hooks/useAuthRedirect';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
 import { Loading } from '../components/molecules/Loading';
+import { GoogleSignInButton } from '../components/molecules/GoogleSignInButton/GoogleSignInButton';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, isLoading, error, isAuthenticated, clearError } = useAuthStore();
+  const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
   const [initialLoading, setInitialLoading] = useState(true);
   const [values, setValues] = useState({
     email: '',
@@ -20,12 +22,7 @@ function Login() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-    return () => clearError();
-  }, [isAuthenticated, navigate, clearError]);
+  useAuthRedirect();
 
   const handleSubmit = async (values: Record<string, string>) => {
     await login({
@@ -84,6 +81,29 @@ function Login() {
           submitText="Sign In"
           loading={isLoading}
         />
+
+        <div className="mt-4 w-full">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white text-gray-500">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <GoogleSignInButton
+              onClick={() => {
+                clearError();
+                loginWithGoogle();
+              }}
+              isLoading={isLoading}
+            />
+          </div>
+        </div>
         <p
           className="text-sky-500 font-semibold text-sm mt-2 cursor-pointer"
           onClick={() => navigate('/reset-password')}

@@ -9,7 +9,6 @@ function ResetPassword() {
   const [values, setValues] = useState({ email: '' });
 
   const handleSubmit = async (values: Record<string, string>) => {
-    console.log('Password reset request for:', values.email);
     navigate('/login');
   };
 
@@ -41,12 +40,13 @@ function ResetPassword() {
         onSubmit={handleSubmit}
         submitText="Enviar"
       />
-      <p 
-        className="mt-4 font-semibold text-sky-600 cursor-pointer" 
-        onClick={() => { navigate('/login') }}
+      <button 
+        type="button"
+        className="mt-4 font-semibold text-sky-600 hover:text-sky-700" 
+        onClick={() => navigate('/login')}
       >
         Volver
-      </p>
+      </button>
     </CenteredBox>
   );
 }

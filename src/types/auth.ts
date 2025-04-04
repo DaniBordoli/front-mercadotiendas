@@ -5,6 +5,8 @@ export interface LoginCredentials {
 
 export interface RegisterData extends LoginCredentials {
   confirmPassword: string;
+  fullName: string;
+  token?: string;
 }
 
 export interface CreateShopData {
@@ -31,12 +33,17 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  token: string | null;
+  needsShopSetup: boolean;
 }
 
-export interface AuthStore extends AuthState {
+export type AuthStore = AuthState & {
   login: (credentials: LoginCredentials) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   createShop: (data: CreateShopData) => Promise<void>;
   logout: () => void;
   clearError: () => void;
+  setToken: (token: string) => void;
+  clearToken: () => void;
 }

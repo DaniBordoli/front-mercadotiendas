@@ -9,7 +9,6 @@ function VerifyPassword() {
   const [values, setValues] = useState({ code: '' });
 
   const handleSubmit = async (values: Record<string, string>) => {
-    console.log('Verification code submitted:', values.code);
     navigate('/reset-password');
   };
 
@@ -43,14 +42,21 @@ function VerifyPassword() {
       />
       <p className="mt-4 text-sm font-medium text-black">
         ¿No recibiste el codigo?{' '}
-        <span className="text-sky-600 cursor-pointer">Enviar nuevamente</span>
+        <button
+          type="button"
+          className="text-sky-600 hover:text-sky-700 font-medium"
+          onClick={() => {}}
+        >
+          Enviar nuevamente
+        </button>
       </p>
-      <p 
-        className="mt-4 font-semibold text-sky-600 cursor-pointer" 
-        onClick={() => { navigate('/reset-password') }}
+      <button 
+        type="button"
+        className="mt-4 font-semibold text-sky-600 hover:text-sky-700" 
+        onClick={() => navigate('/reset-password')}
       >
         Volver al inicio
-      </p>
+      </button>
     </CenteredBox>
   );
 }

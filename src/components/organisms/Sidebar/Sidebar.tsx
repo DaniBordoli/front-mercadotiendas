@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { testConnection } from '../../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { FaHome, FaChevronDown, FaUser } from 'react-icons/fa';
 import { FiExternalLink } from 'react-icons/fi';
@@ -11,7 +12,8 @@ import { MdHelp } from "react-icons/md";
 export const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-  const [isStoreOn, setIsStoreOn] = useState(false); 
+  const [isStoreOn, setIsStoreOn] = useState(false);
+  const [apiStatus, setApiStatus] = useState<string>('Checking...');
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
@@ -20,6 +22,17 @@ export const Sidebar: React.FC = () => {
   const toggleStore = () => {
     setIsStoreOn(!isStoreOn); 
   };
+
+  useEffect(() => {
+    testConnection()
+      .then(data => {
+        setApiStatus('Connected');
+      })
+      .catch(error => {
+        setApiStatus('Error connecting');
+        console.error('API Error:', error);
+      });
+  }, []);
 
   return (
     <div className="w-72 bg-white shadow-md flex flex-col fixed top-16" style={{ height: 'calc(100vh - 4rem)', overflowY: 'auto' }}>
@@ -30,6 +43,9 @@ export const Sidebar: React.FC = () => {
       </div>
       <div className="p-4 text-xs font-bold">
         lorem.ipsum.com.ar
+        <div className={`mt-1 ${apiStatus === 'Connected' ? 'text-green-500' : 'text-red-500'}`}>
+          API Status: {apiStatus}
+        </div>
       </div>
       <div className="p-2 flex items-center justify-between">
         <span

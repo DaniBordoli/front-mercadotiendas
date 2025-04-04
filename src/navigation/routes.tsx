@@ -6,6 +6,9 @@ import Dashboard from '../screens/Dashboard';
 import InfoTienda from '../screens/InfoTienda';
 import ResetPassword from '../screens/ResetPassword';
 import VerifyPassword from '../screens/VerifyPassword';
+import { ProtectedRoute } from '../components/utils/ProtectedRoute';
+import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
+import { NoShopRoute } from '../components/utils/NoShopRoute';
 
 // Rutas públicas (no requieren autenticación)
 export const publicRoutes = [
@@ -33,15 +36,15 @@ export const publicRoutes = [
 export const privateRoutes = [
   {
     path: '/createshop',
-    element: <CreateShop />
+    element: <NoShopRoute><CreateShop /></NoShopRoute>
   },
   {
     path: '/dashboard',
-    element: <Dashboard />
+    element: <ShopRequiredRoute><Dashboard /></ShopRequiredRoute>
   },
   {
     path: '/informacion-tienda',
-    element: <InfoTienda />
+    element: <ShopRequiredRoute><InfoTienda /></ShopRequiredRoute>
   }
 ];
 

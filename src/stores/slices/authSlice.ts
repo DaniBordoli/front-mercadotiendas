@@ -1,69 +1,194 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData, User } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
+import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { auth, googleProvider } from '../../config/firebase';
 
-export interface AuthState {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-  token: string | null;
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
-  createShop: (data: CreateShopData) => Promise<void>;
-  logout: () => void;
-  clearError: () => void;
-  setToken: (token: string) => void;
-  clearToken: () => void;
-}
 
-export const useAuthStore = create<AuthState>((set) => ({
+
+export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   isAuthenticated: !!getStorageItem('token'),
   isLoading: false,
   error: null,
   token: getStorageItem('token'),
+  needsShopSetup: false,
+
+  loginWithGoogle: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const result: UserCredential = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      
+      // Enviar el token de Firebase al backend para obtener nuestro JWT
+      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/google`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: idToken }),
+      });
+      
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Google sign in failed');
+      }
+      
+      if (!responseData.success || !responseData.data || !responseData.data.data) {
+        console.error('Estructura de respuesta inesperada:', responseData);
+        throw new Error('Respuesta inválida del servidor');
+      }
+      
+      const { token, user } = responseData.data.data;
+      setStorageItem('token', token);
+      set({
+        isAuthenticated: true,
+        token,
+        user,
+        isLoading: false,
+        needsShopSetup: !user?.shop
+      });
+      
+
+    } catch (error) {
+      console.error('Error en login con Google:', error);
+      set({ 
+        error: error instanceof Error ? error.message : 'Google sign in failed', 
+        isLoading: false 
+      });
+    }
+  },
 
   login: async (credentials: LoginCredentials) => {
     set({ isLoading: true, error: null });
     try {
-      // Simular una llamada a la API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const token = 'fake-jwt-token';
+      const result = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      const idToken = await result.user.getIdToken();
+      
+      // Enviar el token de Firebase al backend
+      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/firebase`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: idToken }),
+      });
+      
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Invalid credentials');
+      }
+      
+      if (!responseData.success || !responseData.data || !responseData.data.data) {
+        console.error('Estructura de respuesta inesperada:', responseData);
+        throw new Error('Respuesta inválida del servidor');
+      }
+      
+      const { token, user } = responseData.data.data;
+      
       setStorageItem('token', token);
-      set({ isAuthenticated: true, token, isLoading: false });
+      set({
+        isAuthenticated: true,
+        token,
+        user,
+        isLoading: false,
+        needsShopSetup: !user?.shop
+      });
     } catch (error) {
-      set({ error: 'Invalid credentials', isLoading: false });
+      set({ 
+        error: error instanceof Error ? error.message : 'Invalid credentials', 
+        isLoading: false 
+      });
     }
   },
 
   register: async (data: RegisterData) => {
     set({ isLoading: true, error: null });
     try {
-      // Simular una llamada a la API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const token = 'fake-jwt-token';
+      const result = await createUserWithEmailAndPassword(auth, data.email, data.password);
+      const idToken = await result.user.getIdToken();
+      
+      // Enviar el token de Firebase al backend
+      const apiUrl = `${process.env.REACT_APP_API_URL}/auth/firebase`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          token: idToken,
+          userData: {
+            fullName: data.fullName
+          }
+        }),
+      });
+      
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Registration failed');
+      }
+      
+      if (!responseData.success || !responseData.data || !responseData.data.data) {
+        console.error('Estructura de respuesta inesperada:', responseData);
+        throw new Error('Respuesta inválida del servidor');
+      }
+      
+      const { token, user } = responseData.data.data;
+      
       setStorageItem('token', token);
-      set({ isAuthenticated: true, token, isLoading: false });
+      set({
+        isAuthenticated: true,
+        token,
+        user,
+        isLoading: false,
+        needsShopSetup: !user?.shop
+      });
     } catch (error) {
-      set({ error: 'Registration failed', isLoading: false });
+      set({ 
+        error: error instanceof Error ? error.message : 'Registration failed', 
+        isLoading: false 
+      });
     }
   },
 
   createShop: async (data: CreateShopData) => {
+    const currentUser = get().user;
     set({ isLoading: true, error: null });
     try {
-      // Simular una llamada a la API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      set({ isLoading: false });
+      const token = getStorageItem('token');
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+      
+      const apiUrl = `${process.env.REACT_APP_API_URL}/users/profile`;
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ shop: data }),
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Failed to create shop');
+      }
+      const updatedUser = responseData.data;
+      set({ user: updatedUser, isLoading: false, needsShopSetup: false });
     } catch (error) {
-      set({ error: 'Failed to create shop', isLoading: false });
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to create shop', 
+        isLoading: false 
+      });
     }
   },
 
   logout: () => {
     removeStorageItem('token');
-    set({ token: null, isAuthenticated: false, user: null });
+    set({ token: null, isAuthenticated: false, user: null, needsShopSetup: false });
   },
 
   clearError: () => {

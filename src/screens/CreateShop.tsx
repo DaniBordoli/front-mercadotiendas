@@ -4,22 +4,12 @@ import { useAuthStore } from '../stores';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
-import { Loading } from '../components/molecules/Loading';
+
 
 function CreateShop() {
   const navigate = useNavigate();
   const { createShop, isLoading, error, clearError } = useAuthStore();
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [values, setValues] = useState({
-    shopName: '',
-    category: '',
-    address: ''
-  });
-
-  useEffect(() => {
-    const timer = setTimeout(() => setInitialLoading(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
+  const [values, setValues] = useState({ shopName: '', category: '', address: '' });
 
   useEffect(() => {
     return () => clearError();
@@ -27,15 +17,14 @@ function CreateShop() {
 
   const handleSubmit = async (values: Record<string, string>) => {
     try {
-      await createShop({
+      const shopData = {
         shopName: values.shopName,
         category: values.category,
         address: values.address
-      });
+      };
+      await createShop(shopData);
       navigate('/dashboard');
-    } catch (error) {
-      console.error(error);
-    }
+    } catch (error) {}
   };
 
   const fields = [
@@ -68,10 +57,6 @@ function CreateShop() {
       required: true
     }
   ];
-
-  if (initialLoading) {
-    return <Loading />;
-  }
 
   return (
     <CenteredBox height="600px">
