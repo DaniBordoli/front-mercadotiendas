@@ -9,6 +9,7 @@ import VerifyPassword from '../screens/VerifyPassword';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
+import ProfileScreen from '../screens/ProfileScreen';
 
 // Rutas públicas (no requieren autenticación)
 export const publicRoutes = [
@@ -45,6 +46,10 @@ export const privateRoutes = [
   {
     path: '/informacion-tienda',
     element: <ShopRequiredRoute><InfoTienda /></ShopRequiredRoute>
+  },
+  {
+    path: '/my-profile',
+    element: <ShopRequiredRoute><ProfileScreen /></ShopRequiredRoute>
   }
 ];
 
