@@ -5,7 +5,37 @@ import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPass
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
 
+export const forgotPassword = async (email: string): Promise<void> => {
+  const apiUrl = `${API_URL}/auth/forgot-password`;
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email }),
+  });
 
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al enviar el correo.');
+  }
+};
+
+export const resetPassword = async (token: string, password: string): Promise<void> => {
+  const apiUrl = `${API_URL}/auth/reset-password/${token}`;
+  const response = await fetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ password }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al restablecer la contraseña');
+  }
+};
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
