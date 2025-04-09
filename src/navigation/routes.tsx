@@ -20,26 +20,26 @@ export const publicRoutes = [
   {
     path: '/login',
     element: <Login />
-  }
-  ,
+  },
   {
     path: '/reset-password',
     element: <ResetPassword />
-  }
-  ,
+  },
   {
     path: '/email-verification',
     element: <VerifyPassword />
-  }
-  ,
+  },
   {
     path: '/account-confirm',
     element: <VerifyPassword />
-  }
-  ,
+  },
   {
     path: '/password-restore',
     element: <VerifyPassword />
+  },
+  {
+    path: '/dashboard', 
+    element: <Dashboard />
   }
 ];
 
@@ -48,10 +48,6 @@ export const privateRoutes = [
   {
     path: '/createshop',
     element: <NoShopRoute><CreateShop /></NoShopRoute>
-  },
-  {
-    path: '/dashboard',
-    element: <ShopRequiredRoute><Dashboard /></ShopRequiredRoute>
   },
   {
     path: '/informacion-tienda',
@@ -67,7 +63,7 @@ export const privateRoutes = [
 export const redirectRoutes = [
   {
     path: '/',
-    element: <Navigate to="/login" replace />
+    element: <Navigate to="/dashboard" replace />
   },
   {
     path: '*',
