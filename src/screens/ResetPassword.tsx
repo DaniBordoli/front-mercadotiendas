@@ -43,7 +43,7 @@ function ResetPassword() {
       </div>
       <h1 className="text-2xl font-medium my-4">¿Olvidaste tu contraseña?</h1>
       <p className="text-gray-600 text-center w-11/12 text-sm mb-6">
-        Escribe tu dirección de correo electrónico y te enviaremos las instrucciones para restablecer la contraseña.
+        Escribe tu dirección de correo electrónico y si se encuentra en nuestra base de datos te enviaremos las instrucciones para restablecer la contraseña.
       </p>
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
       {success && (
