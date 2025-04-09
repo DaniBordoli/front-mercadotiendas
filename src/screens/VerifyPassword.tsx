@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { Logo } from '../components/atoms/Logo';
+import { resetPassword } from '../stores/slices/authSlice';
 
 function VerifyPassword() {
   const navigate = useNavigate();
@@ -22,23 +23,9 @@ function VerifyPassword() {
 
     try {
       setError(null); // Limpia errores previos
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/auth/reset-password/${token}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password: values.code }),
-      });
-
-      console.log('Sending to backend:', { password: values.code }); // Log the data being sent
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al restablecer la contraseña');
-      }
-
-      setSuccess(true); // Indica éxito
-      setTimeout(() => navigate('/login'), 3000); // Redirige al login después de 3 segundos
+      await resetPassword(token, values.code);
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err: any) {
       setError(err.message);
     }

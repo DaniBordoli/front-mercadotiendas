@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { Logo } from '../components/atoms/Logo';
+import { forgotPassword } from '../stores/slices/authSlice';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -15,19 +16,7 @@ function ResetPassword() {
   const handleSubmit = async (values: Record<string, string>) => {
     try {
       setError(null); // Limpiar errores previos
-      const response = await fetch(`${API_URL}/auth/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: values.email }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al enviar el correo.');
-      }
-
+      await forgotPassword(values.email);
       setSuccess(true); // Mostrar mensaje de éxito
       setTimeout(() => navigate('/password-restore'), 1000);
     } catch (err: any) {
