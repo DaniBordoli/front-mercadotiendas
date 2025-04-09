@@ -31,6 +31,16 @@ export const publicRoutes = [
     path: '/email-verification',
     element: <VerifyPassword />
   }
+  ,
+  {
+    path: '/account-confirm',
+    element: <VerifyPassword />
+  }
+  ,
+  {
+    path: '/password-restore',
+    element: <VerifyPassword />
+  }
 ];
 
 // Rutas privadas (requieren autenticación)
