@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { publicRoutes, privateRoutes, redirectRoutes } from './routes';
-import { useAuthStore } from '../stores/slices/authSlice';
+import { useAuthStore } from '../stores';
 
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);

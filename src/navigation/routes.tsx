@@ -6,12 +6,12 @@ import Dashboard from '../screens/Dashboard';
 import InfoTienda from '../screens/InfoTienda';
 import ResetPassword from '../screens/ResetPassword';
 import VerifyPassword from '../screens/VerifyPassword';
+import AccountActivation from '../screens/AccountActivation';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
 import ProfileScreen from '../screens/ProfileScreen';
 
-// Rutas públicas (no requieren autenticación)
 export const publicRoutes = [
   {
     path: '/register',
@@ -38,12 +38,15 @@ export const publicRoutes = [
     element: <VerifyPassword />
   },
   {
+    path: '/activate-account',
+    element: <AccountActivation />
+  },
+  {
     path: '/dashboard', 
     element: <Dashboard />
   }
 ];
 
-// Rutas privadas (requieren autenticación)
 export const privateRoutes = [
   {
     path: '/createshop',
@@ -59,7 +62,6 @@ export const privateRoutes = [
   }
 ];
 
-// Rutas de redirección
 export const redirectRoutes = [
   {
     path: '/',

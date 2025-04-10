@@ -52,25 +52,14 @@ export const register = async (data: RegisterData) => {
   }
 };
 
-export const getProfile = async (token: string) => {
-  try {
-    const response = await fetch(`${API_URL}/users/profile`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    return handleResponse(response);
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    throw error;
-  }
-};
+// Función getProfile eliminada por no estar en uso
 
 export const loginWithGoogle = async (token: string) => {
   try {
     console.log('Attempting Google login with token:', token.substring(0, 20) + '...');
     console.log('API URL:', API_URL);
-    const response = await fetch(`${API_URL}/auth/google/verify-token`, {
+    // Actualizado para usar el mismo endpoint que authSlice.ts
+    const response = await fetch(`${API_URL}/auth/firebase/verify-token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,19 +98,4 @@ export const createShop = async (data: CreateShopData) => {
   }
 };
 
-export const updateProfile = async (token: string, data: Partial<User>) => {
-  try {
-    const response = await fetch(`${API_URL}/users/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    throw error;
-  }
-};
+// Función updateProfile eliminada por no estar en uso

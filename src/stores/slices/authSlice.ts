@@ -37,12 +37,37 @@ export const resetPassword = async (token: string, password: string): Promise<vo
   }
 };
 
+const checkInitialAuthState = () => {
+  const token = getStorageItem('token');
+  const userStr = getStorageItem('user');
+  let isAuthenticated = false;
+  
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      isAuthenticated = !!user.isActivated;
+      
+      if (!isAuthenticated) {
+        removeStorageItem('token');
+      }
+    } catch (e) {
+      console.error('Error al parsear usuario almacenado:', e);
+      removeStorageItem('token');
+      removeStorageItem('user');
+    }
+  }
+  
+  return { token: isAuthenticated ? token : null, isAuthenticated };
+};
+
+const initialState = checkInitialAuthState();
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
-  isAuthenticated: !!getStorageItem('token'),
+  isAuthenticated: initialState.isAuthenticated,
   isLoading: false,
   error: null,
-  token: getStorageItem('token'),
+  token: initialState.token,
   needsShopSetup: false,
 
   loginWithGoogle: async () => {
@@ -51,8 +76,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      // Enviar el token de Firebase al backend para obtener nuestro JWT
-      const apiUrl = `${API_URL}/auth/google/verify-token`;
+      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -74,14 +98,31 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
       
       const { token, user } = responseData.data;
-      setStorageItem('token', token);
-      set({
-        isAuthenticated: true,
-        token,
-        user,
-        isLoading: false,
-        needsShopSetup: !user?.shop
-      });
+      const isActivated = user?.isActivated === true;
+      
+      if (isActivated) {
+        setStorageItem('token', token);
+        setStorageItem('user', JSON.stringify(user));
+        set({
+          isAuthenticated: true,
+          token,
+          user,
+          isLoading: false,
+          needsShopSetup: !user?.shop
+        });
+      } else {
+        setStorageItem('token', token);
+        setStorageItem('user', JSON.stringify(user));
+        set({
+          isAuthenticated: false,
+          token,
+          user,
+          isLoading: false,
+          needsShopSetup: false
+        });
+        
+        window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
+      }
       
 
     } catch (error) {
@@ -122,14 +163,31 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const { token, user } = responseData.data;
       
-      setStorageItem('token', token);
-      set({
-        isAuthenticated: true,
-        token,
-        user,
-        isLoading: false,
-        needsShopSetup: !user?.shop
-      });
+      const isActivated = user?.isActivated === true;
+      
+      if (isActivated) {
+        setStorageItem('token', token);
+        setStorageItem('user', JSON.stringify(user));
+        set({
+          isAuthenticated: true,
+          token,
+          user,
+          isLoading: false,
+          needsShopSetup: !user?.shop
+        });
+      } else {
+        setStorageItem('token', token);
+        setStorageItem('user', JSON.stringify(user));
+        set({
+          isAuthenticated: false,
+          token,
+          user,
+          isLoading: false,
+          needsShopSetup: false
+        });
+        
+        window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Invalid credentials', 
@@ -172,19 +230,29 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const { token, user } = responseData.data;
       
+      const userWithActivation = {
+        ...user,
+        isActivated: user.isActivated !== undefined ? user.isActivated : false
+      };
+      
       setStorageItem('token', token);
+      setStorageItem('user', JSON.stringify(userWithActivation));
+      
       set({
-        isAuthenticated: true,
+        isAuthenticated: false,
         token,
-        user,
+        user: userWithActivation,
         isLoading: false,
-        needsShopSetup: !user?.shop
+        needsShopSetup: !userWithActivation?.shop
       });
+      
+      return userWithActivation;
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Registration failed', 
         isLoading: false 
       });
+      throw error; // Re-lanzamos el error para manejarlo en el componente
     }
   },
 
@@ -224,6 +292,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   logout: () => {
     removeStorageItem('token');
+    removeStorageItem('user');
     set({ token: null, isAuthenticated: false, user: null, needsShopSetup: false });
   },
 
@@ -238,6 +307,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   clearToken: () => {
     removeStorageItem('token');
+    removeStorageItem('user');
     set({ token: null, isAuthenticated: false });
   }
 }));
