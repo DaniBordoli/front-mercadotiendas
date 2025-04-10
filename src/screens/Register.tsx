@@ -61,6 +61,8 @@ function Register() {
     return errors;
   };
 
+  // Ya no necesitamos este efecto porque redirigiremos a la página de activación
+
   const handleSubmit = async (values: Record<string, string>) => {
     // Limpiar errores anteriores
     setValidationErrors({});
@@ -71,12 +73,21 @@ function Register() {
       setValidationErrors(errors);
       return;
     }
-    await register({
-      fullName: values.fullName,
-      email: values.email,
-      password: values.password,
-      confirmPassword: values.confirmPassword
-    });
+    
+    try {
+      // Registrar al usuario
+      await register({
+        fullName: values.fullName,
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmPassword
+      });
+      
+      // Redirigir a la página de activación de cuenta
+      navigate(`/activate-account?email=${encodeURIComponent(values.email)}`);
+    } catch (err) {
+      console.error('Error durante el registro:', err);
+    }
   };
 
   const fields = [

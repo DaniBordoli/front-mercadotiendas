@@ -4,7 +4,7 @@ import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Dashboard from '../screens/Dashboard';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
-import { useAuthStore } from '../stores/auth.store';
+import { useAuthStore } from '../stores';
 
 export const AppRouter: React.FC = () => {
   const { isAuthenticated } = useAuthStore();

@@ -5,16 +5,15 @@ import type { AuthStore } from '../types/auth';
 
 export function useAuthRedirect() {
   const navigate = useNavigate();
-  const { isAuthenticated, needsShopSetup, clearError } = useAuthStore();
+  const { isAuthenticated, clearError } = useAuthStore();
+  
+  const isAuthPage = window.location.pathname === '/login' || 
+                    window.location.pathname === '/reset-password';
 
   useEffect(() => {
-    if (isAuthenticated) {
-      if (needsShopSetup) {
-        navigate('/createshop');
-      } else {
-        navigate('/dashboard');
-      }
+    if (isAuthenticated && isAuthPage) {
+      navigate('/dashboard');
     }
     return () => clearError();
-  }, [isAuthenticated, needsShopSetup, navigate, clearError]);
+  }, [isAuthenticated, navigate, clearError, isAuthPage]);
 }

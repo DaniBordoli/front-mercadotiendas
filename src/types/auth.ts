@@ -26,6 +26,7 @@ export interface User {
   email: string;
   name: string;
   shop?: Shop;
+  isActivated?: boolean;
 }
 
 export interface AuthState {
