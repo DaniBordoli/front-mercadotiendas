@@ -31,31 +31,31 @@ function Register() {
 
     // Validar nombre completo
     if (!values.fullName?.trim()) {
-      errors.fullName = 'Full name is required';
+      errors.fullName = 'Nombre completo es requerido';
     } else if (values.fullName.length < 3) {
-      errors.fullName = 'Full name must be at least 3 characters';
+      errors.fullName = 'El nombre completo debe tener al menos 3 caracteres';
     }
 
     // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email?.trim()) {
-      errors.email = 'Email is required';
+      errors.email = 'Email es requerido';
     } else if (!emailRegex.test(values.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = 'Por favor ingresa un email válido';
     }
 
     // Validar contraseña
     if (!values.password) {
-      errors.password = 'Password is required';
+      errors.password = 'Contraseña es requerido';
     } else if (values.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+      errors.password = 'Contraseña debe tener al menos 6 caracteres';
     }
 
     // Validar confirmación de contraseña
     if (!values.confirmPassword) {
-      errors.confirmPassword = 'Please confirm your password';
+      errors.confirmPassword = 'Por favor confirma tu contraseña';
     } else if (values.confirmPassword !== values.password) {
-      errors.confirmPassword = 'Passwords do not match';
+      errors.confirmPassword = 'Las contraseñas no coinciden';
     }
 
     return errors;
@@ -83,8 +83,8 @@ function Register() {
     {
       type: 'text' as const,
       name: 'fullName',
-      label: 'Full Name',
-      placeholder: 'Enter your full name*',
+      label: 'Nombre completo',
+      placeholder: 'Ingresa tu nombre completo*',
       required: true,
       autoComplete: 'name'
     },
@@ -92,23 +92,23 @@ function Register() {
       type: 'email' as const,
       name: 'email',
       label: 'Email',
-      placeholder: 'Enter your email*',
+      placeholder: 'Ingresa tu Email*',
       required: true,
       autoComplete: 'email'
     },
     {
       type: 'password' as const,
       name: 'password',
-      label: 'Password',
-      placeholder: 'Create a password*',
+      label: 'Contraseña',
+      placeholder: 'Crea una contraseña*',
       required: true,
       autoComplete: 'new-password'
     },
     {
       type: 'password' as const,
       name: 'confirmPassword',
-      label: 'Confirm Password',
-      placeholder: 'Confirm your password*',
+      label: 'Confirmar contraseña',
+      placeholder: 'Confirma tu contraseña*',
       required: true,
       autoComplete: 'new-password'
     }
@@ -128,9 +128,9 @@ function Register() {
           <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
         </div>
 
-        <h2 className="text-2xl font-semibold mb-6">Create an account</h2>
+        <h2 className="text-2xl font-semibold mb-6">Crear cuenta</h2>
         <p className="text-center text-gray-600 text-sm mb-8">
-          Start selling with your own MercadoTiendas shop
+          Comienza a vender con tu tienda en MercadoTiendas 
         </p>
 
         <Form
@@ -143,17 +143,17 @@ function Register() {
           }}
           onSubmit={handleSubmit}
           errors={{ ...validationErrors, ...(error ? { email: error } : {}) }}
-          submitText="Create Account"
+          submitText="Crear cuenta"
           loading={isLoading}
         />
 
         <p className="mt-6 text-sm text-gray-600">
-          Already have an account?{' '}
+          Ya tienes una cuenta?{' '}
           <button
             onClick={() => navigate('/login')}
             className="text-sky-500 hover:text-sky-600 font-medium"
           >
-            Sign in
+            Inicia sesión
           </button>
         </p>
       </div>

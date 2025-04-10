@@ -16,7 +16,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ onClick,
     >
       <FcGoogle className="w-5 h-5 mr-2" />
       <span className="text-gray-700 font-medium">
-        {isLoading ? 'Signing in...' : 'Sign in with Google'}
+        {isLoading ? 'Iniciando sesión...' : 'Inicia sesión con Google'}
       </span>
     </button>
   );
