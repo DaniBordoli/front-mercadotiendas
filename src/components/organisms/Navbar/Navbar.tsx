@@ -9,10 +9,14 @@ import { useAuthStore } from '../../../stores/index';
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, isAuthenticated } = useAuthStore();
 
   const handleLogout = () => {
     logout();
+    navigate('/login');
+  };
+
+  const handleLoginClick = () => {
     navigate('/login');
   };
 
@@ -45,24 +49,26 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
       <div className="flex items-start space-x-6 mt-1 ml-auto pr-4">
-        <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-          <MdHelp className="text-xl mr-2" />
-          <span>Enviar consulta</span>
-        </div>
-        <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-          <IoMdInformationCircleOutline className="text-xl mr-2" />
-          <span>Tutoriales</span>
-        </div>
-        <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-          <FaShop className="text-xl mr-2" />
-          <span>Ver mi tienda</span>
-        </div>
+        {isAuthenticated ? (
+          <>
+            <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
+              <MdHelp className="text-xl mr-2" />
+              <span>Enviar consulta</span>
+            </div>
+            <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
+              <IoMdInformationCircleOutline className="text-xl mr-2" />
+              <span>Tutoriales</span>
+            </div>
+            <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
+              <FaShop className="text-xl mr-2" />
+              <span>Ver mi tienda</span>
+            </div>
             <div 
               className={`relative flex items-center cursor-pointer transition-colors ${
                 isDropdownOpen ? 'text-sky-500' : 'hover:text-sky-500'
               }`}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
+            >
               <FaUser className="text-xl mr-2" />
               <span>Mi cuenta</span>
               {isDropdownOpen && (
@@ -90,7 +96,17 @@ export const Navbar: React.FC = () => {
                 </div>
               )}
             </div>
+          </>
+        ) : (
+          <div 
+            className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
+            onClick={handleLoginClick}
+          >
+            <FaUser className="text-xl mr-2" />
+            <span>Ingresa</span>
           </div>
+        )}
+      </div>
     </nav>
   );
 };
