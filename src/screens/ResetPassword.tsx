@@ -20,11 +20,11 @@ function ResetPassword() {
       setIsLoading(true); // Activar loading
       await forgotPassword(values.email);
       setSuccess(true); // Mostrar mensaje de éxito
-      setTimeout(() => navigate('/login'), 1000);
+
     } catch (err: any) {
       setError(err.message || 'Ocurrió un error. Inténtalo nuevamente.');
     } finally {
-      setIsLoading(false); // Desactivar loading
+      setIsLoading(false);
     }
   };
 
@@ -47,12 +47,12 @@ function ResetPassword() {
       </div>
       <h1 className="text-2xl font-medium my-4">¿Olvidaste tu contraseña?</h1>
       <p className="text-gray-600 text-center w-11/12 text-sm mb-6">
-        Escribe tu dirección de correo electrónico y si se encuentra en nuestra base de datos te enviaremos las instrucciones para restablecer la contraseña.
+        Escribe tu dirección de correo electrónico, te enviaremos las instrucciones para restablecer la contraseña.
       </p>
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
       {success && (
-        <p className="text-green-500 text-sm mb-4">
-          ¡Correo enviado! Revisa tu bandeja de entrada para más instrucciones.
+        <p className="text-green-500 text-sm mb-4 text-center">
+          ¡Correo enviado! Si el correo está en la base de datos, recibirás un correo con instrucciones para restablecer tu contraseña.
         </p>
       )}
       <Form
