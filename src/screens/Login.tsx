@@ -36,15 +36,15 @@ function Login() {
       type: 'email' as const,
       name: 'email',
       label: 'Email',
-      placeholder: 'Email*',
+      placeholder: 'Ingresa tu email*',
       required: true,
       autoComplete: 'email'
     },
     {
       type: 'password' as const,
       name: 'password',
-      label: 'Password',
-      placeholder: 'Password*',
+      label: 'Contraseña',
+      placeholder: 'Ingresa tu contraseña*',
       required: true,
       autoComplete: 'current-password'
     }
@@ -64,9 +64,9 @@ function Login() {
           <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
         </div>
 
-        <h2 className="text-2xl font-semibold mb-6">Welcome back!</h2>
+        <h2 className="text-2xl font-semibold mb-6">¡Bienvenido de vuelta!</h2>
         <p className="text-center text-gray-600 text-sm mb-8">
-          Sign in to your MercadoTiendas account
+          Inicia sesión en tu cuenta de MercadoTiendas
         </p>
 
         <Form
@@ -78,7 +78,7 @@ function Login() {
           }}
           onSubmit={handleSubmit}
           errors={error ? { email: error } : {}}
-          submitText="Sign In"
+          submitText="Inicia sesión"
           loading={isLoading}
         />
 
@@ -89,7 +89,7 @@ function Login() {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">
-                Or continue with
+                O accede con
               </span>
             </div>
           </div>
@@ -108,16 +108,16 @@ function Login() {
           className="text-sky-500 font-semibold text-sm mt-2 cursor-pointer"
           onClick={() => navigate('/reset-password')}
         >
-          Forgot your password?
+          ¿Olvidaste tu contraseña? 
         </p>
 
         <p className="mt-6 text-sm text-gray-600">
-          Don't have an account?{' '}
+          No tienes una cuenta?{' '}
           <button
             onClick={() => navigate('/register')}
             className="text-sky-500 hover:text-sky-600 font-medium"
           >
-            Sign up
+            Registrate
           </button>
         </p>
       </div>
