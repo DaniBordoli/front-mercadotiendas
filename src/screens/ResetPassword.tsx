@@ -12,15 +12,19 @@ function ResetPassword() {
   const [values, setValues] = useState({ email: '' });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (values: Record<string, string>) => {
     try {
       setError(null); // Limpiar errores previos
+      setIsLoading(true); // Activar loading
       await forgotPassword(values.email);
       setSuccess(true); // Mostrar mensaje de éxito
-      setTimeout(() => navigate('/password-restore'), 1000);
+      setTimeout(() => navigate('/login'), 1000);
     } catch (err: any) {
       setError(err.message || 'Ocurrió un error. Inténtalo nuevamente.');
+    } finally {
+      setIsLoading(false); // Desactivar loading
     }
   };
 
@@ -57,11 +61,13 @@ function ResetPassword() {
         onChange={(name, value) => setValues((prev) => ({ ...prev, [name]: value }))}
         onSubmit={handleSubmit}
         submitText="Enviar"
+        loading={isLoading}
       />
       <button
         type="button"
         className="mt-4 font-semibold text-sky-600 hover:text-sky-700"
         onClick={() => navigate('/login')}
+        disabled={isLoading}
       >
         Volver
       </button>

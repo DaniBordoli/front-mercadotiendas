@@ -79,7 +79,7 @@ function VerifyPassword() {
       <button
         type="button"
         className="mt-4 font-semibold text-sky-600 hover:text-sky-700"
-        onClick={() => navigate('/reset-password')}
+        onClick={() => navigate('/login')}
       >
         Volver al inicio
       </button>
