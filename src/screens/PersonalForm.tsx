@@ -4,6 +4,7 @@ import { Form } from '../components/organisms/Form';
 import { API_URL } from '../services/api';
 import { getStorageItem } from '../utils/storage';
 import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
+import Toast from '../components/atoms/Toast';
 
 const PersonalForm: React.FC = () => {
   const [values, setValues] = useState({
@@ -15,6 +16,11 @@ const PersonalForm: React.FC = () => {
     country: ''
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [toast, setToast] = useState({
+    show: false,
+    message: '',
+    type: 'success' as 'success' | 'error' | 'info'
+  });
 
   useEffect(() => {
     const loadUserProfile = async () => {
@@ -64,10 +70,18 @@ const PersonalForm: React.FC = () => {
       };
   
       await updateUserProfile(payload);
-      alert('Perfil actualizado exitosamente');
+      setToast({
+        show: true,
+        message: 'Perfil actualizado',
+        type: 'success'
+      });
     } catch (error) {
       console.error('Error updating profile:', error instanceof Error ? error.message : 'Unknown error');
-      alert('Error al actualizar el perfil');
+      setToast({
+        show: true,
+        message: 'Error al actualizar',
+        type: 'error'
+      });
     }
   };
   const fields = [
@@ -123,25 +137,34 @@ const PersonalForm: React.FC = () => {
   ];
 
   return (
-    <div className="flex">
-      <Sidebar />
-      <div className="p-4 flex-grow flex justify-center">
-        <div className="max-w-4xl w-full">
-          <h1 className="text-2xl font-bold mb-4">Formulario Personal</h1>
-          <Form
-            fields={fields}
-            values={values}
-            onChange={(name, value) => {
-              setValidationErrors(prev => ({ ...prev, [name]: '' }));
-              setValues(prev => ({ ...prev, [name]: value }));
-            }}
-            onSubmit={handleSubmit}
-            errors={validationErrors}
-            submitText="Guardar"
-          />
+    <>
+      <div className="flex">
+        <Sidebar />
+        <div className="p-4 flex-grow flex justify-center">
+          <div className="max-w-4xl w-full">
+            <h1 className="text-2xl font-bold mb-4">Formulario Personal</h1>
+            <Form
+              fields={fields}
+              values={values}
+              onChange={(name, value) => {
+                setValidationErrors(prev => ({ ...prev, [name]: '' }));
+                setValues(prev => ({ ...prev, [name]: value }));
+              }}
+              onSubmit={handleSubmit}
+              errors={validationErrors}
+              submitText="Guardar"
+            />
+          </div>
         </div>
       </div>
-    </div>
+      <Toast 
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(prev => ({ ...prev, show: false }))}
+        duration={3000}
+      />
+    </>
   );
 };
 
