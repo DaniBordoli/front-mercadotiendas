@@ -62,6 +62,33 @@ export const fetchUserProfile = async () => {
   return responseData.data.user; // Return the user data
 };
 
+export const updateUserProfile = async (profileData: Record<string, string>): Promise<void> => {
+  const apiUrl = `${API_URL}/users/profile`;
+  const token = getStorageItem('token');
+
+  if (!token) {
+    console.error('No token provided');
+    throw new Error('No token provided');
+  }
+
+  const response = await fetch(apiUrl, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error updating user profile');
+  }
+
+  const responseData = await response.json();
+  console.log('Profile updated successfully:', responseData);
+};
+
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
   const userStr = getStorageItem('user');

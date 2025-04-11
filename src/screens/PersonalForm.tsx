@@ -3,7 +3,7 @@ import { Sidebar } from '../components/organisms/Sidebar/Sidebar';
 import { Form } from '../components/organisms/Form';
 import { API_URL } from '../services/api';
 import { getStorageItem } from '../utils/storage';
-import { fetchUserProfile } from '../stores/slices/authSlice';
+import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
 
 const PersonalForm: React.FC = () => {
   const [values, setValues] = useState({
@@ -47,16 +47,29 @@ const PersonalForm: React.FC = () => {
     return errors;
   };
 
-  const handleSubmit = (values: Record<string, string>) => {
+  const handleSubmit = async (values: Record<string, string>) => {
     setValidationErrors({});
     const errors = validateForm(values);
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
     }
-    console.log('Form submitted:', values);
+  
+    try {
+     
+      const { fullName, ...restValues } = values;
+      const payload = {
+        ...restValues,
+        name: fullName, 
+      };
+  
+      await updateUserProfile(payload);
+      alert('Perfil actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating profile:', error instanceof Error ? error.message : 'Unknown error');
+      alert('Error al actualizar el perfil');
+    }
   };
-
   const fields = [
     {
       type: 'text' as const,
