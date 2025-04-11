@@ -9,6 +9,7 @@ interface BaseFormFieldProps {
   required?: boolean;
   error?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export interface TextFormFieldProps extends BaseFormFieldProps {

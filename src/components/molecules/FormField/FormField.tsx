@@ -4,7 +4,7 @@ import { SelectField } from '../../atoms/SelectField';
 import { FormFieldProps } from './types';
 
 export const FormField: React.FC<FormFieldProps> = (props) => {
-  const { type, label, name, required, error, className } = props;
+  const { type, label, name, required, error, className, disabled } = props;
 
   if (type === 'select') {
     const { options, value, onChange, placeholder } = props;
@@ -20,6 +20,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
         required={required}
         error={error}
         className={className}
+        disabled={disabled}
       />
     );
   }
@@ -38,6 +39,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
       error={error}
       className={className}
       autoComplete={autoComplete}
+      disabled={disabled}
     />
   );
 };

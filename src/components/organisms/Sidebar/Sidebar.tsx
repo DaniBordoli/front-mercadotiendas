@@ -161,7 +161,12 @@ export const Sidebar: React.FC = () => {
           className={`overflow-hidden transition-all duration-200 transform ${openDropdown === 'miCuenta' ? 'max-h-96 translate-y-0' : 'max-h-0 -translate-y-4'}`}
         >
           <div className="space-y-2">
-            <div className="text-sm cursor-pointer px-4">Cuenta 1</div>
+            <div
+              className="text-sm cursor-pointer px-4"
+              onClick={() => navigate('/personal-form')}
+            >
+              Informacion personal
+            </div>
             <div className="text-sm cursor-pointer px-4">Cuenta 2</div>
           </div>
         </div>
