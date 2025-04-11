@@ -1,5 +1,5 @@
 export interface InputFieldProps {
-  type?: 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search';
+  type?: 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search' | 'date';
   placeholder?: string;
   value?: string | number;
   onChange?: (value: string) => void;

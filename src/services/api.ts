@@ -1,4 +1,4 @@
-import { LoginCredentials, RegisterData, User, CreateShopData } from '../types/auth';
+import { User, CreateShopData } from '../types/auth';
 
 export const API_URL = process.env.REACT_APP_API_URL;
 
@@ -20,46 +20,14 @@ export const testConnection = async () => {
   }
 };
 
-export const login = async (credentials: LoginCredentials) => {
-  try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-    return handleResponse(response);
-  } catch (error) {
-    console.error('Error during login:', error);
-    throw error;
-  }
-};
 
-export const register = async (data: RegisterData) => {
-  try {
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    return handleResponse(response);
-  } catch (error) {
-    console.error('Error during registration:', error);
-    throw error;
-  }
-};
-
-// Función getProfile eliminada por no estar en uso
 
 export const loginWithGoogle = async (token: string) => {
   try {
     console.log('Attempting Google login with token:', token.substring(0, 20) + '...');
     console.log('API URL:', API_URL);
-    // Actualizado para usar el mismo endpoint que authSlice.ts
-    const response = await fetch(`${API_URL}/auth/firebase/verify-token`, {
+
+    const response = await fetch(`${API_URL}/auth/authenticate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,4 +66,4 @@ export const createShop = async (data: CreateShopData) => {
   }
 };
 
-// Función updateProfile eliminada por no estar en uso
+

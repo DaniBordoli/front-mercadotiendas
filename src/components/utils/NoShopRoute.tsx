@@ -6,15 +6,13 @@ interface NoShopRouteProps {
 }
 
 export function NoShopRoute({ children }: NoShopRouteProps) {
-  const { isAuthenticated, needsShopSetup } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!needsShopSetup) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+  // Ya no redirigimos basado en si tiene tienda o no
+  // Este componente ahora simplemente verifica la autenticación
   return <>{children}</>;
 }

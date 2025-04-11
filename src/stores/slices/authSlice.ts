@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   isLoading: false,
   error: null,
   token: initialState.token,
-  needsShopSetup: false,
+
 
   loginWithGoogle: async () => {
     set({ isLoading: true, error: null });
@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
+      const apiUrl = `${API_URL}/auth/authenticate`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           token,
           user,
           isLoading: false,
-          needsShopSetup: !user?.shop
+
         });
       } else {
         setStorageItem('token', token);
@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           token,
           user,
           isLoading: false,
-          needsShopSetup: false
+
         });
         
         window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
@@ -140,8 +140,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const result = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
       const idToken = await result.user.getIdToken();
       
-      // Enviar el token de Firebase al backend
-      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
+  
+      const apiUrl = `${API_URL}/auth/authenticate`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -173,7 +173,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           token,
           user,
           isLoading: false,
-          needsShopSetup: !user?.shop
+
         });
       } else {
         setStorageItem('token', token);
@@ -183,7 +183,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           token,
           user,
           isLoading: false,
-          needsShopSetup: false
+
         });
         
         window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
@@ -202,8 +202,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const result = await createUserWithEmailAndPassword(auth, data.email, data.password);
       const idToken = await result.user.getIdToken();
       
-      // Enviar el token de Firebase al backend
-      const apiUrl = `${API_URL}/auth/firebase/verify-token`;
+  
+      const apiUrl = `${API_URL}/auth/authenticate`;
       console.log('Sending request to:', apiUrl);
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -213,7 +213,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         body: JSON.stringify({ 
           token: idToken,
           userData: {
-            fullName: data.fullName
+            fullName: data.fullName,
+            birthDate: data.birthDate,
+            city: data.city,
+            province: data.province,
+            country: data.country
           }
         }),
       });
@@ -243,7 +247,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         token,
         user: userWithActivation,
         isLoading: false,
-        needsShopSetup: !userWithActivation?.shop
+
       });
       
       return userWithActivation;
@@ -281,7 +285,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error(responseData.message || 'Failed to create shop');
       }
       const updatedUser = responseData.data;
-      set({ user: updatedUser, isLoading: false, needsShopSetup: false });
+      set({ user: updatedUser, isLoading: false });
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to create shop', 
@@ -293,7 +297,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   logout: () => {
     removeStorageItem('token');
     removeStorageItem('user');
-    set({ token: null, isAuthenticated: false, user: null, needsShopSetup: false });
+    set({ token: null, isAuthenticated: false, user: null });
   },
 
   clearError: () => {

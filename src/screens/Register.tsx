@@ -15,7 +15,11 @@ function Register() {
     fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    birthDate: '',
+    city: '',
+    province: '',
+    country: ''
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
@@ -80,7 +84,11 @@ function Register() {
         fullName: values.fullName,
         email: values.email,
         password: values.password,
-        confirmPassword: values.confirmPassword
+        confirmPassword: values.confirmPassword,
+        birthDate: values.birthDate,
+        city: values.city,
+        province: values.province,
+        country: values.country
       });
       
       // Redirigir a la página de activación de cuenta
@@ -108,6 +116,38 @@ function Register() {
       autoComplete: 'email'
     },
     {
+      type: 'date' as const,
+      name: 'birthDate',
+      label: 'Fecha de nacimiento',
+      placeholder: 'Selecciona tu fecha de nacimiento',
+      required: false,
+      autoComplete: 'bday'
+    },
+    {
+      type: 'text' as const,
+      name: 'city',
+      label: 'Ciudad',
+      placeholder: 'Ingresa tu ciudad',
+      required: false,
+      autoComplete: 'address-level2'
+    },
+    {
+      type: 'text' as const,
+      name: 'province',
+      label: 'Provincia',
+      placeholder: 'Ingresa tu provincia',
+      required: false,
+      autoComplete: 'address-level1'
+    },
+    {
+      type: 'text' as const,
+      name: 'country',
+      label: 'País',
+      placeholder: 'Ingresa tu país',
+      required: false,
+      autoComplete: 'country-name'
+    },
+    {
       type: 'password' as const,
       name: 'password',
       label: 'Contraseña',
@@ -130,7 +170,7 @@ function Register() {
   }
 
   return (
-    <CenteredBox height="600px">
+    <CenteredBox height="850px">
       <div className="flex flex-col items-center mt-4">
         <div className="flex items-center mb-8">
           <span className="text-green-500 text-3xl mr-2">

@@ -6,6 +6,10 @@ export interface LoginCredentials {
 export interface RegisterData extends LoginCredentials {
   confirmPassword: string;
   fullName: string;
+  birthDate?: string;
+  city?: string;
+  province?: string;
+  country?: string;
   token?: string;
 }
 
@@ -25,6 +29,10 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  birthDate?: string;
+  city?: string;
+  province?: string;
+  country?: string;
   shop?: Shop;
   isActivated?: boolean;
 }
@@ -35,7 +43,6 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
   token: string | null;
-  needsShopSetup: boolean;
 }
 
 export type AuthStore = AuthState & {

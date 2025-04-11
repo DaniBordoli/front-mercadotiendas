@@ -1,7 +1,7 @@
 import { InputFieldProps } from '../../atoms/InputField/types';
 import { SelectFieldProps } from '../../atoms/SelectField/types';
 
-export type TextFieldType = 'text' | 'password' | 'email';
+export type TextFieldType = 'text' | 'password' | 'email' | 'date';
 
 interface BaseFormFieldProps {
   label: string;

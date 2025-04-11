@@ -7,14 +7,10 @@ interface ShopRequiredRouteProps {
 }
 
 export const ShopRequiredRoute: React.FC<ShopRequiredRouteProps> = ({ children }) => {
-  const { isAuthenticated, needsShopSetup } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (needsShopSetup) {
-    return <Navigate to="/createshop" replace />;
   }
 
   return <>{children}</>;
