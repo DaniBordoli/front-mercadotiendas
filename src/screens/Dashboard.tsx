@@ -1,5 +1,4 @@
 import React from 'react';
-import { Navbar } from '../components/organisms/Navbar';
 import { Sidebar } from '../components/organisms/Sidebar';
 
 import Carousel from '../components/organisms/Carousel/Carousel';
@@ -11,7 +10,7 @@ import { Footer } from '../components/organisms/Footer';
 const Dashboard: React.FC = () => {
     return (
         <div>
-            <Navbar />
+           
             <div className="flex">
                 <div className="flex-1 p-4">
                     <Carousel />
