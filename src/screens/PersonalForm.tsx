@@ -47,14 +47,37 @@ const PersonalForm: React.FC = () => {
     return errors;
   };
 
-  const handleSubmit = (values: Record<string, string>) => {
+  const handleSubmit = async (values: Record<string, string>) => {
     setValidationErrors({});
     const errors = validateForm(values);
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
     }
-    console.log('Form submitted:', values);
+
+    try {
+      const token = getStorageItem('token'); // Retrieve token from storage
+      const response = await fetch(`${API_URL}/users/profile`, { // Updated endpoint
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pass token in headers
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al actualizar el perfil');
+      }
+
+      const responseData = await response.json();
+      console.log('Profile updated successfully:', responseData);
+      alert('Perfil actualizado exitosamente');
+    } catch (error) {
+      console.error('Error updating profile:', error instanceof Error ? error.message : 'Unknown error');
+      alert('Error al actualizar el perfil');
+    }
   };
 
   const fields = [
