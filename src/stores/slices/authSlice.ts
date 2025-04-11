@@ -37,6 +37,31 @@ export const resetPassword = async (token: string, password: string): Promise<vo
   }
 };
 
+export const fetchUserProfile = async () => {
+  const apiUrl = `${API_URL}/users/profile`;
+  const token = getStorageItem('token'); // Retrieve the token from storage
+
+  if (!token) {
+    console.error('No token provided');
+    throw new Error('No token provided');
+  }
+
+  const response = await fetch(apiUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
+    },
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error fetching user profile');
+  }
+
+  return responseData.data.user; // Return the user data
+};
+
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
   const userStr = getStorageItem('user');

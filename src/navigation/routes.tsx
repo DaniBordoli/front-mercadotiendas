@@ -11,6 +11,7 @@ import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
 import ProfileScreen from '../screens/ProfileScreen';
+import PersonalForm from '../screens/PersonalForm';
 
 export const publicRoutes = [
   {
@@ -59,6 +60,10 @@ export const privateRoutes = [
   {
     path: '/my-profile',
     element: <ShopRequiredRoute><ProfileScreen /></ShopRequiredRoute>
+  },
+  {
+    path: '/personal-form',
+    element: <ShopRequiredRoute><PersonalForm /></ShopRequiredRoute>
   }
 ];
 
