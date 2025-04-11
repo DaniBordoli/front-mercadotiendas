@@ -1,5 +1,4 @@
 import React from 'react';
-import { Navbar } from '../components/organisms/Navbar';
 import { Sidebar } from '../components/organisms/Sidebar';
 import { LabeledInputField } from '../components/atoms/LabeledInputField';
 import { Button } from '../components/atoms/Button';
@@ -7,7 +6,6 @@ import { Button } from '../components/atoms/Button';
 const InfoTienda = () => {
     return (
         <div>
-            <Navbar />
             <div>
                 <Sidebar />
                 <main className='ml-60 p-20'>

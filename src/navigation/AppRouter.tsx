@@ -11,6 +11,7 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({ element }) =>
 export const AppRouter: React.FC = () => {
   return (
     <Router>
+      <Navbar />
       <Routes>
         {/* Rutas públicas */}
         {publicRoutes.map((route) => (
