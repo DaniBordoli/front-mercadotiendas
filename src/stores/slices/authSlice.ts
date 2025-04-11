@@ -64,7 +64,7 @@ export const fetchUserProfile = async () => {
 
 export const updateUserProfile = async (profileData: Record<string, string>): Promise<void> => {
   const apiUrl = `${API_URL}/users/profile`;
-  const token = getStorageItem('token'); // Retrieve the token from storage
+  const token = getStorageItem('token');
 
   if (!token) {
     console.error('No token provided');
@@ -75,7 +75,7 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(profileData),
   });

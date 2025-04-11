@@ -3,7 +3,7 @@ import { Sidebar } from '../components/organisms/Sidebar/Sidebar';
 import { Form } from '../components/organisms/Form';
 import { API_URL } from '../services/api';
 import { getStorageItem } from '../utils/storage';
-import { fetchUserProfile } from '../stores/slices/authSlice';
+import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
 
 const PersonalForm: React.FC = () => {
   const [values, setValues] = useState({
@@ -54,32 +54,22 @@ const PersonalForm: React.FC = () => {
       setValidationErrors(errors);
       return;
     }
-
+  
     try {
-      const token = getStorageItem('token'); // Retrieve token from storage
-      const response = await fetch(`${API_URL}/users/profile`, { // Updated endpoint
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`, // Pass token in headers
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al actualizar el perfil');
-      }
-
-      const responseData = await response.json();
-      console.log('Profile updated successfully:', responseData);
+     
+      const { fullName, ...restValues } = values;
+      const payload = {
+        ...restValues,
+        name: fullName, 
+      };
+  
+      await updateUserProfile(payload);
       alert('Perfil actualizado exitosamente');
     } catch (error) {
       console.error('Error updating profile:', error instanceof Error ? error.message : 'Unknown error');
       alert('Error al actualizar el perfil');
     }
   };
-
   const fields = [
     {
       type: 'text' as const,
