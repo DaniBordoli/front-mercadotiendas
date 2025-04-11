@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { publicRoutes, privateRoutes, redirectRoutes } from './routes';
 import { useAuthStore } from '../stores';
+import { Navbar } from '../components/organisms/Navbar';
 
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -11,6 +12,7 @@ const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({ element }) =>
 export const AppRouter: React.FC = () => {
   return (
     <Router>
+      <Navbar />
       <Routes>
         {/* Rutas públicas */}
         {publicRoutes.map((route) => (
