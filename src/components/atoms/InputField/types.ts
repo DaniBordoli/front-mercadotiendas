@@ -1,6 +1,8 @@
+import { ReactNode } from 'react';
+
 export interface InputFieldProps {
   type?: 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search' | 'date';
-  placeholder?: string;
+  placeholder?: string | ReactNode;
   value?: string | number;
   onChange?: (value: string) => void;
   className?: string;

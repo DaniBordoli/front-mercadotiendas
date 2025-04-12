@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { InputFieldProps } from './types';
 
 export const InputField: React.FC<InputFieldProps> = ({
@@ -43,7 +43,7 @@ export const InputField: React.FC<InputFieldProps> = ({
           onChange={(e) => onChange?.(e.target.value)}
           onFocus={onFocus}
           onBlur={onBlur}
-          placeholder={placeholder}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined} // Handle string placeholders
           disabled={disabled}
           required={required}
           autoComplete={autoComplete}
@@ -54,6 +54,11 @@ export const InputField: React.FC<InputFieldProps> = ({
             ${className || ''}
           `}
         />
+        {placeholder && typeof placeholder !== 'string' && (
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            {placeholder}
+          </div>
+        )}
         {error && (
           <p className="absolute -bottom-5 left-0 text-xs text-red-500 mt-1">{error}</p>
         )}

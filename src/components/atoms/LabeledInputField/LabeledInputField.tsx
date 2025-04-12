@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { InputField, InputFieldProps } from '../InputField';
 
 interface LabeledInputFieldProps extends InputFieldProps {
   label: string;
+  placeholder?: ReactNode; // Allow placeholder to accept React elements
 }
 
 export const LabeledInputField: React.FC<LabeledInputFieldProps> = ({
   label,
+  placeholder,
   ...inputProps
 }) => {
   const [isFocused, setIsFocused] = useState(false);
@@ -23,10 +25,16 @@ export const LabeledInputField: React.FC<LabeledInputFieldProps> = ({
         </span>
         <InputField
           {...inputProps}
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined} // Handle string placeholders
           className="mt-2 border-black focus:border-sky-500 focus:ring-sky-500"
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
+        {placeholder && typeof placeholder !== 'string' && (
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            {placeholder}
+          </div>
+        )}
       </div>
     </div>
   );

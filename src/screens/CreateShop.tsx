@@ -9,7 +9,14 @@ import { FaStore } from 'react-icons/fa';
 function CreateShop() {
   const navigate = useNavigate();
   const { createShop, isLoading, error, clearError } = useAuthStore();
-  const [values, setValues] = useState({ shopName: '', category: '', address: '' });
+  const [values, setValues] = useState({
+    shopName: '',
+    category: '',
+    address: '',
+    brandName: '',
+    contactEmail: '',
+    shopPhone: ''
+  });
 
   useEffect(() => {
     return () => clearError();
@@ -20,8 +27,14 @@ function CreateShop() {
       const shopData = {
         shopName: values.shopName,
         category: values.category,
-        address: values.address
+        address: values.address,
+        brandName: values.brandName,
+        contactEmail: values.contactEmail,
+        shopPhone: values.shopPhone
+      
       };
+      console.log('Datos enviados al backend:', shopData); 
+
       await createShop(shopData);
       navigate('/dashboard');
     } catch (error) {}
@@ -54,6 +67,27 @@ function CreateShop() {
       name: 'address',
       label: 'Address',
       placeholder: 'Enter your shop address*',
+      required: true
+    },
+    {
+      type: 'text' as const,
+      name: 'brandName',
+      label: 'Brand Name',
+      placeholder: 'Enter your brand name*',
+      required: true
+    },
+    {
+      type: 'email' as const,
+      name: 'contactEmail',
+      label: 'Contact Email',
+      placeholder: 'Enter your contact email*',
+      required: true
+    },
+    {
+      type: 'text' as const,
+      name: 'shopPhone',
+      label: 'Shop Phone',
+      placeholder: 'Enter your shop phone number*',
       required: true
     }
   ];
