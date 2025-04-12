@@ -17,6 +17,9 @@ export interface CreateShopData {
   shopName: string;
   category: string;
   address: string;
+  brandName: string,
+  contactEmail: string,
+  shopPhone: string,
 }
 
 export interface Shop {

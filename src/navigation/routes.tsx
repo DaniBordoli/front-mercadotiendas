@@ -12,6 +12,7 @@ import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
 import ProfileScreen from '../screens/ProfileScreen';
 import PersonalForm from '../screens/PersonalForm';
+import RedesTienda from '../screens/RedesTienda';
 
 export const publicRoutes = [
   {
@@ -56,6 +57,10 @@ export const privateRoutes = [
   {
     path: '/informacion-tienda',
     element: <ShopRequiredRoute><InfoTienda /></ShopRequiredRoute>
+  },
+  {
+    path: '/informacion-tienda-redes',
+    element: <ShopRequiredRoute><RedesTienda /></ShopRequiredRoute>
   },
   {
     path: '/my-profile',
