@@ -78,9 +78,17 @@ export const Sidebar: React.FC = () => {
         >
           <div className="space-y-8">
             <div className="text-sm cursor-pointer px-4">Diseño</div>
-            <div className="text-sm cursor-pointer px-4">Informacion de mi tienda</div>
+            
+            <div 
+  className="text-sm cursor-pointer px-4" 
+  onClick={() => navigate('/informacion-tienda')}
+>
+  Informacion de mi tienda
+</div>
             <div className="text-sm cursor-pointer px-4">Activar formulario de contacto</div>
-            <div className="text-sm cursor-pointer px-4">Agregar redes sociales</div>
+            <div className="text-sm cursor-pointer px-4" onClick={() => navigate('/createshop')}>Crear tienda</div>
+            <div className="text-sm cursor-pointer px-4"
+            onClick={() => navigate('/informacion-tienda-redes')}>Agregar redes sociales</div>
             <div className="text-sm cursor-pointer px-4">Añadir chat a mi tienda</div>
             <div className="text-sm cursor-pointer px-4">Editar páginas</div>
             <div className="text-sm cursor-pointer px-4">Crear blog</div>
