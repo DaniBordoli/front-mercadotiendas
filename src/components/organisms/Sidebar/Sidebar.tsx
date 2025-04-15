@@ -8,12 +8,14 @@ import { FaDollarSign } from "react-icons/fa6";
 import { MdShoppingBasket } from "react-icons/md";
 import { FiTrendingUp } from "react-icons/fi";
 import { MdHelp } from "react-icons/md";
+import { useAuthStore } from '../../../stores';
 
 export const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [isStoreOn, setIsStoreOn] = useState(false);
   const [apiStatus, setApiStatus] = useState<string>('Checking...');
+  const { user } = useAuthStore();
 
   const toggleDropdown = (menu: string) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
@@ -81,12 +83,14 @@ export const Sidebar: React.FC = () => {
             
             <div 
   className="text-sm cursor-pointer px-4" 
-  onClick={() => navigate('/informacion-tienda')}
+  onClick={() => navigate('/my-shop')}
 >
   Informacion de mi tienda
 </div>
             <div className="text-sm cursor-pointer px-4">Activar formulario de contacto</div>
-            <div className="text-sm cursor-pointer px-4" onClick={() => navigate('/createshop')}>Crear tienda</div>
+            {!user?.shop && (
+              <div className="text-sm cursor-pointer px-4" onClick={() => navigate('/createshop')}>Crear tienda</div>
+            )}
             <div className="text-sm cursor-pointer px-4"
             onClick={() => navigate('/informacion-tienda-redes')}>Agregar redes sociales</div>
             <div className="text-sm cursor-pointer px-4">Añadir chat a mi tienda</div>

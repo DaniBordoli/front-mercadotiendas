@@ -55,7 +55,7 @@ export const privateRoutes = [
     element: <NoShopRoute><CreateShop /></NoShopRoute>
   },
   {
-    path: '/informacion-tienda',
+    path: '/my-shop',
     element: <ShopRequiredRoute><InfoTienda /></ShopRequiredRoute>
   },
   {

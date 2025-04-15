@@ -17,15 +17,21 @@ export interface CreateShopData {
   shopName: string;
   category: string;
   address: string;
-  brandName: string,
-  contactEmail: string,
-  shopPhone: string,
+  brandName: string;
+  contactEmail: string;
+  shopPhone: string;
+  image?: File;
 }
 
 export interface Shop {
+  _id: string;
   name: string;
   category: string;
   address: string;
+  brandName: string;
+  contactEmail: string;
+  shopPhone: string;
+  imageUrl?: string;
 }
 
 export interface User {
@@ -49,6 +55,7 @@ export interface AuthState {
 }
 
 export type AuthStore = AuthState & {
+  loadProfile: () => Promise<void>;
   login: (credentials: LoginCredentials) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   register: (data: RegisterData) => Promise<void>;

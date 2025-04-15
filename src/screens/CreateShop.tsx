@@ -33,7 +33,7 @@ function CreateShop() {
         shopPhone: values.shopPhone
       
       };
-      console.log('Datos enviados al backend:', shopData); 
+
 
       await createShop(shopData);
       navigate('/dashboard');
