@@ -1,5 +1,5 @@
 import { useAuthStore } from './slices/authSlice';
 import { useUIStore } from './slices/uiSlice';
+import { useShopStore } from './slices/shopStore';
 
-export { useAuthStore };
-export { useUIStore };
+export { useAuthStore, useUIStore, useShopStore };

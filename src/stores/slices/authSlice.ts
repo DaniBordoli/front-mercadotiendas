@@ -86,7 +86,7 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
   }
 
   const responseData = await response.json();
-  console.log('Profile updated successfully:', responseData);
+
 };
 
 const checkInitialAuthState = () => {
@@ -109,12 +109,39 @@ const checkInitialAuthState = () => {
     }
   }
   
-  return { token: isAuthenticated ? token : null, isAuthenticated };
+  if (!isAuthenticated || !token) {
+    return { token: null, isAuthenticated: false, user: null };
+  }
+
+  // Intentar obtener el usuario del storage
+  try {
+    const user = JSON.parse(userStr || '{}');
+    return { token, isAuthenticated: true, user };
+  } catch (error) {
+    console.error('Error al parsear usuario:', error);
+    removeStorageItem('token');
+    removeStorageItem('user');
+    return { token: null, isAuthenticated: false, user: null };
+  }
 };
 
 const initialState = checkInitialAuthState();
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
+  loadProfile: async () => {
+    const token = get().token;
+    if (!token) return;
+
+    try {
+      const user = await fetchUserProfile();
+      setStorageItem('user', JSON.stringify(user));
+      set({ user });
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      get().logout();
+    }
+  },
+
   user: null,
   isAuthenticated: initialState.isAuthenticated,
   isLoading: false,
@@ -123,13 +150,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
 
   loginWithGoogle: async () => {
+    const store = get();
+
     set({ isLoading: true, error: null });
     try {
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
       const apiUrl = `${API_URL}/auth/authenticate`;
-      console.log('Sending request to:', apiUrl);
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -154,14 +183,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       if (isActivated) {
         setStorageItem('token', token);
-        setStorageItem('user', JSON.stringify(user));
         set({
           isAuthenticated: true,
           token,
-          user,
           isLoading: false,
-
         });
+        
+        // Cargar el perfil actualizado incluyendo la tienda
+        await get().loadProfile();
       } else {
         setStorageItem('token', token);
         setStorageItem('user', JSON.stringify(user));
@@ -194,7 +223,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
   
       const apiUrl = `${API_URL}/auth/authenticate`;
-      console.log('Sending request to:', apiUrl);
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -219,14 +248,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       if (isActivated) {
         setStorageItem('token', token);
-        setStorageItem('user', JSON.stringify(user));
         set({
           isAuthenticated: true,
           token,
-          user,
           isLoading: false,
-
         });
+        
+        // Cargar el perfil actualizado incluyendo la tienda
+        await get().loadProfile();
       } else {
         setStorageItem('token', token);
         setStorageItem('user', JSON.stringify(user));
@@ -256,7 +285,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
   
       const apiUrl = `${API_URL}/auth/authenticate`;
-      console.log('Sending request to:', apiUrl);
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -322,8 +351,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
       
       const apiUrl = `${API_URL}/shops`;
-      console.log('Sending request to:', apiUrl);
-      console.log('Data being sent:', data);
+
+
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
