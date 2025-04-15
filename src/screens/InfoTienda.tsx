@@ -37,7 +37,6 @@ const InfoTienda = () => {
                 address: user.shop.address || '',
                 shopPhone: user.shop.shopPhone || ''
             });
-
             // Si el usuario ya tiene una imagen de tienda, mostrarla
             if (user.shop.imageUrl) {
                 setImagePreview(user.shop.imageUrl);
