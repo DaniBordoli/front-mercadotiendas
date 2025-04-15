@@ -20,7 +20,7 @@ const Carousel: React.FC = () => {
     };
 
     return (
-        <div id="default-carousel" className="relative w-full overflow-hidden" data-carousel="slide">
+        <div id="default-carousel" className="relative w-full overflow-hidden mt-24" data-carousel="slide">
             <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
                 {slides.map((slide, index) => (
                     <div
