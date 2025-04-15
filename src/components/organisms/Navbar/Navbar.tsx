@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="w-full bg-white shadow-md px-4 py-2 flex items-start justify-center z-50 relative">
+    <nav className="w-full bg-white shadow-md px-4 py-2 flex items-start justify-center z-50 fixed">
       <div className="container mx-auto flex justify-between max-w-7xl">
         <div className="flex flex-col max-w-5xl mx-auto">
           <div className="flex items-center gap-6 mb-2 w-full">
