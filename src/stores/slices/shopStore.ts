@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { API_URL } from '../../services/api';
 import { Shop } from '../../types/auth';
+import { useAuthStore } from '../';
 
 interface ShopState {
     shop: Shop | null;
@@ -47,6 +48,12 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
+                // Actualizar el usuario en authStore
+                const authStore = useAuthStore.getState();
+                if (authStore.user) {
+                    authStore.user.shop = result.shop;
+                    useAuthStore.setState({ user: authStore.user });
+                }
             } else {
                 const response = await fetch(`${API_URL}/shops/${shopId}`, {
                     method: 'PUT',
@@ -64,6 +71,12 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
+                // Actualizar el usuario en authStore
+                const authStore = useAuthStore.getState();
+                if (authStore.user) {
+                    authStore.user.shop = result.shop;
+                    useAuthStore.setState({ user: authStore.user });
+                }
             }
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
