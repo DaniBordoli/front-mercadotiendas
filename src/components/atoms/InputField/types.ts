@@ -15,4 +15,8 @@ export interface InputFieldProps {
   autoComplete?: string;
   onFocus?: () => void;
   onBlur?: () => void;
+  suffix?: string;
+  pattern?: string;
+  patternMessage?: string;
+  maxLength?: number;
 }

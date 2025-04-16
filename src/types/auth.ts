@@ -26,16 +26,21 @@ export interface CreateShopData {
 export interface Shop {
   _id: string;
   name: string;
+  subdomain: string;
+  template: string;
   category: string;
   address: string;
   brandName: string;
   contactEmail: string;
   shopPhone: string;
   imageUrl?: string;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
   birthDate?: string;
@@ -43,7 +48,10 @@ export interface User {
   province?: string;
   country?: string;
   shop?: Shop;
-  isActivated?: boolean;
+  role: 'user' | 'admin';
+  isActivated: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthState {

@@ -5,12 +5,13 @@ import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
 import { FaStore } from 'react-icons/fa';
 
-
 function CreateShop() {
   const navigate = useNavigate();
   const { createShop, isLoading, error, clearError } = useAuthStore();
   const [values, setValues] = useState({
     shopName: '',
+    subdomain: '',
+    template: '',
     category: '',
     address: '',
     brandName: '',
@@ -26,14 +27,14 @@ function CreateShop() {
     try {
       const shopData = {
         shopName: values.shopName,
+        subdomain: values.subdomain.toLowerCase(),
+        template: values.template,
         category: values.category,
         address: values.address,
         brandName: values.brandName,
         contactEmail: values.contactEmail,
         shopPhone: values.shopPhone
-      
       };
-
 
       await createShop(shopData);
       navigate('/dashboard');
@@ -47,6 +48,30 @@ function CreateShop() {
       label: 'Shop Name',
       placeholder: 'Enter your shop name*',
       required: true
+    },
+    {
+      type: 'text' as const,
+      name: 'subdomain',
+      label: 'Shop URL',
+      placeholder: 'myshop',
+      suffix: '.mercadotiendas.com',
+      required: true,
+      pattern: '^[a-z0-9-]+$',
+      patternMessage: 'Only lowercase letters, numbers and hyphens are allowed',
+      maxLength: 30
+    },
+    {
+      type: 'select' as const,
+      name: 'template',
+      label: 'Shop Template',
+      placeholder: 'Select a template*',
+      required: true,
+      options: [
+        { value: 'modern', label: 'Modern - Clean and minimalist design' },
+        { value: 'classic', label: 'Classic - Traditional e-commerce layout' },
+        { value: 'boutique', label: 'Boutique - Elegant and sophisticated' },
+        { value: 'tech', label: 'Tech - Perfect for electronics and gadgets' }
+      ]
     },
     {
       type: 'select' as const,

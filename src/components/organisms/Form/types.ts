@@ -1,8 +1,28 @@
-import { TextFieldType, TextFormFieldProps, SelectFormFieldProps } from '../../molecules/FormField/types';
+export interface BaseFormField {
+  name: string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+}
 
-export type FormField = 
-  | Omit<TextFormFieldProps, 'value' | 'onChange'> 
-  | Omit<SelectFormFieldProps, 'value' | 'onChange'>;
+export interface TextFormField extends BaseFormField {
+  type: 'text' | 'email' | 'password' | 'number' | 'date';
+  autoComplete?: string;
+  suffix?: string;
+  pattern?: string;
+  patternMessage?: string;
+  maxLength?: number;
+}
+
+export interface SelectFormField extends BaseFormField {
+  type: 'select';
+  options: Array<{
+    value: string;
+    label: string;
+  }>;
+}
+
+export type FormField = TextFormField | SelectFormField;
 
 export interface FormProps {
   fields: FormField[];

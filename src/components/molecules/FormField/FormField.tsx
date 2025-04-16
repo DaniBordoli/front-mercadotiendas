@@ -1,13 +1,13 @@
 import React from 'react';
 import { InputField } from '../../atoms/InputField';
 import { SelectField } from '../../atoms/SelectField';
-import { FormFieldProps } from './types';
+import { FormFieldProps, TextFormFieldProps, SelectFormFieldProps } from './types';
 
 export const FormField: React.FC<FormFieldProps> = (props) => {
   const { type, label, name, required, error, className, disabled } = props;
 
   if (type === 'select') {
-    const { options, value, onChange, placeholder } = props;
+    const { options, value, onChange, placeholder } = props as SelectFormFieldProps & { value?: string; onChange?: (value: string) => void };
     return (
       <SelectField
         options={options}
@@ -25,7 +25,7 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
     );
   }
 
-  const { placeholder, value, onChange, autoComplete } = props;
+  const { placeholder, value, onChange, autoComplete, suffix, pattern, patternMessage, maxLength } = props as TextFormFieldProps & { value?: string; onChange?: (value: string) => void };
   return (
     <InputField
       type={type}
@@ -40,6 +40,10 @@ export const FormField: React.FC<FormFieldProps> = (props) => {
       className={className}
       autoComplete={autoComplete}
       disabled={disabled}
+      suffix={suffix}
+      pattern={pattern}
+      patternMessage={patternMessage}
+      maxLength={maxLength}
     />
   );
 };
