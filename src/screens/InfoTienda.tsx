@@ -10,6 +10,8 @@ const InfoTienda = () => {
     const [shopData, setShopData] = useState({
         email: '',
         shopName: '',
+        subdomain: '',
+        template: '',
         category: '',
         brandName: '',
         contactEmail: '',
@@ -31,6 +33,8 @@ const InfoTienda = () => {
             setShopData({
                 email: user.email || '',
                 shopName: user.shop.name || '',
+                subdomain: user.shop.subdomain || '',
+                template: user.shop.template || '',
                 category: user.shop.category || '',
                 brandName: user.shop.brandName || '',
                 contactEmail: user.shop.contactEmail || '',
@@ -164,71 +168,61 @@ const InfoTienda = () => {
                             />
                             <p className='text-sm  mb-4 text-gray-500'>Email registrado para iniciar sesión en tu panel</p>
                         </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="shopName" 
-                                label="Nombre de la Tienda (editable)" 
-                                placeholder="Mi Tienda" 
-                                value={shopData.shopName} 
-                                onChange={handleInputChange("shopName")} 
+                        <div className="mt-8 space-y-6">
+                            <LabeledInputField
+                                label="Nombre de la tienda"
+                                name="shopName"
+                                value={shopData.shopName}
+                                onChange={handleInputChange('shopName')}
+                                placeholder="Ingresa el nombre de tu tienda"
+                                required
                             />
-                            <p className='text-sm mb-4 text-gray-500'>Nombre de tu tienda online</p>
-                        </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="category" 
-                                label="Categoría (editable)" 
-                                placeholder="Ej: Ropa, Electrónica, etc." 
-                                value={shopData.category} 
-                                onChange={handleInputChange("category")} 
+                            <LabeledInputField
+                                label="URL de la tienda"
+                                name="subdomain"
+                                value={shopData.subdomain}
+                                suffix=".mercadotiendas.com"
+                                disabled
                             />
-                            <p className='text-sm mb-4 text-gray-500'>Categoría principal de tus productos</p>
-                        </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="brandName" 
-                                label="Nombre de la Marca (editable)" 
-                                placeholder="Mi marca" 
-                                value={shopData.brandName} 
-                                onChange={handleInputChange("brandName")} 
+                            <LabeledInputField
+                                label="Template"
+                                name="template"
+                                value={shopData.template}
+                                disabled
                             />
-                            <p className='text-sm mb-4 text-gray-500'>Nombre de tu negocio</p>
-                        </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="contactEmail" 
-                                label="Email de contacto (editable)" 
-                                placeholder="mimarca@email.com" 
-                                value={shopData.contactEmail} 
-                                onChange={handleInputChange("contactEmail")} 
+                            <LabeledInputField
+                                label="Dirección"
+                                name="address"
+                                value={shopData.address}
+                                onChange={handleInputChange('address')}
+                                placeholder="Ej Libertador 1892, CABA, Buenos Aires"
+                                required
                             />
-                            <p className='text-sm  mb-4 text-gray-500'>Email que aparecerá en la parte inferior de tu tienda. Allí te llegarán todas las notificaciones (ventas, consultas, etc.).</p>
-                        </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="address" 
-                                label="Dirección de la tienda (opcional)" 
-                                placeholder="Ej Libertador 1892, CABA, Buenos Aires" 
-                                value={shopData.address} 
-                                onChange={handleInputChange("address")} 
+                            <LabeledInputField
+                                label="Nombre de la marca"
+                                name="brandName"
+                                value={shopData.brandName}
+                                onChange={handleInputChange('brandName')}
+                                placeholder="Ingresa el nombre de tu marca"
+                                required
                             />
-                            <p className='text-sm mb-4 text-gray-500'>Aparecerá en la parte inferior de tu tienda</p>
-                        </div>
-                        <div>
-                            <LabeledInputField 
-                                type="text" 
-                                name="shopPhone" 
-                                label="Teléfono de la tienda (opcional)" 
-                                placeholder="Ej 1122334455" 
-                                value={shopData.shopPhone} 
-                                onChange={handleInputChange("shopPhone")} 
+                            <LabeledInputField
+                                label="Email de contacto"
+                                name="contactEmail"
+                                value={shopData.contactEmail}
+                                onChange={handleInputChange('contactEmail')}
+                                placeholder="Ingresa el email de contacto"
+                                type="email"
+                                required
                             />
-                            <p className='text-sm mb-4 text-gray-500'>Aparecerá en la parte inferior de tu tienda</p>
+                            <LabeledInputField
+                                label="Teléfono de contacto"
+                                name="shopPhone"
+                                value={shopData.shopPhone}
+                                onChange={handleInputChange('shopPhone')}
+                                placeholder="Ej: +54 11 1234-5678"
+                                required
+                            />
                         </div>
                         <div className="mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -15,7 +15,11 @@ export const InputField: React.FC<InputFieldProps> = ({
   label,
   autoComplete,
   onFocus,
-  onBlur
+  onBlur,
+  suffix,
+  pattern,
+  patternMessage,
+  maxLength
 }) => {
   const baseStyles = "w-full h-10 sm:h-12 px-3 sm:px-4 py-2 border rounded-lg transition-all duration-200 focus:outline-none text-sm sm:text-base";
   const stateStyles = error
@@ -43,14 +47,17 @@ export const InputField: React.FC<InputFieldProps> = ({
           onChange={(e) => onChange?.(e.target.value)}
           onFocus={onFocus}
           onBlur={onBlur}
-          placeholder={typeof placeholder === 'string' ? placeholder : undefined} // Handle string placeholders
+          placeholder={typeof placeholder === 'string' ? placeholder : undefined}
           disabled={disabled}
           required={required}
           autoComplete={autoComplete}
+          pattern={pattern}
+          maxLength={maxLength}
           className={`
             ${baseStyles}
             ${stateStyles}
             ${disabledStyles}
+            ${suffix ? 'pr-24' : ''}
             ${className || ''}
           `}
         />
@@ -59,8 +66,15 @@ export const InputField: React.FC<InputFieldProps> = ({
             {placeholder}
           </div>
         )}
+        {suffix && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <span className="text-gray-500">{suffix}</span>
+          </div>
+        )}
         {error && (
-          <p className="absolute -bottom-5 left-0 text-xs text-red-500 mt-1">{error}</p>
+          <p className="absolute -bottom-5 left-0 text-xs text-red-500 mt-1">
+            {patternMessage && error.includes('pattern') ? patternMessage : error}
+          </p>
         )}
       </div>
     </div>
