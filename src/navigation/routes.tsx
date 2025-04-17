@@ -4,7 +4,6 @@ import Login from '../screens/Login';
 import CreateShop from '../screens/CreateShop';
 import Dashboard from '../screens/Dashboard';
 import InfoTienda from '../screens/InfoTienda';
-import ResetPassword from '../screens/ResetPassword';
 import VerifyPassword from '../screens/VerifyPassword';
 import AccountActivation from '../screens/AccountActivation';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
@@ -13,6 +12,8 @@ import { NoShopRoute } from '../components/utils/NoShopRoute';
 import ProfileScreen from '../screens/ProfileScreen';
 import PersonalForm from '../screens/PersonalForm';
 import RedesTienda from '../screens/RedesTienda';
+import Design from '../screens/Design';
+import ResetPass from '../screens/ResetPass';
 
 export const publicRoutes = [
   {
@@ -25,7 +26,7 @@ export const publicRoutes = [
   },
   {
     path: '/reset-password',
-    element: <ResetPassword />
+    element: <ResetPass />
   },
   {
     path: '/email-verification',
@@ -46,7 +47,7 @@ export const publicRoutes = [
   {
     path: '/dashboard', 
     element: <Dashboard />
-  }
+  },
 ];
 
 export const privateRoutes = [

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CenteredBox } from '../components/templates/CenteredBox';
-import { FaStore } from 'react-icons/fa';
 import { API_URL } from '../services/api';
 import { useAuthStore } from '../stores';
 import { Loading } from '../components/molecules/Loading';
+import logoTienda from '../public/assets/logoTienda.png';
+import { colors } from '../design/colors';
+import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
+import { DesignButton } from '../components/atoms/DesignButton';
+import { FaKey } from 'react-icons/fa';
 
 function AccountActivation() {
   const navigate = useNavigate();
@@ -117,22 +120,36 @@ function AccountActivation() {
     }
   };
 
+  const handleActivationCodeChange = (value: string) => {
+    setError(null);
+    setActivationCode(value);
+  };
+
   if (initialLoading) {
     return <Loading />;
   }
 
   return (
-    <CenteredBox height="520px">
-      <div className="flex flex-col items-center mt-4">
-        <div className="flex items-center mb-8">
-          <span className="text-green-500 text-3xl mr-2">
-            <FaStore size={28} color="skyblue" />
+    <div className="bg-white h-screen flex flex-col items-center">
+      <div className="mt-28 mr-20 flex items-center space-x-6">
+        <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
+        <div className="flex flex-col">
+          <span className="font-bold text-4xl">Mercado Tiendas</span>
+          <span
+            className="font-space font-bold text-4xl tracking-[5px] mt-2"
+            style={{ color: colors.primaryRed }}
+          >
+            Live shopping
           </span>
-          <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
         </div>
-
-        <h2 className="text-2xl font-semibold mb-6">Activación de Cuenta</h2>
-        <p className="text-center text-gray-600 text-sm mb-8">
+      </div>
+        
+      <div className="mt-10 w-full max-w-md px-4">
+        <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
+          Activación de Cuenta
+        </h2>
+        
+        <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
           Hemos enviado un código de activación a <strong>{email || 'tu correo'}</strong>. 
           Por favor, ingresa el código para activar tu cuenta.
         </p>
@@ -149,66 +166,54 @@ function AccountActivation() {
           </div>
         )}
 
-        <div className="mb-4 w-full">
-          <label htmlFor="activationCode" className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
             Código de activación
           </label>
-          <input
-            id="activationCode"
+          <InputDefault
             type="text"
             value={activationCode}
-            onChange={(e) => setActivationCode(e.target.value)}
+            onChange={handleActivationCodeChange}
             placeholder="Ingresa el código de 6 dígitos"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
-            disabled={isLoading}
+            className='w-full'
+            icon={<FaKey style={{ color: colors.mediumGray }} />}
           />
         </div>
 
-        <div className="flex flex-col gap-3 w-full">
-          <button
+        <div className="mt-8">
+          <DesignButton
+            fullWidth={true}
+            variant='primary'
             onClick={handleActivation}
             disabled={isLoading}
-            className="w-full bg-sky-500 hover:bg-sky-600 text-white py-2 px-4 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            {isLoading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Activando...
-              </>
-            ) : 'Activar Cuenta'}
-          </button>
+            {isLoading ? "Activando..." : "Activar Cuenta"}
+          </DesignButton>
 
-          <button
-            onClick={handleResendCode}
-            disabled={resendLoading}
-            className="text-sky-500 hover:text-sky-600 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          >
-            {resendLoading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-sky-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Reenviando...
-              </>
-            ) : 'Reenviar código'}
-          </button>
+          <div className="flex justify-center mt-4">
+            <button
+              onClick={handleResendCode}
+              disabled={resendLoading}
+              className="font-space text-sm"
+              style={{ color: colors.primaryRed }}
+            >
+              {resendLoading ? "Reenviando..." : "Reenviar código"}
+            </button>
+          </div>
         </div>
-
-        <p className="mt-6 text-sm text-gray-600">
-          ¿Ya tienes una cuenta activada?{' '}
-          <button
+        
+        <div className="flex justify-center mt-8 font-space text-sm">
+          <span style={{color: colors.mediumGray}}>¿Ya tienes una cuenta activada?</span>
+          <span 
+            className="ml-1 cursor-pointer"
+            style={{ color: colors.primaryRed }}
             onClick={() => navigate('/login')}
-            className="text-sky-500 hover:text-sky-600 font-medium"
           >
-            Inicia sesión
-          </button>
-        </p>
+            Iniciar sesión
+          </span>
+        </div>
       </div>
-    </CenteredBox>
+    </div>
   );
 }
 

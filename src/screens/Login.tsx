@@ -7,11 +7,10 @@ import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { MdMailOutline } from "react-icons/md";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
-import { PrimaryButton } from '../components/atoms/PrimaryButton/PrimaryButton';
-import { NeutralButton } from '../components/atoms/NeutralButton/NeutralButton';
 import { FaGoogle } from "react-icons/fa";
 import { BsFacebook } from 'react-icons/bs';
 import { Loading } from '../components/molecules/Loading';
+import { DesignButton } from '../components/atoms/DesignButton';
 
 function Login() {
   const navigate = useNavigate();
@@ -135,13 +134,14 @@ function Login() {
         </div>
         
         <div className="mt-8">
-          <PrimaryButton 
+          <DesignButton
             fullWidth={true}
             type="submit"
             disabled={isLoading}
+            variant='primary'
           >
             {isLoading ? "Cargando..." : "Iniciar sesión"}
-          </PrimaryButton>
+          </DesignButton>
         </div>
         
         <div className="flex items-center justify-center mt-8">
@@ -160,7 +160,8 @@ function Login() {
         
         <div className="flex justify-center space-x-4 mt-6">
           <div className="w-1/2">
-            <NeutralButton 
+            <DesignButton 
+            variant='neutral'
               icon={FaGoogle}
               iconPosition="left"
               fullWidth={true}
@@ -168,10 +169,11 @@ function Login() {
               disabled={isLoading}
             >
               Google
-            </NeutralButton>
+            </DesignButton>
           </div>
           <div className="w-1/2">
-            <NeutralButton 
+            <DesignButton 
+            variant='neutral'
               icon={BsFacebook}
               iconPosition="left"
               fullWidth={true}
@@ -179,7 +181,7 @@ function Login() {
               disabled={isLoading}
             >
               Facebook
-            </NeutralButton>
+            </DesignButton>
           </div>
         </div>
         
