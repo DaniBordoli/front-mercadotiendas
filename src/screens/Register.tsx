@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CenteredBox } from '../components/templates/CenteredBox';
-import { useAuthRedirect } from '../hooks/useAuthRedirect';
-import { Form } from '../components/organisms/Form';
-import { FaStore } from 'react-icons/fa';
+import logoTienda from '../public/assets/logoTienda.png';
+import { colors } from '../design/colors';
+import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
+import { MdMailOutline, MdPersonOutline } from "react-icons/md";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores'; 
-import { Loading } from '../components/molecules/Loading';
 
-function Register() {
+const Register = () => {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError } = useAuthStore();
-  const [initialLoading, setInitialLoading] = useState(true);
+  const { register, isLoading, clearError } = useAuthStore();
   const [values, setValues] = useState({
     fullName: '',
     email: '',
@@ -23,192 +23,278 @@ function Register() {
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  useEffect(() => {
-    const timer = setTimeout(() => setInitialLoading(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useAuthRedirect();
-
   const validateForm = (values: Record<string, string>): Record<string, string> => {
     const errors: Record<string, string> = {};
-
-    // Validar nombre completo
     if (!values.fullName?.trim()) {
       errors.fullName = 'Nombre completo es requerido';
     } else if (values.fullName.length < 3) {
       errors.fullName = 'El nombre completo debe tener al menos 3 caracteres';
     }
-
-    // Validar email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email?.trim()) {
       errors.email = 'Email es requerido';
     } else if (!emailRegex.test(values.email)) {
       errors.email = 'Por favor ingresa un email válido';
     }
-
-    // Validar contraseña
     if (!values.password) {
       errors.password = 'Contraseña es requerido';
     } else if (values.password.length < 6) {
       errors.password = 'Contraseña debe tener al menos 6 caracteres';
     }
-
-    // Validar confirmación de contraseña
     if (!values.confirmPassword) {
       errors.confirmPassword = 'Por favor confirma tu contraseña';
     } else if (values.confirmPassword !== values.password) {
       errors.confirmPassword = 'Las contraseñas no coinciden';
     }
-
     return errors;
   };
 
-  // Ya no necesitamos este efecto porque redirigiremos a la página de activación
-
-  const handleSubmit = async (values: Record<string, string>) => {
-    // Limpiar errores anteriores
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setValidationErrors({});
-
-    // Validar formulario
     const errors = validateForm(values);
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
     }
-    
     try {
-      // Registrar al usuario
-      await register({
-        fullName: values.fullName,
-        email: values.email,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-        birthDate: values.birthDate,
-        city: values.city,
-        province: values.province,
-        country: values.country
-      });
-      
-      // Redirigir a la página de activación de cuenta
+      await register(values);
       navigate(`/activate-account?email=${encodeURIComponent(values.email)}`);
     } catch (err) {
       console.error('Error durante el registro:', err);
     }
   };
 
-  const fields = [
-    {
-      type: 'text' as const,
-      name: 'fullName',
-      label: 'Nombre completo',
-      placeholder: 'Ingresa tu nombre completo*',
-      required: true,
-      autoComplete: 'name'
-    },
-    {
-      type: 'email' as const,
-      name: 'email',
-      label: 'Email',
-      placeholder: 'Ingresa tu Email*',
-      required: true,
-      autoComplete: 'email'
-    },
-    {
-      type: 'date' as const,
-      name: 'birthDate',
-      label: 'Fecha de nacimiento',
-      placeholder: 'Selecciona tu fecha de nacimiento',
-      required: false,
-      autoComplete: 'bday'
-    },
-    {
-      type: 'text' as const,
-      name: 'city',
-      label: 'Ciudad',
-      placeholder: 'Ingresa tu ciudad',
-      required: false,
-      autoComplete: 'address-level2'
-    },
-    {
-      type: 'text' as const,
-      name: 'province',
-      label: 'Provincia',
-      placeholder: 'Ingresa tu provincia',
-      required: false,
-      autoComplete: 'address-level1'
-    },
-    {
-      type: 'text' as const,
-      name: 'country',
-      label: 'País',
-      placeholder: 'Ingresa tu país',
-      required: false,
-      autoComplete: 'country-name'
-    },
-    {
-      type: 'password' as const,
-      name: 'password',
-      label: 'Contraseña',
-      placeholder: 'Crea una contraseña*',
-      required: true,
-      autoComplete: 'new-password'
-    },
-    {
-      type: 'password' as const,
-      name: 'confirmPassword',
-      label: 'Confirmar contraseña',
-      placeholder: 'Confirma tu contraseña*',
-      required: true,
-      autoComplete: 'new-password'
-    }
-  ];
-
-  if (initialLoading) {
-    return <Loading />;
-  }
-
   return (
-    <CenteredBox height="850px">
-      <div className="flex flex-col items-center mt-4">
-        <div className="flex items-center mb-8">
-          <span className="text-green-500 text-3xl mr-2">
-            <FaStore size={28} color="skyblue" />
-          </span>
-          <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
-        </div>
-
-        <h2 className="text-2xl font-semibold mb-6">Crear cuenta</h2>
-        <p className="text-center text-gray-600 text-sm mb-8">
-          Comienza a vender con tu tienda en MercadoTiendas 
-        </p>
-
-        <Form
-          fields={fields}
-          values={values}
-          onChange={(name, value) => {
-            clearError();
-            setValidationErrors(prev => ({ ...prev, [name]: '' }));
-            setValues(prev => ({ ...prev, [name]: value }));
-          }}
-          onSubmit={handleSubmit}
-          errors={{ ...validationErrors, ...(error ? { email: error } : {}) }}
-          submitText="Crear cuenta"
-          loading={isLoading}
-        />
-
-        <p className="mt-6 text-sm text-gray-600">
-          Ya tienes una cuenta?{' '}
-          <button
-            onClick={() => navigate('/login')}
-            className="text-sky-500 hover:text-sky-600 font-medium"
+    <div className="bg-white h-screen flex flex-col items-center">
+      <div className="mt-28 mr-20 flex items-center space-x-6">
+        <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
+        <div className="flex flex-col">
+          <span className="font-bold text-4xl">Mercado Tiendas</span>
+          <span
+            className="font-space font-bold text-4xl tracking-[5px] mt-2"
+            style={{ color: colors.primaryRed }}
           >
-            Inicia sesión
-          </button>
-        </p>
+            Live shopping
+          </span>
+        </div>
       </div>
-    </CenteredBox>
+      <div className="mt-10 flex items-center space-x-10">
+        <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/login')}>
+          <span className="text-lg font-space">Iniciar sesión</span>
+          <div
+            className="w-[200px] h-0.5 mt-1"
+            style={{ backgroundColor: colors.lightGray }}
+          ></div>
+        </div>
+        <div className="flex flex-col items-center">
+          <span style={{color: colors.primaryRed}} className="text-lg font-space">Crear cuenta</span>
+          <div
+            className="w-[200px] h-0.5 mt-1"
+            style={{ backgroundColor: colors.primaryRed }}
+          ></div>
+        </div>
+      </div>
+      
+      <form className="mt-10 w-full max-w-md px-4" onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Nombre completo
+          </label>
+          <InputDefault
+            type="text"
+            placeholder="Ingresa tu nombre completo*"
+            className="w-full"
+            icon={<MdPersonOutline style={{ color: colors.mediumGray }} />}
+            value={values.fullName}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, fullName: '' }));
+              setValues((prev) => ({ ...prev, fullName: value }));
+            }}
+          />
+          {validationErrors.fullName && (
+            <span className="text-red-500 text-sm">{validationErrors.fullName}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Correo electrónico
+          </label>
+          <InputDefault
+            type="email"
+            placeholder="Ingresa tu Email*"
+            className="w-full"
+            icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
+            value={values.email}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, email: '' }));
+              setValues((prev) => ({ ...prev, email: value }));
+            }}
+          />
+          {validationErrors.email && (
+            <span className="text-red-500 text-sm">{validationErrors.email}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Fecha de nacimiento
+          </label>
+          <input
+            type="date"
+            placeholder="Selecciona tu fecha de nacimiento"
+            className="w-full border border-gray-300 rounded-md p-2"
+            value={values.birthDate}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
+              setValues((prev) => ({ ...prev, birthDate: e.target.value }));
+            }}
+          />
+          {validationErrors.birthDate && (
+            <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Ciudad
+          </label>
+          <InputDefault
+            type="text"
+            placeholder="Ingresa tu ciudad"
+            className="w-full"
+            value={values.city}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, city: '' }));
+              setValues((prev) => ({ ...prev, city: value }));
+            }}
+          />
+          {validationErrors.city && (
+            <span className="text-red-500 text-sm">{validationErrors.city}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Provincia
+          </label>
+          <InputDefault
+            type="text"
+            placeholder="Ingresa tu provincia"
+            className="w-full"
+            value={values.province}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, province: '' }));
+              setValues((prev) => ({ ...prev, province: value }));
+            }}
+          />
+          {validationErrors.province && (
+            <span className="text-red-500 text-sm">{validationErrors.province}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            País
+          </label>
+          <InputDefault
+            type="text"
+            placeholder="Ingresa tu país"
+            className="w-full"
+            value={values.country}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, country: '' }));
+              setValues((prev) => ({ ...prev, country: value }));
+            }}
+          />
+          {validationErrors.country && (
+            <span className="text-red-500 text-sm">{validationErrors.country}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Contraseña
+          </label>
+          <InputDefault
+            type="password"
+            placeholder="Crea una contraseña*"
+            className="w-full"
+            icon={<AiOutlineQuestionCircle style={{ color: colors.mediumGray }} />}
+            value={values.password}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, password: '' }));
+              setValues((prev) => ({ ...prev, password: value }));
+            }}
+          />
+          {validationErrors.password && (
+            <span className="text-red-500 text-sm">{validationErrors.password}</span>
+          )}
+        </div>
+        
+        <div className="mb-4">
+          <label className="block mb-2 font-space text-darkGray">
+            Confirmar contraseña
+          </label>
+          <InputDefault
+            type="password"
+            placeholder="Confirma tu contraseña*"
+            className="w-full"
+            icon={<AiOutlineQuestionCircle style={{ color: colors.mediumGray }} />}
+            value={values.confirmPassword}
+            onChange={(value: string) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, confirmPassword: '' }));
+              setValues((prev) => ({ ...prev, confirmPassword: value }));
+            }}
+          />
+          {validationErrors.confirmPassword && (
+            <span className="text-red-500 text-sm">{validationErrors.confirmPassword}</span>
+          )}
+        </div>
+        
+        <div className="flex items-center mt-4">
+          <input
+            type="checkbox"
+            id="termsConditions"
+            className="mr-2"
+          />
+          <label style={{color: colors.darkGray}} htmlFor="termsConditions" className="font-space text-sm">
+            Acepto los <span style={{ color: colors.primaryRed }} className="cursor-pointer">términos y condiciones</span>
+          </label>
+        </div>
+        
+        <div className="mt-8">
+          <DesignButton
+            fullWidth={true}
+            variant="primary"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
+          </DesignButton>
+        </div>     
+        
+        <div className="flex justify-center my-8 font-space text-sm">
+          <span style={{color: colors.mediumGray}}>¿Ya tenés cuenta?</span>
+          <span 
+            className="ml-1 cursor-pointer"
+            style={{ color: colors.primaryRed }}
+            onClick={() => navigate('/login')}
+          >
+            Iniciar sesión
+          </span>
+        </div>
+      </form>
+    </div>
   );
 }
 

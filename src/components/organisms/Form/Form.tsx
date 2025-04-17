@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '../../atoms/Button';
 import { FormField } from '../../molecules/FormField';
 import { FormProps } from './types';
+import { FormFieldProps } from '../../molecules/FormField/types';
 
 export const Form: React.FC<FormProps> = ({
   fields,
@@ -26,12 +27,25 @@ export const Form: React.FC<FormProps> = ({
     <form onSubmit={handleSubmit} className={`w-full space-y-4 sm:space-y-6 ${className}`}>
       <div className="space-y-3 sm:space-y-4">
         {fields.map((field) => {
-          const fieldProps = {
-            ...field,
-            value: values[field.name],
-            onChange: (value: string) => handleChange(field.name, value),
-            error: errors[field.name]
-          };
+        
+          let fieldProps: FormFieldProps;
+          
+          if (field.type === 'select') {
+            fieldProps = {
+              ...field,
+              value: values[field.name],
+              onChange: (value: string) => handleChange(field.name, value),
+              error: errors[field.name],
+              options: field.options || [] 
+            } as FormFieldProps;
+          } else {
+            fieldProps = {
+              ...field,
+              value: values[field.name],
+              onChange: (value: string) => handleChange(field.name, value),
+              error: errors[field.name]
+            } as FormFieldProps;
+          }
 
           return (
             <div key={field.name} className="w-full">
