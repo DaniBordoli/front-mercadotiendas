@@ -12,7 +12,6 @@ import { NoShopRoute } from '../components/utils/NoShopRoute';
 import ProfileScreen from '../screens/ProfileScreen';
 import PersonalForm from '../screens/PersonalForm';
 import RedesTienda from '../screens/RedesTienda';
-import Design from '../screens/Design';
 import ResetPass from '../screens/ResetPass';
 
 export const publicRoutes = [

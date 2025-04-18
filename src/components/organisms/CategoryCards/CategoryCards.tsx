@@ -1,64 +1,68 @@
 import React from 'react';
+import { colors } from '../../../design/colors';
+import { MdOutlinePhoneIphone } from "react-icons/md";
+import { FaShirt, FaDumbbell } from "react-icons/fa6";
+import { IoMdHome } from "react-icons/io";
+import { WideCard } from '../../molecules/WideCard';
 
 const categories = [
   {
     title: "TEXTILES",
     mainImage: "https://placehold.co/300x200",
-    smallImages: [
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-    ],
   },
   {
     title: "DEPORTES",
     mainImage: "https://placehold.co/300x200",
-    smallImages: [
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-    ],
   },
   {
     title: "CELULARES",
     mainImage: "https://placehold.co/300x200",
-    smallImages: [
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-      "https://placehold.co/70x70",
-    ],
   },
 ];
 
 export const CategoryCards: React.FC = () => {
+  const categoryIcons = [
+    { icon: <MdOutlinePhoneIphone size={24} />, bgColor: colors.primaryRed },
+    { icon: <FaShirt size={24} />, bgColor: colors.accentTeal },
+    { icon: <IoMdHome size={24} />, bgColor: colors.primaryRed },
+    { icon: <FaDumbbell size={24} />, bgColor: colors.accentTeal },
+  ];
+
   return (
-    <div className="flex justify-center items-center space-x-6 mt-24">
-      {categories.map((category, index) => (
-        <div
-          key={index}
-          className="w-96 h-auto bg-white rounded-sm shadow-md flex flex-col overflow-hidden"
-        >
-          <h2 className="text-xl font-bold text-gray-800 mb-4 px-4 pt-4">{category.title}</h2>
-          <img
-            src={category.mainImage}
-            alt={category.title}
-            className="w-full h-auto mb-4"
-          />
-          <div className="flex justify-between w-full px-6 pb-4">
-            {category.smallImages.map((image, idx) => (
-              <img
-                key={idx}
-                src={image}
-                alt={`${category.title} ${idx + 1}`}
-                className="w-20 h-16 rounded-md"
-              />
-            ))}
+    <div className="w-full h-[250px] bg-[#F8F8F8] rounded-lg overflow-hidden">
+      <h2 
+        className="text-xl mt-8 font-space ml-8 text-left pl-32 mb-4"
+        style={{ color: colors.darkGray }}
+      >
+        Categorías Populares
+      </h2>
+      
+      <div className="flex justify-center items-center gap-6 mt-4">
+        {categoryIcons.map((item, index) => (
+          <div 
+            key={index}
+            className="w-96 h-36 bg-white rounded-lg shadow-sm flex items-center justify-center"
+          >
+           
+            <div className="relative flex items-center justify-center">
+              <div 
+                className="absolute w-16 h-16 rounded-full"
+                style={{ 
+                  backgroundColor: item.bgColor,
+                  opacity: 0.1
+                }}
+              ></div>
+            
+              <div 
+                className="relative z-10 flex items-center justify-center w-16 h-16"
+                style={{ color: item.bgColor }}
+              >
+                {item.icon}
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
