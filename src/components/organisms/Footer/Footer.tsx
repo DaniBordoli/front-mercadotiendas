@@ -1,29 +1,96 @@
 import React from 'react';
-import { FaHome, FaInfoCircle, FaArchive } from 'react-icons/fa';
-import { CiCreditCard1 } from "react-icons/ci";
-import { IoShieldCheckmarkOutline } from "react-icons/io5";
-import { FaCreditCard } from "react-icons/fa6";
+import { colors } from '../../../design/colors';
+import { FaInstagram, FaTwitter, FaFacebook } from 'react-icons/fa';
 
 export const Footer: React.FC = () => {
+  const footerSections = [
+    {
+      title: "Empresa",
+      links: [
+        { text: "Sobre Nosotros", url: "#" },
+        { text: "Careers", url: "#" },
+        { text: "Blog", url: "#" }
+      ]
+    },
+    {
+      title: "Legal",
+      links: [
+        { text: "Términos y Condiciones", url: "#" },
+        { text: "Privacidad", url: "#" },
+        { text: "Cookies", url: "#" }
+      ]
+    }
+  ];
+
+  // Social media icons for "Síguenos" section
+  const socialMediaIcons = [
+    { icon: <FaInstagram size={24} />, url: "#" },
+    { icon: <FaTwitter size={24} />, url: "#" },
+    { icon: <FaFacebook size={24} />, url: "#" }
+  ];
+
   return (
-    <footer className="w-full bg-white shadow-md py-6 flex justify-center items-center">
-      <div className="flex mt-8 items-center space-x-24">
-        <div className="flex flex-col items-center">
-          <FaCreditCard  className="text-6xl text-sky-500" />
-          <span className="text-xl text-gray-600 mt-3">Elegí como pagar</span>
-          <span className="text-sm text-gray-400 w-80 text-center">Podés pagar con tarjeta, débito, efectivo o con Cuotas sin Tarjeta.</span>
+    <footer className="w-full h-[629px] bg-[#F8F8F8] py-16">
+      <div className="container mx-auto flex justify-center mt-20 mr-32">
+        <div className="flex gap-80"> 
+          {/* Regular sections with text links */}
+          {footerSections.map((section, index) => (
+            <div key={index} className="flex flex-col">
+              <h3 
+                className="mb-8 font-space font-medium" 
+                style={{ color: colors.darkGray }}
+              >
+                {section.title}
+              </h3>
+              <div className="flex flex-col gap-4"> 
+                {section.links.map((link, linkIndex) => (
+                  <a 
+                    key={linkIndex} 
+                    href={link.url} 
+                    className="text-sm hover:underline" 
+                    style={{ color: colors.mediumGray }}
+                  >
+                    {link.text}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+          
+      
+          <div className="flex flex-col">
+            <h3 
+              className="mb-8 font-space font-medium" 
+              style={{ color: colors.darkGray }}
+            >
+              Síguenos
+            </h3>
+            <div className="flex flex-row gap-6"> 
+              {socialMediaIcons.map((social, index) => (
+                <a 
+                  key={index} 
+                  href={social.url} 
+                  style={{ color: colors.mediumGray }}
+                >
+                  {social.icon}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="h-16 border-l border-gray-300"></div>
-        <div className="flex flex-col items-center">
-          <FaArchive className="text-6xl text-sky-500" />
-          <span className="text-xl text-gray-600 mt-3">Envío gratis desde $ 33.000</span>
-          <span className="text-sm text-gray-400 w-80 text-center">Solo por estar registrado en Mercado Libre tenés envíos gratis en miles de productos. Es un beneficio de Mercado Puntos.</span>
-        </div>
-        <div className="h-16 border-l border-gray-300"></div>
-        <div className="flex flex-col items-center">
-          <IoShieldCheckmarkOutline className="text-6xl text-sky-500" />
-          <span className="text-xl text-gray-600 mt-3">Seguridad de principio a fin</span>
-          <span className="text-sm text-gray-400 w-80 text-center">¿No te gusta? ¡Devolvelo! En Mercado Libre, no hay nada que no puedas hacer, porque estás siempre protegido.</span>
+      </div>
+      
+      <div className="container mx-auto mt-40">
+        <div className="flex flex-col">
+          <div className="flex justify-between items-end pb-4">
+            <p className="text-sm w-[30%] mt-14 ml-2" style={{ color: colors.mediumGray }}>
+              La plataforma de e-commerce social para emprendedores y creadores de contenido.
+            </p>
+          </div>
+          <div className="w-[90%] mx-auto border-t mt-4 border-gray-200"></div>
+          <div className="text-center text-xs pt-4" style={{ color: colors.mediumGray }}>
+            © 2025 MercadoTiendas. Todos los derechos reservados.
+          </div>
         </div>
       </div>
     </footer>
