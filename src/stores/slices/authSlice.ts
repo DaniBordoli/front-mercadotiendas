@@ -181,30 +181,37 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { token, user } = responseData.data;
       const isActivated = user?.isActivated === true;
       
-      if (isActivated) {
-        setStorageItem('token', token);
-        set({
-          isAuthenticated: true,
-          token,
-          isLoading: false,
-        });
-        
+      const needsProfileCompletion = isActivated && 
+      (!user.country || !user.city || !user.birthDate || !user.province);
+    
+    if (isActivated) {
+      setStorageItem('token', token);
+      set({
+        isAuthenticated: true,
+        token,
+        user,
+        isLoading: false,
+      });
+      
+      // Si necesita completar su perfil, redirigir a una pantalla especial
+      if (needsProfileCompletion) {
+        window.location.href = '/complete-profile';
+      } else {
         // Cargar el perfil actualizado incluyendo la tienda
         await get().loadProfile();
-      } else {
-        setStorageItem('token', token);
-        setStorageItem('user', JSON.stringify(user));
-        set({
-          isAuthenticated: false,
-          token,
-          user,
-          isLoading: false,
-
-        });
-        
-        window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
       }
+    } else {
+      setStorageItem('token', token);
+      setStorageItem('user', JSON.stringify(user));
+      set({
+        isAuthenticated: false,
+        token,
+        user,
+        isLoading: false,
+      });
       
+      window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
+    }
 
     } catch (error) {
       console.error('Error en login con Google:', error);
@@ -396,3 +403,58 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ token: null, isAuthenticated: false });
   }
 }));
+
+export const fetchProvincesForArgentina = async (): Promise<string[]> => {
+  try {
+    const response = await fetch('https://restcountries.com/v3.1/all');
+    const countries = await response.json();
+    const argentina = countries.find((country: any) => country.name.common === 'Argentina');
+    if (argentina) {
+     
+      return [
+        'Buenos Aires',
+        'Córdoba',
+        'Santa Fe',
+        'Mendoza',
+        'Tucumán',
+        'Salta',
+        'Entre Ríos',
+        'Misiones',
+        'Chaco',
+        'Corrientes',
+        'Santiago del Estero',
+        'San Juan',
+        'Jujuy',
+        'Río Negro',
+        'Neuquén',
+        'Formosa',
+        'Chubut',
+        'San Luis',
+        'Catamarca',
+        'La Rioja',
+        'La Pampa',
+        'Santa Cruz',
+        'Tierra del Fuego',
+      ];
+    }
+    throw new Error('Argentina not found in the API response');
+  } catch (error) {
+    console.error('Error fetching provinces for Argentina:', error);
+    throw error;
+  }
+};
+
+export const fetchCountries = async (): Promise<{ name: string; code: string }[]> => {
+  try {
+    const response = await fetch('https://restcountries.com/v3.1/all');
+    const data = await response.json();
+    const argentina = data.filter((country: any) => country.name.common === 'Argentina');
+    return argentina.map((country: any) => ({
+      name: country.name.common,
+      code: country.cca2,
+    }));
+  } catch (error) {
+    console.error('Error fetching countries:', error);
+    throw error;
+  }
+};
