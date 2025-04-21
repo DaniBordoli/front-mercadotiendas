@@ -2,7 +2,7 @@ import React from 'react';
 import { colors } from '../../../design/colors';
 
 interface InputDefaultProps {
-  type?: 'text' | 'password' | 'email' | 'number';
+  type?: 'text' | 'password' | 'email' | 'number' | 'date';
   value?: string;
   placeholder?: string;
   onChange?: (value: string) => void;

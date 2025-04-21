@@ -3,10 +3,11 @@ import { colors } from '../../../design/colors';
 
 interface StatusTagsProps {
   status: 'Active' | 'Pending' | 'Inactive';
+  text?: string; 
   className?: string; 
 }
 
-export const StatusTags: React.FC<StatusTagsProps> = ({ status, className }) => {
+export const StatusTags: React.FC<StatusTagsProps> = ({ status, text, className }) => {
   const styles = {
     Active: {
       backgroundColor: `${colors.accentTeal}1A`, 
@@ -31,7 +32,7 @@ export const StatusTags: React.FC<StatusTagsProps> = ({ status, className }) => 
         fontSize: '0.875rem',
       }}
     >
-      {status}
+      {text || status}
     </span>
   );
 };

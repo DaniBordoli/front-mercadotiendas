@@ -13,6 +13,8 @@ import ProfileScreen from '../screens/ProfileScreen';
 import PersonalForm from '../screens/PersonalForm';
 import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
+import PersonalInfo from '../screens/PersonalInfo';
+
 
 export const publicRoutes = [
   {
