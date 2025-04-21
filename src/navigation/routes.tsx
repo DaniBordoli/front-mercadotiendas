@@ -14,6 +14,7 @@ import PersonalForm from '../screens/PersonalForm';
 import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
 import PersonalInfo from '../screens/PersonalInfo';
+import GoogleComplete from '../screens/GoogleComplete';
 
 
 export const publicRoutes = [
@@ -48,6 +49,10 @@ export const publicRoutes = [
   {
     path: '/dashboard', 
     element: <Dashboard />
+  },
+  {
+    path: '/complete-profile', 
+    element: <GoogleComplete />
   },
 ];
 
