@@ -8,6 +8,7 @@ import { WideCard } from '../components/molecules/WideCard';
 import { StartSellingSection } from '../components/molecules/StartSellingSection';
 import { BenefitsSection } from '../components/organisms/BenefitsSection';
 import { Footer } from '../components/organisms/Footer';
+import Carousel from '../components/organisms/Carousel/Carousel';
 
 const Dashboard: React.FC = () => {
     return (
@@ -27,6 +28,10 @@ const Dashboard: React.FC = () => {
                 </div>
                 
 
+                <div className='my-12'>
+                    <Carousel />
+                </div>
+                
                 <div className="w-10/12 mx-auto">
                     <h2 
                         className="text-xl font-space text-left"
@@ -35,7 +40,6 @@ const Dashboard: React.FC = () => {
                         Productos Destacados
                     </h2>
                 </div>
-                
                 <div className="flex justify-start pl-32"> 
                     <CardList />
                 </div>

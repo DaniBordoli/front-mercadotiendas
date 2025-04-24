@@ -5,6 +5,7 @@ import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaShop, FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/index';
+import { FaShoppingCart } from "react-icons/fa";
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -27,7 +28,7 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center gap-6 mb-2 w-full">
             <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
               <Logo size={28} color="skyblue" />
-              <h1 className="text-xl font-bold ml-2 text-sky-500">MercadoTienda</h1>
+              <h1 className="text-xl font-bold ml-2 font-space">MercadoTiendas</h1>
             </div>
             <div className="flex-1 max-w-4xl">
               <div className="relative">
@@ -41,9 +42,19 @@ export const Navbar: React.FC = () => {
           </div>
           <div className="flex gap-8 text-gray-600 text-sm justify-center mt-2 ml-52">
             <a href="#" className="hover:text-sky-500 transition-colors">Gestión de ventas</a>
+            <div className="relative group">
+              <a href="#" className="hover:text-sky-500 transition-colors">Categorias</a>
+              <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48">
+                <ul className="py-2">
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 1</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
+                </ul>
+              </div>
+            </div>
+            <a href="#" className="hover:text-sky-500 transition-colors">Cupones</a>
             <a href="#" className="hover:text-sky-500 transition-colors">Productos</a>
-            <a href="#" className="hover:text-sky-500 transition-colors">Potenciar mi tienda</a>
-            <a href="#" className="hover:text-sky-500 transition-colors">Categorias</a>
             <a href="#" className="hover:text-sky-500 transition-colors">Ofertas</a>
           </div>
         </div>
@@ -97,15 +108,24 @@ export const Navbar: React.FC = () => {
               )}
             </div>
           </>
-        ) : (
-          <div 
-            className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
-            onClick={handleLoginClick}
-          >
-            <FaUser className="text-xl mr-2" />
-            <span>Ingresa</span>
-          </div>
-        )}
+   ) : (
+    <div className="flex items-center space-x-6">
+      <div 
+        className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
+        onClick={() => navigate('/cart')}
+      >
+        <FaShoppingCart className="text-xl mr-2" />
+        <span>Ver mi carrito</span>
+      </div>
+      <div 
+        className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
+        onClick={handleLoginClick}
+      >
+        <FaUser className="text-xl mr-2" />
+        <span>Ingresa</span>
+      </div>
+    </div>
+  )}
       </div>
     </nav>
   );

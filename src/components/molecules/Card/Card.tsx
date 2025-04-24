@@ -1,14 +1,24 @@
 import React from 'react';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton';
+import '../../../styles/responsive.css';
 
 interface CardProps {
   imageSrc?: string;
+  onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ imageSrc }) => {
+export const Card: React.FC<CardProps> = ({ imageSrc, onClick }) => {
+  const handleCardClick = () => {
+    if (onClick) onClick();
+    else console.log('Card clicked');
+  };
+
   return (
-    <div className="card ml-6 w-84 h-96 bg-white rounded-lg shadow-sm overflow-hidden">
+    <div 
+      className="card ml-6 w-84 h-96 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+      onClick={handleCardClick}
+    >
       <figure className="m-0 w-full h-60">
         <img
           className="w-full h-full object-cover"
@@ -39,12 +49,20 @@ const cardData = [
 ];
 
 export const CardList: React.FC = () => {
+  const handleCardClick = (index: number) => {
+    console.log(`Card ${index + 1} clicked`);
+   
+  };
+
   return (
-    <div className="text-center mt-8">
-      
-      <div className="flex justify-center flex-wrap ">
+    <div className="text-center mt-8 px-4">
+      <div className="flex justify-center flex-wrap gap-4">
         {cardData.map((card, index) => (
-          <Card key={index} imageSrc={card.imageSrc} />
+          <Card 
+            key={index} 
+            imageSrc={card.imageSrc} 
+            onClick={() => handleCardClick(index)}
+          />
         ))}
       </div>
     </div>

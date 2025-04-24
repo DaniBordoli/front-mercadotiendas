@@ -1,13 +1,17 @@
 import React from 'react';
-import { FaStore } from 'react-icons/fa';
+import logoTienda from '../../../public/assets/logoTienda.png'; // Import the logo
 import { LogoProps } from './types';
 
 export const Logo: React.FC<LogoProps> = ({ 
   size = 28, 
-  color = "skyblue",
   className = "" 
 }) => {
   return (
-    <FaStore size={size} color={color} className={className} />
+    <img 
+      src={logoTienda} 
+      alt="Logo Tienda" 
+      style={{ width: size, height: size }} 
+      className={className} 
+    />
   );
 };

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import './styles.css';
 
 const Carousel: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [direction, setDirection] = useState<"left" | "right">("right");
     const slides = [
         "https://placehold.co/1200x400",
         "https://placehold.co/1200x400",
@@ -10,37 +11,44 @@ const Carousel: React.FC = () => {
     ];
 
     const handlePrev = () => {
-        setDirection("left");
         setCurrentIndex((prevIndex) => (prevIndex === 0 ? slides.length - 1 : prevIndex - 1));
     };
 
     const handleNext = () => {
-        setDirection("right");
         setCurrentIndex((prevIndex) => (prevIndex === slides.length - 1 ? 0 : prevIndex + 1));
     };
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            handleNext();
+        }, 5000); 
+        return () => clearInterval(interval);
+    }, [currentIndex]);
+
     return (
-        <div id="default-carousel" className="relative w-full overflow-hidden mt-24" data-carousel="slide">
-            <div className="relative h-56 overflow-hidden rounded-lg md:h-96">
+        <div id="default-carousel" className="carousel-container" data-carousel="slide">
+            <div className="carousel-content">
                 {slides.map((slide, index) => (
-                    <div
+                    <motion.div
                         key={index}
-                        className={`absolute inset-0 transition-transform duration-700 ease-in-out ${
-                            index === currentIndex
-                                ? "translate-x-0"
-                                : direction === "right"
-                                ? "translate-x-full"
-                                : "-translate-x-full"
-                        }`}
-                        style={{ transform: index === currentIndex ? "translateX(0)" : "" }}
+                        className="carousel-slide"
+                        initial={{ x: index === currentIndex ? 0 : index < currentIndex ? "-100%" : "100%" }}
+                        animate={{ x: index === currentIndex ? 0 : index < currentIndex ? "-100%" : "100%" }}
+                        transition={{ duration: 0.7, ease: "easeInOut" }}
                         data-carousel-item
                     >
-                        <img
-                            src={slide}
-                            className="absolute block w-full h-full object-contain"
-                            alt={`Slide ${index + 1}`}
-                        />
-                    </div>
+                        <a 
+                            href="#" 
+                            className="carousel-link" 
+                            onClick={(e) => e.preventDefault()}
+                        >
+                            <img
+                                src={slide}
+                                className="carousel-image"
+                                alt={`Slide ${index + 1}`}
+                            />
+                        </a>
+                    </motion.div>
                 ))}
             </div>
             <div className="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3 rtl:space-x-reverse">
@@ -51,10 +59,7 @@ const Carousel: React.FC = () => {
                         className={`w-3 h-3 rounded-full ${index === currentIndex ? "bg-blue-500" : "bg-gray-300"}`}
                         aria-current={index === currentIndex}
                         aria-label={`Slide ${index + 1}`}
-                        onClick={() => {
-                            setDirection(index > currentIndex ? "right" : "left");
-                            setCurrentIndex(index);
-                        }}
+                        onClick={() => setCurrentIndex(index)}
                     ></button>
                 ))}
             </div>
