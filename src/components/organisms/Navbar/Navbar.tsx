@@ -90,7 +90,7 @@ export const Navbar: React.FC = () => {
                   <ul className="py-2">
                     <li 
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                      onClick={() => navigate('/my-profile')}
+                      onClick={() => navigate('/personal-info')}
                     >
                       Mi perfil
                     </li>
@@ -99,7 +99,7 @@ export const Navbar: React.FC = () => {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Data fiscal</li>
       
                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                    onClick={() => navigate('/personal-info')}>Informacion de tienda</li>
+                    onClick={() => navigate('/my-profile')}>Informacion de tienda</li>
                     <li 
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                       onClick={handleLogout}
