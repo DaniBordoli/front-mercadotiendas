@@ -10,6 +10,7 @@ import { useAuthStore } from '../stores';
 import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { fetchProvincesForArgentina } from '../stores/slices/authSlice';
 import { fetchCountries } from '../stores/slices/authSlice'
+import { Navbar } from '../components/organisms/Navbar';
 
 const Register = () => {
   const navigate = useNavigate();

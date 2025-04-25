@@ -11,7 +11,6 @@ import { FaGoogle } from "react-icons/fa";
 import { BsFacebook } from 'react-icons/bs';
 import { Loading } from '../components/molecules/Loading';
 import { DesignButton } from '../components/atoms/DesignButton';
-
 function Login() {
   const navigate = useNavigate();
   const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();

@@ -5,6 +5,8 @@ import { Button } from '../components/atoms/Button';
 import { useAuthStore } from '../stores';
 import { useShopStore } from '../stores';
 import Toast from '../components/atoms/Toast';
+import { Navbar } from '../components/organisms/Navbar/Navbar';
+
 
 const InfoTienda = () => {
     const [shopData, setShopData] = useState({
@@ -152,6 +154,7 @@ const InfoTienda = () => {
     return (
         <>
             <div>
+                <Navbar />
                 <Sidebar />
                 <main className='ml-60 p-20'>
                     <h1 className='text-3xl font-medium mb-6'>Información de mi tienda</h1>

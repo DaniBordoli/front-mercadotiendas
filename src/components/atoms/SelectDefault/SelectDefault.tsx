@@ -28,28 +28,30 @@ export const SelectDefault: React.FC<SelectDefaultProps> = ({
           {icon}
         </div>
       )}
-      <select
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        disabled={disabled}
-        style={{
-          borderColor: colors.lightGray,
-          color: colors.darkGray,
-          borderRadius: '0.5rem',
-          backgroundColor: 'transparent',
-          appearance: 'none',
-        }}
-        className={`border px-3 py-2 ${icon ? 'pl-10' : ''} ${className || ''}`}
-      >
-        {placeholder && <option value="">{placeholder}</option>}
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-        <FaChevronDown className="text-gray-500" />
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          disabled={disabled}
+          style={{
+            borderColor: colors.lightGray,
+            color: colors.darkGray,
+            borderRadius: '0.5rem',
+            backgroundColor: 'transparent',
+            appearance: 'none',
+          }}
+          className={`border px-3 py-2 w-full ${icon ? 'pl-10' : ''} ${className || ''}`}
+        >
+          {placeholder && <option value="">{placeholder}</option>}
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+          <FaChevronDown className="text-gray-500" />
+        </div>
       </div>
     </div>
   );
