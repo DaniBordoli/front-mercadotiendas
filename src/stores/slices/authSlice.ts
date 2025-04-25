@@ -182,37 +182,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const isActivated = user?.isActivated === true;
       
       const needsProfileCompletion = isActivated && 
-      (!user.country || !user.city || !user.birthDate || !user.province);
-    
-    if (isActivated) {
-      setStorageItem('token', token);
+        (!user.country || !user.city || !user.birthDate || !user.province);
+  
+      setStorageItem('token', token); 
+      setStorageItem('user', JSON.stringify(user));
       set({
         isAuthenticated: true,
         token,
         user,
         isLoading: false,
       });
-      
-      // Si necesita completar su perfil, redirigir a una pantalla especial
+
       if (needsProfileCompletion) {
-        window.location.href = '/complete-profile';
+        window.location.href = '/complete-profile'; 
       } else {
-        // Cargar el perfil actualizado incluyendo la tienda
         await get().loadProfile();
       }
-    } else {
-      setStorageItem('token', token);
-      setStorageItem('user', JSON.stringify(user));
-      set({
-        isAuthenticated: false,
-        token,
-        user,
-        isLoading: false,
-      });
-      
-      window.location.href = `/activate-account?email=${encodeURIComponent(user.email)}`;
-    }
-
     } catch (error) {
       console.error('Error en login con Google:', error);
       set({ 
