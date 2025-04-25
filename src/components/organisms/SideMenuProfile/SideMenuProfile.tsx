@@ -111,7 +111,7 @@ const SideMenuProfile: React.FC = () => {
                         fullWidth={true}
                         onClick={handleEditProfileClick}
                     >
-                        Editar Perfil
+                        Editar Avatar
                     </DesignButton>
                     <input
                         ref={fileInputRef}
