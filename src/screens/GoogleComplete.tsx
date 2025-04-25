@@ -80,20 +80,17 @@ const GoogleComplete = () => {
         }
         
         try {
-            await updateUserProfile(values);
-            
-            
             const authStore = useAuthStore.getState();
+            const token = authStore.token;
+
+            if (!token) {
+                throw new Error('No token provided');
+            }
+
+            await updateUserProfile(values);
             await authStore.loadProfile();
             
-        
-            const token = authStore.token;
-            if (token) {
-                authStore.setToken(token);
-            }
-            
-           
-            navigate('/login');
+            navigate('/'); 
         } catch (err) {
             console.error('Error durante la actualización del perfil:', err);
         }
