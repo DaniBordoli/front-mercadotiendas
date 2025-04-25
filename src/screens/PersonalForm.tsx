@@ -5,7 +5,7 @@ import { API_URL } from '../services/api';
 import { getStorageItem } from '../utils/storage';
 import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
 import Toast from '../components/atoms/Toast';
-
+import { Navbar } from '../components/organisms/Navbar';
 const PersonalForm: React.FC = () => {
   const [values, setValues] = useState({
     fullName: '',
@@ -139,6 +139,7 @@ const PersonalForm: React.FC = () => {
   return (
     <>
       <div className="flex">
+        <Navbar />
         <Sidebar />
         <div className="p-4 flex-grow flex justify-center">
           <div className="max-w-4xl w-full">

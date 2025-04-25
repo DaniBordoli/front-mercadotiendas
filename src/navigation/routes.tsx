@@ -15,6 +15,7 @@ import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
 import PersonalInfo from '../screens/PersonalInfo';
 import GoogleComplete from '../screens/GoogleComplete';
+import FirstTemplate from '../screens/templates/FirstTemplate';
 
 
 export const publicRoutes = [
@@ -53,6 +54,10 @@ export const publicRoutes = [
   {
     path: '/complete-profile', 
     element: <GoogleComplete />
+  },  
+  {
+    path: '/first-template', 
+    element: <FirstTemplate />
   },
 ];
 
@@ -76,6 +81,10 @@ export const privateRoutes = [
   {
     path: '/personal-form',
     element: <ShopRequiredRoute><PersonalForm /></ShopRequiredRoute>
+  },
+  {
+    path: '/personal-info',
+    element: <ShopRequiredRoute><PersonalInfo /></ShopRequiredRoute>
   }
 ];
 

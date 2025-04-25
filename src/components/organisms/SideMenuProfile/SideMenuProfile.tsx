@@ -5,11 +5,13 @@ import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar, FaRegCreditCard , 
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import { FaRegClock } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
+import { useNavigate } from 'react-router-dom';
 const SideMenuProfile: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <div 
-            className="w-[288px] h-[716px] mt-24 bg-white rounded-md shadow-md p-6"
-            style={{ minHeight: '716px' }}
+            className="w-[288px] mt-24 bg-white rounded-md shadow-md p-6"
+            style={{ minHeight: '716px', height: 'auto' }}
         >
             <div className="flex flex-col items-center mb-6">
                
@@ -75,6 +77,17 @@ const SideMenuProfile: React.FC = () => {
                         <li className="flex items-center ml-2 cursor-pointer">
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Configuración</span>
+                        </li>
+                        <li 
+                            className="flex items-center ml-2 cursor-pointer"
+                            onClick={() => navigate('/first-template')}
+                        >
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Template</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer">
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Información de mi tienda</span>
                         </li>
                         
                         <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity">

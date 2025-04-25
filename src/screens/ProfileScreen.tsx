@@ -2,9 +2,11 @@ import React from 'react';
 import { Sidebar } from '../components/organisms/Sidebar';
 import { CenteredBox } from '../components/templates/CenteredBox/CenteredBox';
 import { FaStore, FaShoppingBasket, FaPaintBrush, FaMoneyBill, FaTruck, FaChevronRight } from 'react-icons/fa';
+import { Navbar } from '../components/organisms/Navbar/Navbar';
 const ProfileScreen = () => {
     return (
         <div className="flex">
+            <Navbar />
             <Sidebar />
             <div className="flex-1">
                

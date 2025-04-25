@@ -9,10 +9,12 @@ import { StartSellingSection } from '../components/molecules/StartSellingSection
 import { BenefitsSection } from '../components/organisms/BenefitsSection';
 import { Footer } from '../components/organisms/Footer';
 import Carousel from '../components/organisms/Carousel/Carousel';
+import { Navbar } from '../components/organisms/Navbar';
 
 const Dashboard: React.FC = () => {
     return (
         <div className="flex flex-col h-screen">
+            <Navbar /> 
             <div className="flex-1"> 
                 <div className="flex justify-between items-center mb-4">
                 </div>
