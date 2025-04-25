@@ -87,7 +87,8 @@ const SideMenuProfile: React.FC = () => {
                         </li>
                         <li className="flex items-center ml-2 cursor-pointer">
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Información de mi tienda</span>
+                            <span className="font-space text-gray-500"
+                            onClick={() => navigate('/my-profile')}>Información de mi tienda</span>
                         </li>
                         
                         <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity">
