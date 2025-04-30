@@ -7,6 +7,7 @@ import { fetchUserProfile, updateUserProfile } from '../../../stores/slices/auth
 import Toast from '../../atoms/Toast';
 
 const PersonalSection: React.FC = () => {
+
     const [values, setValues] = useState({
         fullName: '',
         email: '',
@@ -14,7 +15,8 @@ const PersonalSection: React.FC = () => {
         birthDate: '',
         city: '',
         province: '',
-        country: ''
+        country: '',
+        avatar: ''
     });
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [toast, setToast] = useState({
@@ -34,7 +36,8 @@ const PersonalSection: React.FC = () => {
                     birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
                     city: user.city || '',
                     province: user.province || '',
-                    country: user.country || ''
+                    country: user.country || '',
+                    avatar: user.avatar || ''
                 });
             } catch (error) {
                 console.error('Error loading user profile:', error instanceof Error ? error.message : 'Unknown error');
@@ -54,6 +57,8 @@ const PersonalSection: React.FC = () => {
         }
         return errors;
     };
+
+
 
     const handleSaveChanges = async () => {
         setValidationErrors({});
@@ -90,6 +95,7 @@ const PersonalSection: React.FC = () => {
     return (
         <div className='flex justify-center '>
             <div className='w-[928px] h-auto mt-24 bg-white rounded-md shadow-md p-6'>
+
                 <div className="flex justify-between items-center mb-8">
                     <h1
                     style={{color: colors.darkGray}}

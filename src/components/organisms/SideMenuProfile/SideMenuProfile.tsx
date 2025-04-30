@@ -7,12 +7,17 @@ import { FaRegClock } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
-import { fetchUserProfile } from '../../../stores/slices/authSlice';
+import { fetchUserProfile, updateAvatar } from '../../../stores/slices/authSlice';
 
 const SideMenuProfile: React.FC = () => {
     const navigate = useNavigate();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>("https://placehold.co/100x100");
+    const [toast, setToast] = useState({
+        show: false,
+        message: '',
+        type: 'success' as const
+    });
     const [userData, setUserData] = useState({ name: '', email: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,8 +31,12 @@ const SideMenuProfile: React.FC = () => {
                     name: user.name || 'Usuario',
                     email: user.email || 'email@ejemplo.com'
                 });
+                if (user.avatar) {
+                    setImagePreview(user.avatar);
+                }
             } catch (error) {
-                console.error('Error loading user profile:', error instanceof Error ? error.message : 'Unknown error');
+                // Silently handle error loading profile
+                return;
             }
         };
 
@@ -62,6 +71,23 @@ const SideMenuProfile: React.FC = () => {
         };
 
         reader.readAsDataURL(file);
+
+        // Upload to server
+        (async () => {
+    
+            try {
+                const avatarUrl = await updateAvatar(file);
+                setImagePreview(avatarUrl);
+                setToast({
+                    show: true,
+                    message: 'Avatar actualizado correctamente',
+                    type: 'success'
+                });
+            } catch (error) {
+                setImagePreview(null);
+                alert('Error al subir el avatar');
+            }
+        })();
     };
 
     const handleRemoveImage = () => {
