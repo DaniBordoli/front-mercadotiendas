@@ -1,19 +1,19 @@
 import * as React from 'react';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
-import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar, FaRegCreditCard , FaRegMap} from 'react-icons/fa';
+import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar } from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import { FaRegClock } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
-import { fetchUserProfile, updateAvatar } from '../../../stores/slices/authSlice';
+import { fetchUserProfile, updateAvatar, logout } from '../../../stores/slices/authSlice';
 
 const SideMenuProfile: React.FC = () => {
     const navigate = useNavigate();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>("https://placehold.co/100x100");
-    const [toast, setToast] = useState({
+    const [, setToast] = useState({
         show: false,
         message: '',
         type: 'success' as const
@@ -97,6 +97,15 @@ const SideMenuProfile: React.FC = () => {
 
     const handleEditProfileClick = () => {
         fileInputRef.current?.click();
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            navigate('/');
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+        }
     };
 
     return (
@@ -197,7 +206,7 @@ const SideMenuProfile: React.FC = () => {
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Crear tienda</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => navigate('/logout')}>
+                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLogout}>
                             <MdLogout className="mr-3" style={{ color: colors.primaryRed }} />
                             <span className="font-space font-medium" style={{ color: colors.primaryRed }}>Cerrar Sesión</span>
                         </li>

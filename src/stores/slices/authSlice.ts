@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData, AuthStore } from '../../types/auth';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
@@ -113,8 +113,7 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
     throw new Error(errorData.message || 'Error updating user profile');
   }
 
-  const responseData = await response.json();
-
+  await response.json();
 };
 
 const checkInitialAuthState = () => {
@@ -362,7 +361,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   createShop: async (data: CreateShopData) => {
-    const currentUser = get().user;
     set({ isLoading: true, error: null });
     try {
       const token = getStorageItem('token');
@@ -452,11 +450,6 @@ export const fetchProvincesForArgentina = async (): Promise<string[]> => {
     }
     throw new Error('Argentina not found in the API response');
   } catch (error) {
-    console.error('Error fetching provinces for Argentina:', error);
-    throw error;
-  }
-};
-
 export const fetchCountries = async (): Promise<{ name: string; code: string }[]> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/all');

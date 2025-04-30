@@ -57,10 +57,7 @@ export const publicRoutes = [
     path: '/dashboard', 
     element: <Dashboard />
   },
-  {
-    path: '/complete-profile', 
-    element: <GoogleComplete />
-  },  
+
   {
     path: '/first-template', 
     element: <FirstTemplate />
@@ -68,6 +65,10 @@ export const publicRoutes = [
 ];
 
 export const privateRoutes = [
+  {
+    path: '/complete-profile',
+    element: <ProtectedRoute><GoogleComplete /></ProtectedRoute>
+  },
   {
     path: '/createshop',
     element: <NoShopRoute><CreateShop /></NoShopRoute>
