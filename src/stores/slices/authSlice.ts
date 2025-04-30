@@ -415,6 +415,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   }
 }));
 
+export const logout = () => useAuthStore.getState().logout();
+
 export const fetchProvincesForArgentina = async (): Promise<string[]> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/all');
@@ -450,6 +452,11 @@ export const fetchProvincesForArgentina = async (): Promise<string[]> => {
     }
     throw new Error('Argentina not found in the API response');
   } catch (error) {
+    console.error('Error fetching provinces for Argentina:', error);
+    throw error;
+  }
+};
+
 export const fetchCountries = async (): Promise<{ name: string; code: string }[]> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/all');
