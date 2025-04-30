@@ -5,12 +5,11 @@ import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores';
-import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
-import { updateUserProfile, fetchCountries, fetchProvincesForArgentina } from '../stores/slices/authSlice';
+import { updateUserProfile, fetchProvincesForArgentina } from '../stores/slices/authSlice';
 
 const GoogleComplete = () => {
     const navigate = useNavigate();
-    const { user, isLoading, clearError } = useAuthStore();
+    const { user, isLoading, clearError, isAuthenticated } = useAuthStore();
     const [values, setValues] = useState({
         birthDate: '',
         city: '',
@@ -20,6 +19,13 @@ const GoogleComplete = () => {
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [countries, setCountries] = useState<{ name: string; code: string }[]>([]);
     const [provinces, setProvinces] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
+            return;
+        }
+    }, [isAuthenticated, navigate]);
 
     useEffect(() => {
         if (user) {
@@ -33,20 +39,13 @@ const GoogleComplete = () => {
     }, [user]);
 
     useEffect(() => {
-        fetchCountries()
-            .then((data) => setCountries(data))
-            .catch((error) => console.error('Error fetching countries:', error));
+        // Por ahora solo permitimos Argentina
+        setCountries([{ name: 'Argentina', code: 'AR' }]);
+        // Cargamos las provincias automáticamente
+        fetchProvincesForArgentina()
+            .then((data) => setProvinces(data))
+            .catch((error) => console.error('Error fetching provinces:', error));
     }, []);
-
-    useEffect(() => {
-        if (values.country === 'Argentina') {
-            fetchProvincesForArgentina()
-                .then((data) => setProvinces(data))
-                .catch((error) => console.error('Error fetching provinces:', error));
-        } else {
-            setProvinces([]);
-        }
-    }, [values.country]);
 
     const validateForm = (values: Record<string, string>): Record<string, string> => {
         const errors: Record<string, string> = {};
@@ -80,6 +79,10 @@ const GoogleComplete = () => {
         }
         
         try {
+            if (!isAuthenticated) {
+                throw new Error('Usuario no autenticado');
+            }
+
             const authStore = useAuthStore.getState();
             const token = authStore.token;
 
