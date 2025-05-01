@@ -35,7 +35,7 @@ function Login() {
 
   const handleGoogleLogin = () => {
     clearError();
-    loginWithGoogle();
+    loginWithGoogle(navigate);
   };
 
   const handleEmailChange = (value: string) => {

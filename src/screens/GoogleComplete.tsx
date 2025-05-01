@@ -9,7 +9,7 @@ import { updateUserProfile, fetchProvincesForArgentina } from '../stores/slices/
 
 const GoogleComplete = () => {
     const navigate = useNavigate();
-    const { user, isLoading, clearError, isAuthenticated } = useAuthStore();
+    const { user, isLoading, clearError, isAuthenticated, needsProfileCompletion } = useAuthStore();
     const [values, setValues] = useState({
         birthDate: '',
         city: '',
@@ -21,11 +21,12 @@ const GoogleComplete = () => {
     const [provinces, setProvinces] = useState<string[]>([]);
 
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate('/login');
+        // Si no está autenticado o no necesita completar el perfil, redirigir
+        if (!isAuthenticated || !needsProfileCompletion) {
+            navigate('/');
             return;
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, needsProfileCompletion, navigate]);
 
     useEffect(() => {
         if (user) {

@@ -7,19 +7,26 @@ export const useAuthRedirect = () => {
     const location = useLocation();
     const user = useAuthStore(state => state.user);
     const isLoading = useAuthStore(state => state.isLoading);
+    const needsProfileCompletion = useAuthStore(state => state.needsProfileCompletion);
 
     useEffect(() => {
         if (isLoading) return;
 
-        const publicRoutes = ['/login', '/register', '/reset-password'];
-        const isPublicRoute = publicRoutes.includes(location.pathname);
+        const authOnlyRoutes = ['/my-shop', '/createshop', '/personal-form'];
+        const isAuthOnlyRoute = authOnlyRoutes.includes(location.pathname);
+        const isLoginPage = location.pathname === '/login';
 
-        if (!user && !isPublicRoute) {
-            // Si no hay usuario y no es una ruta pública, redirigir a login
+        if (!user && isAuthOnlyRoute) {
+            // Si no hay usuario y es una ruta que requiere autenticación
             navigate('/login');
-        } else if (user && isPublicRoute) {
-            // Si hay usuario y es una ruta pública, redirigir a home
-            navigate('/');
+        } else if (user) {
+            if (needsProfileCompletion && location.pathname !== '/complete-profile') {
+                // Si necesita completar el perfil y no está en esa página
+                navigate('/complete-profile');
+            } else if (isLoginPage) {
+                // Si está autenticado y está en login, llevarlo a home
+                navigate('/');
+            }
         }
-    }, [user, isLoading, navigate, location]);
+    }, [user, isLoading, navigate, location, needsProfileCompletion]);
 };

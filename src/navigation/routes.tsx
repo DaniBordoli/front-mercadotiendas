@@ -26,6 +26,10 @@ import ShopConfig from '../screens/ShopConfig';
 
 export const publicRoutes = [
   {
+    path: '/',
+    element: <Dashboard />
+  },
+  {
     path: '/register',
     element: <Register />
   },
@@ -53,11 +57,6 @@ export const publicRoutes = [
     path: '/activate-account',
     element: <AccountActivation />
   },
-  {
-    path: '/dashboard', 
-    element: <Dashboard />
-  },
-
   {
     path: '/first-template', 
     element: <FirstTemplate />
@@ -126,11 +125,7 @@ export const privateRoutes = [
 
 export const redirectRoutes = [
   {
-    path: '/',
-    element: <Navigate to="/dashboard" replace />
-  },
-  {
     path: '*',
-    element: <Navigate to="/login" replace />
+    element: <Navigate to="/" replace />
   }
 ];
