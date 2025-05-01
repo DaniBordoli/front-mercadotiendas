@@ -22,6 +22,10 @@ import Billing from '../screens/Billing';
 import SalesManagement from '../screens/SalesManagement';
 import ShopState from '../screens/ShopState';
 import ShopConfig from '../screens/ShopConfig';
+import ShopInfo from '../screens/ShopInfo';
+import SeoMetadata from '../screens/Seo-Metadata';
+import Settings from '../screens/Settings';
+import DomainInfo from '../screens/ShopInfo';
 
 
 export const publicRoutes = [
@@ -61,7 +65,20 @@ export const publicRoutes = [
     path: '/first-template', 
     element: <FirstTemplate />
   },
+  {
+    path: '/domain-config', 
+    element: <DomainInfo />
+  },
+  {
+    path: '/seo-metadata', 
+    element: <SeoMetadata />
+  },
+  {
+    path: '/settings', 
+    element: <Settings />
+  },
 ];
+
 
 export const privateRoutes = [
   {

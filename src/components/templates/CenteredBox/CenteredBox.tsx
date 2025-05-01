@@ -10,13 +10,13 @@ export const CenteredBox: React.FC<CenteredBoxProps> = ({
   padding = true,
   rounded = true
 }) => {
-  const baseStyles = "flex flex-col items-center transition-all duration-300";
+  const baseStyles = "flex flex-col transition-all duration-300";
   const shadowStyles = shadow ? "shadow-lg hover:shadow-xl" : "";
   const paddingStyles = padding ? "p-4 sm:p-6" : "";
   const roundedStyles = rounded ? "rounded-xl" : "";
-  
+
   return (
-    <div className="min-h-screen w-full flex items-center justify-center px-4 py-6 sm:p-4 bg-gradient-to-br from-sky-50 to-white">
+    <div className="w-full px-4 py-6 sm:p-4 bg-gradient-to-br from-sky-50 to-white">
       <div
         style={{ width, minHeight: height }}
         className={`
@@ -27,6 +27,7 @@ export const CenteredBox: React.FC<CenteredBoxProps> = ({
           ${className}
           bg-white
           max-w-full
+          mx-auto
         `}
       >
         {children}

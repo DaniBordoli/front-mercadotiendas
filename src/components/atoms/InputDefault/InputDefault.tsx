@@ -36,9 +36,8 @@ export const InputDefault: React.FC<InputDefaultProps> = ({
           borderColor: colors.lightGray,
           color: colors.darkGray,
           borderRadius: '0.5rem',
-          width: '100%', 
         }}
-        className={`border px-3 py-2 ${icon ? 'pl-10' : ''} font-space w-full ${className || ''}`}
+        className={`border px-3 py-2 ${icon ? 'pl-10' : ''} font-space ${className || ''}`}
         disabled={disabled}
       />
     </div>
