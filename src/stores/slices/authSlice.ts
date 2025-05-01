@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData, AuthStore } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData } from '../../types/auth';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
@@ -154,6 +154,27 @@ const checkInitialAuthState = () => {
 
 const initialState = checkInitialAuthState();
 
+export interface AuthState {
+  isAuthenticated: boolean;
+  token: string | null;
+  user: any | null;
+  isLoading: boolean;
+  error: string | null;
+  needsProfileCompletion?: boolean;
+}
+
+export type AuthStore = AuthState & {
+  loadProfile: () => void;
+  loginWithGoogle: (navigate?: (path: string) => void) => void;
+  login: (credentials: LoginCredentials) => void;
+  register: (data: RegisterData) => void;
+  createShop: (data: CreateShopData) => void;
+  logout: () => void;
+  clearError: () => void;
+  setToken: (token: string) => void;
+  clearToken: () => void;
+}
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
   loadProfile: async () => {
     const token = get().token;
@@ -176,9 +197,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   token: initialState.token,
 
 
-  loginWithGoogle: async () => {
-    const store = get();
-
+  loginWithGoogle: async (navigate?: (path: string) => void) => {
     set({ isLoading: true, error: null });
     try {
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
@@ -208,21 +227,36 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { token, user } = responseData.data;
       const isActivated = user?.isActivated === true;
       
-      const needsProfileCompletion = isActivated && 
-        (!user.country || !user.city || !user.birthDate || !user.province);
+      // Si el usuario está activado pero le faltan datos del perfil
+      const needsProfileCompletion = isActivated && (
+        !user.country || !user.city || !user.birthDate || !user.province
+      );
+      
+      console.log('User:', user);
+      console.log('isActivated:', isActivated);
+      console.log('needsProfileCompletion:', needsProfileCompletion);
   
       setStorageItem('token', token); 
       setStorageItem('user', JSON.stringify(user));
+      
+      console.log('Estableciendo estado en el store...');
       set({
         isAuthenticated: true,
         token,
         user,
         isLoading: false,
+        needsProfileCompletion
       });
 
       if (needsProfileCompletion) {
-        window.location.href = '/complete-profile'; 
+        console.log('Redirigiendo a /complete-profile...');
+        if (navigate) {
+          navigate('/complete-profile');
+        } else {
+          window.location.href = '/complete-profile';
+        }
       } else {
+        console.log('Cargando perfil...');
         await get().loadProfile();
       }
     } catch (error) {
