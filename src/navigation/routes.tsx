@@ -15,7 +15,7 @@ import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
 import PersonalInfo from '../screens/PersonalInfo';
 import GoogleComplete from '../screens/GoogleComplete';
-import FirstTemplate from '../screens/templates/FirstTemplate';
+import CreateShopAIScreen from '../screens/CreateShopAIScreen';
 import PurchaseHistory from '../screens/PurchaseHistory';
 import Subscription from '../screens/Subscription';
 import Billing from '../screens/Billing';
@@ -56,10 +56,6 @@ export const publicRoutes = [
   {
     path: '/activate-account',
     element: <AccountActivation />
-  },
-  {
-    path: '/first-template', 
-    element: <FirstTemplate />
   },
 ];
 
@@ -120,6 +116,10 @@ export const privateRoutes = [
   {
     path: '/shop-config',
     element: <ShopRequiredRoute><ShopConfig /></ShopRequiredRoute>
+  },
+  {
+    path: '/create-shop-ai',
+    element: <ProtectedRoute><CreateShopAIScreen /></ProtectedRoute>
   }
 ];
 

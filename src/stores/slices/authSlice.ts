@@ -118,38 +118,28 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
 
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
-  const userStr = getStorageItem('user');
-  let isAuthenticated = false;
-  
-  if (token && userStr) {
+  const userStr = getStorageItem('user'); // Keep reading user for potential initial display
+  let user = null;
+
+  // Try to parse user if it exists, but don't rely on it for isAuthenticated
+  if (userStr) {
     try {
-      const user = JSON.parse(userStr);
-      isAuthenticated = !!user.isActivated;
-      
-      if (!isAuthenticated) {
-        removeStorageItem('token');
-      }
+      user = JSON.parse(userStr);
     } catch (e) {
       console.error('Error al parsear usuario almacenado:', e);
-      removeStorageItem('token');
+      // If user data is corrupted, remove it, but token might still be valid
       removeStorageItem('user');
     }
   }
-  
-  if (!isAuthenticated || !token) {
-    return { token: null, isAuthenticated: false, user: null };
+
+  // If a token exists, assume the user is authenticated initially.
+  // loadProfile will verify the token and fetch actual user data/status.
+  if (token) {
+    return { token, isAuthenticated: true, user }; // Set isAuthenticated based on token presence
   }
 
-  // Intentar obtener el usuario del storage
-  try {
-    const user = JSON.parse(userStr || '{}');
-    return { token, isAuthenticated: true, user };
-  } catch (error) {
-    console.error('Error al parsear usuario:', error);
-    removeStorageItem('token');
-    removeStorageItem('user');
-    return { token: null, isAuthenticated: false, user: null };
-  }
+  // No token means not authenticated
+  return { token: null, isAuthenticated: false, user: null };
 };
 
 const initialState = checkInitialAuthState();

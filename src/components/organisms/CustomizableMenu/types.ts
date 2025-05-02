@@ -27,6 +27,13 @@ export interface EditableVariables {
     buttonTextColor?: string;
     buttonBorderColor?: string;
     buttonText?: string;
+    // Additional fields for AI chat integration
+    storeName?: string;
+    storeDescription?: string;
+    storeSlogan?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    footerElements?: { title: string; content: string }[];
 }
 
 export interface CustomizableMenuProps {
