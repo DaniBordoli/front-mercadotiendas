@@ -15,7 +15,10 @@ import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
 import PersonalInfo from '../screens/PersonalInfo';
 import GoogleComplete from '../screens/GoogleComplete';
+import CreateShopAIScreen from '../screens/CreateShopAIScreen';
 import FirstTemplate from '../screens/templates/FirstTemplate';
+import SearchResultsPage from '../screens/SearchResultsPage';
+import ProductDetailPage from '../screens/ProductDetailPage';
 import PurchaseHistory from '../screens/PurchaseHistory';
 import Subscription from '../screens/Subscription';
 import Billing from '../screens/Billing';
@@ -29,10 +32,6 @@ import DomainInfo from '../screens/ShopInfo';
 
 
 export const publicRoutes = [
-  {
-    path: '/',
-    element: <Dashboard />
-  },
   {
     path: '/register',
     element: <Register />
@@ -62,8 +61,24 @@ export const publicRoutes = [
     element: <AccountActivation />
   },
   {
+    path: '/dashboard', 
+    element: <Dashboard />
+  },
+  {
+    path: '/complete-profile', 
+    element: <GoogleComplete />
+  },  
+  {
     path: '/first-template', 
     element: <FirstTemplate />
+  },
+  {
+    path: '/search', 
+    element: <SearchResultsPage />
+  },
+  {
+    path: '/producto/:productId', 
+    element: <ProductDetailPage />
   },
   {
     path: '/domain-config', 
@@ -81,10 +96,6 @@ export const publicRoutes = [
 
 
 export const privateRoutes = [
-  {
-    path: '/complete-profile',
-    element: <ProtectedRoute><GoogleComplete /></ProtectedRoute>
-  },
   {
     path: '/createshop',
     element: <NoShopRoute><CreateShop /></NoShopRoute>
@@ -137,12 +148,20 @@ export const privateRoutes = [
   {
     path: '/shop-config',
     element: <ShopRequiredRoute><ShopConfig /></ShopRequiredRoute>
+  },
+  {
+    path: '/create-shop-ai',
+    element: <ProtectedRoute><CreateShopAIScreen /></ProtectedRoute>
   }
 ];
 
 export const redirectRoutes = [
   {
+    path: '/',
+    element: <Navigate to="/dashboard" replace />
+  },
+  {
     path: '*',
-    element: <Navigate to="/" replace />
+    element: <Navigate to="/login" replace />
   }
 ];

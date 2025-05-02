@@ -1,23 +1,18 @@
 import * as React from 'react';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
-import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar } from 'react-icons/fa';
+import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar, FaRegCreditCard , FaRegMap} from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import { FaRegClock } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
-import { fetchUserProfile, updateAvatar, logout } from '../../../stores/slices/authSlice';
+import { fetchUserProfile } from '../../../stores/slices/authSlice';
 
 const SideMenuProfile: React.FC = () => {
     const navigate = useNavigate();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>("https://placehold.co/100x100");
-    const [, setToast] = useState({
-        show: false,
-        message: '',
-        type: 'success' as const
-    });
     const [userData, setUserData] = useState({ name: '', email: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,12 +26,8 @@ const SideMenuProfile: React.FC = () => {
                     name: user.name || 'Usuario',
                     email: user.email || 'email@ejemplo.com'
                 });
-                if (user.avatar) {
-                    setImagePreview(user.avatar);
-                }
             } catch (error) {
-                // Silently handle error loading profile
-                return;
+                console.error('Error loading user profile:', error instanceof Error ? error.message : 'Unknown error');
             }
         };
 
@@ -71,23 +62,6 @@ const SideMenuProfile: React.FC = () => {
         };
 
         reader.readAsDataURL(file);
-
-        // Upload to server
-        (async () => {
-    
-            try {
-                const avatarUrl = await updateAvatar(file);
-                setImagePreview(avatarUrl);
-                setToast({
-                    show: true,
-                    message: 'Avatar actualizado correctamente',
-                    type: 'success'
-                });
-            } catch (error) {
-                setImagePreview(null);
-                alert('Error al subir el avatar');
-            }
-        })();
     };
 
     const handleRemoveImage = () => {
@@ -97,15 +71,6 @@ const SideMenuProfile: React.FC = () => {
 
     const handleEditProfileClick = () => {
         fileInputRef.current?.click();
-    };
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate('/');
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-        }
     };
 
     return (
@@ -161,7 +126,7 @@ const SideMenuProfile: React.FC = () => {
                 
                 <div className="w-full mt-8">
                     <ul className="space-y-5">
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/personal-info')}>
+ <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/personal-info')}>
                             <FaRegUser className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Información Personal</span>
                         </li>

@@ -1,15 +1,22 @@
 import * as React from 'react';
-import { InputDefault } from '../../components/atoms/InputDefault/InputDefault';
-import { SelectDefault } from '../../components/atoms/SelectDefault/SelectDefault';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
+import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { FaSearch, FaShoppingCart } from 'react-icons/fa';
-import { Card } from '../../components/molecules/Card/Card';
-import CustomizableMenu from '../../components/organisms/CustomizableMenu/CustomizableMenu';
-import { FooterCustom } from '../../components/organisms/FooterCustom';
+import { Card } from '../components/molecules/Card/Card';
+import CustomizableMenu from '../components/organisms/CustomizableMenu/CustomizableMenu';
+import { FooterCustom } from '../components/organisms/FooterCustom';
+import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
+import { EditableVariables } from '../components/organisms/CustomizableMenu/types';
+import { AIChat } from '../components/organisms/AIChat/AIChat';
+import AICreationConfirmModal from '../components/organisms/AICreationConfirmModal/AICreationConfirmModal';
+import { useShopStore } from '../stores';
 
-const FirstTemplate: React.FC = () => {
+const CreateShopAIScreen: React.FC = () => {
     const [isMenuOpen, setMenuOpen] = React.useState(false);
 
-    const [editableVariables, setEditableVariables] = React.useState({
+    const [editableVariables, setEditableVariables] = React.useState<EditableVariables>({
         navbarLinks: [
             { label: 'Inicio', href: '#' },
             { label: 'Productos', href: '#' },
@@ -65,7 +72,24 @@ const FirstTemplate: React.FC = () => {
         ],
         footerDescription: 'La plataforma de e-commerce social para emprendedores y creadores de contenido.', 
         searchTitle: 'Encuentra lo que necesitas', 
+        buttonBackgroundColor: '#007BFF',
+        buttonTextColor: '#FFFFFF',  
+        buttonBorderColor: '#0056b3',
+        buttonText: 'Test Button', 
+        storeName: 'MercadoTiendas',
+        storeDescription: 'La plataforma de e-commerce social para emprendedores y creadores de contenido.',
+        storeSlogan: 'Crea, Vende, Crece',
+        primaryColor: '#007BFF',
+        secondaryColor: '#93C5FD',
+        footerElements: [],
     });
+
+    const [isConfirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const [subdomain, setSubdomain] = useState('');
+    const [creationError, setCreationError] = useState<string | null>(null);
+    const [isCreating, setIsCreating] = useState(false);
+    const shopStoreCreateShop = useShopStore(state => state.createShop);
+    const navigate = useNavigate();
 
     const menuItems = [
         { label: 'Inicio', onClick: () => console.log('Inicio clicked') },
@@ -73,6 +97,58 @@ const FirstTemplate: React.FC = () => {
         { label: 'Sobre Nosotros', onClick: () => console.log('Sobre Nosotros clicked') },
         { label: 'Contacto', onClick: () => console.log('Contacto clicked') },
     ];
+
+    const handleTemplateChanges = (changes: Partial<EditableVariables>) => {
+        setEditableVariables(prev => ({
+            ...prev,
+            ...changes,
+            filterOptions: changes.filterOptions 
+                ? { ...prev.filterOptions, ...changes.filterOptions } 
+                : prev.filterOptions,
+        }));
+    };
+
+    const handleChatComplete = () => {
+        console.log("[CreateShopAIScreen] Chat complete, opening confirmation modal.");
+        setConfirmationModalOpen(true);
+    };
+
+    const handleConfirmAndCreate = async (finalSubdomain: string) => {
+        if (!finalSubdomain.trim()) {
+            setCreationError("El subdominio es requerido.");
+            return;
+        }
+        if (!/^[a-z0-9-]+$/.test(finalSubdomain)) {
+            setCreationError("Subdominio inválido. Solo letras minúsculas, números y guiones.");
+            return;
+        }
+
+        setIsCreating(true);
+        setCreationError(null);
+
+        const finalShopData = {
+            shopName: editableVariables.storeName || editableVariables.title || 'Mi Tienda AI',
+            description: editableVariables.storeDescription || 'Descripción generada por IA',
+            address: finalSubdomain,
+            brandName: editableVariables.storeName || editableVariables.title || 'Mi Marca AI',
+            contactEmail: 'ai-generated@example.com',
+            shopPhone: '000000000',
+            subdomain: finalSubdomain,
+        };
+
+        try {
+            console.log("Attempting to create shop with data:", finalShopData);
+            await shopStoreCreateShop(finalShopData);
+            setConfirmationModalOpen(false);
+            alert('¡Tienda creada con éxito!');
+            navigate('/dashboard');
+        } catch (err: any) {
+            console.error("Shop creation failed:", err);
+            setCreationError(err.message || 'Error al crear la tienda. El subdominio puede estar en uso.');
+        } finally {
+            setIsCreating(false);
+        }
+    };
 
     return (
         <div>
@@ -82,12 +158,13 @@ const FirstTemplate: React.FC = () => {
                 onClose={() => setMenuOpen(false)}
                 editableVariables={{
                     ...editableVariables,
-                    onUpdate: (updatedVariables) =>
-                        setEditableVariables({
-                            ...editableVariables,
+                    onUpdate: (updatedVariables: Partial<EditableVariables>) => 
+                        setEditableVariables((prev) => ({
+                            ...prev,
                             ...updatedVariables,
-                            searchTitle: updatedVariables.searchTitle || editableVariables.searchTitle, 
-                        }),
+                            filterOptions: updatedVariables.filterOptions ? { ...prev.filterOptions, ...updatedVariables.filterOptions } : prev.filterOptions,
+                            searchTitle: updatedVariables.searchTitle || prev.searchTitle, 
+                        })),
                 }}
             />
             {/* Navbar */}
@@ -131,7 +208,7 @@ const FirstTemplate: React.FC = () => {
                     ))}
                 </div>
                 <div>
-                    <FaShoppingCart size={24} style={{ color: editableVariables.textColor }} /> {/* Apply textColor */}
+                    <FaShoppingCart size={24} style={{ color: editableVariables.textColor }} />
                 </div>
             </div>
 
@@ -147,7 +224,9 @@ const FirstTemplate: React.FC = () => {
                         color: editableVariables.textColor,
                     }}
                 >
-                  
+                  {editableVariables.storeName && (
+                    <h1 className="text-center bg-black bg-opacity-50 p-4 rounded">{editableVariables.storeName}</h1>
+                  )}
                 </div>
 
                 {/* Filters Section */}
@@ -196,6 +275,17 @@ const FirstTemplate: React.FC = () => {
                         />
                     ))}
                 </div>
+                <div className="p-5">
+                    <DesignButton
+                        variant="primary" 
+                        customBackgroundColor={editableVariables.buttonBackgroundColor}
+                        customTextColor={editableVariables.buttonTextColor}
+                        customBorderColor={editableVariables.buttonBorderColor}
+                        onClick={() => console.log('Test button clicked')}
+                    >
+                        {editableVariables.buttonText} 
+                    </DesignButton>
+                </div>
             </div>
             <FooterCustom
                 backgroundColor={editableVariables.footerBackgroundColor}
@@ -203,8 +293,32 @@ const FirstTemplate: React.FC = () => {
                 footerSections={editableVariables.footerSections}
                 footerDescription={editableVariables.footerDescription}
             />
+
+            {/* AI Chat Component */}
+            <AIChat 
+                onApplyTemplateChanges={handleTemplateChanges}
+                initialVariables={editableVariables}
+                onChatComplete={handleChatComplete}
+            />
+
+            {/* Render Confirmation Modal */}
+            {isConfirmationModalOpen && (
+                <AICreationConfirmModal
+                    isOpen={isConfirmationModalOpen}
+                    onClose={() => {
+                        setConfirmationModalOpen(false);
+                        setCreationError(null);
+                    }}
+                    initialData={editableVariables}
+                    subdomain={subdomain}
+                    onSubdomainChange={setSubdomain}
+                    onConfirm={handleConfirmAndCreate}
+                    isLoading={isCreating}
+                    error={creationError}
+                />
+            )}
         </div>
     );
 };
 
-export default FirstTemplate;
+export default CreateShopAIScreen; 
