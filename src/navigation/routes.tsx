@@ -18,6 +18,16 @@ import GoogleComplete from '../screens/GoogleComplete';
 import FirstTemplate from '../screens/templates/FirstTemplate';
 import SearchResultsPage from '../screens/SearchResultsPage';
 import ProductDetailPage from '../screens/ProductDetailPage';
+import PurchaseHistory from '../screens/PurchaseHistory';
+import Subscription from '../screens/Subscription';
+import Billing from '../screens/Billing';
+import SalesManagement from '../screens/SalesManagement';
+import ShopState from '../screens/ShopState';
+import ShopConfig from '../screens/ShopConfig';
+import ShopInfo from '../screens/ShopInfo';
+import SeoMetadata from '../screens/Seo-Metadata';
+import Settings from '../screens/Settings';
+import DomainInfo from '../screens/ShopInfo';
 
 
 export const publicRoutes = [
@@ -68,8 +78,19 @@ export const publicRoutes = [
   {
     path: '/producto/:productId', 
     element: <ProductDetailPage />
+    path: '/domain-config', 
+    element: <DomainInfo />
+  },
+  {
+    path: '/seo-metadata', 
+    element: <SeoMetadata />
+  },
+  {
+    path: '/settings', 
+    element: <Settings />
   },
 ];
+
 
 export const privateRoutes = [
   {
