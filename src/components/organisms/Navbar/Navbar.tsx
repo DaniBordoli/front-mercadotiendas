@@ -4,10 +4,8 @@ import { MdHelp } from "react-icons/md";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaShop, FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../../stores/index';
 import { FaShoppingCart, FaRobot } from "react-icons/fa";
 import { useAuthStore, useSearchStore } from '../../../stores/index';
-import { FaShoppingCart } from "react-icons/fa";
 import { SearchSuggestions } from '../../molecules/SearchSuggestions';
 
 export const Navbar: React.FC = () => {
@@ -15,7 +13,6 @@ export const Navbar: React.FC = () => {
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { logout, isAuthenticated, user } = useAuthStore();
-  const { logout, isAuthenticated } = useAuthStore();
   const {
     searchTerm,
     suggestions,

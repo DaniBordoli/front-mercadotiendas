@@ -79,6 +79,8 @@ export const publicRoutes = [
   {
     path: '/producto/:productId', 
     element: <ProductDetailPage />
+  },
+  {
     path: '/domain-config', 
     element: <DomainInfo />
   },
