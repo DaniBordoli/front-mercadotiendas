@@ -179,7 +179,7 @@ const SideMenuProfile: React.FC = () => {
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Crear tienda</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLogout}>
+                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity">
                             <MdLogout className="mr-3" style={{ color: colors.primaryRed }} />
                             <span className="font-space font-medium" style={{ color: colors.primaryRed }}>Cerrar Sesión</span>
                         </li>
