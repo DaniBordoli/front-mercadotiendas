@@ -5,32 +5,51 @@ import '../../../styles/responsive.css';
 
 interface CardProps {
   imageSrc?: string;
+  title?: string;
+  price?: number;
+  category?: string;
   onClick?: () => void;
 }
 
-export const Card: React.FC<CardProps> = ({ imageSrc, onClick }) => {
+export const Card: React.FC<CardProps> = ({ 
+  imageSrc, 
+  title = "Título no disponible",
+  price,
+  category = "General",
+  onClick 
+}) => {
   const handleCardClick = () => {
     if (onClick) onClick();
     else console.log('Card clicked');
   };
 
+  const formattedPrice = price !== undefined 
+    ? `$${price.toLocaleString()}`
+    : "Precio no disponible";
+
   return (
     <div 
-      className="card ml-6 w-84 h-96 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+      className="card ml-6 w-84 h-96 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col"
       onClick={handleCardClick}
     >
-      <figure className="m-0 w-full h-60">
+      <figure className="m-0 w-full h-60 flex-shrink-0">
         <img
           className="w-full h-full object-cover"
-          src={imageSrc || ""}
-          alt="Generic placeholder"
+          src={imageSrc || "https://placehold.co/600x400?text=No+Image"}
+          alt={title}
         />
       </figure>
-      <div className="card-body p-4 flex flex-col items-center">
-        <h5 
+      <div className="card-body p-4 flex flex-col items-start flex-grow">
+        <p 
           style={{ color: colors.mediumGray }}
-          className="card-title mb-2.5 mt-5 font-light text-left font-space self-start w-full">Tecnología</h5>
-        <div className="flex justify-center flex-grow items-center mt-5">
+          className="text-xs font-light mb-1">{category}</p>
+        <h5 
+          className="card-title mb-1 font-semibold text-left text-base line-clamp-2">
+          {title}
+        </h5>
+        <p className="text-lg font-bold mb-2">{formattedPrice}</p>
+        
+        <div className="flex justify-center w-full mt-auto">
           <DesignButton 
           variant="primary">
             Comprar

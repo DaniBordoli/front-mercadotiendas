@@ -5,7 +5,6 @@ import { FaSearch, FaShoppingCart } from 'react-icons/fa';
 import { Card } from '../../components/molecules/Card/Card';
 import CustomizableMenu from '../../components/organisms/CustomizableMenu/CustomizableMenu';
 import { FooterCustom } from '../../components/organisms/FooterCustom';
-import { DesignButton } from '../../components/atoms/DesignButton/DesignButton';
 
 const FirstTemplate: React.FC = () => {
     const [isMenuOpen, setMenuOpen] = React.useState(false);
@@ -66,10 +65,6 @@ const FirstTemplate: React.FC = () => {
         ],
         footerDescription: 'La plataforma de e-commerce social para emprendedores y creadores de contenido.', 
         searchTitle: 'Encuentra lo que necesitas', 
-        buttonBackgroundColor: '#007BFF',
-        buttonTextColor: '#FFFFFF',  
-        buttonBorderColor: '#0056b3',
-        buttonText: 'Test Button', 
     });
 
     const menuItems = [
@@ -200,17 +195,6 @@ const FirstTemplate: React.FC = () => {
                             onClick={() => console.log(`Producto ${i} seleccionado`)}
                         />
                     ))}
-                </div>
-                <div className="p-5">
-                    <DesignButton
-                        variant="primary" 
-                        customBackgroundColor={editableVariables.buttonBackgroundColor}
-                        customTextColor={editableVariables.buttonTextColor}
-                        customBorderColor={editableVariables.buttonBorderColor}
-                        onClick={() => console.log('Test button clicked')}
-                    >
-                        {editableVariables.buttonText} 
-                    </DesignButton>
                 </div>
             </div>
             <FooterCustom

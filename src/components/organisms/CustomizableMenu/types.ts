@@ -23,10 +23,6 @@ export interface EditableVariables {
     footerSections?: { title: string; links: { text: string; url: string }[] }[];
     footerDescription?: string;
     searchTitle?: string; 
-    buttonBackgroundColor?: string;
-    buttonTextColor?: string;
-    buttonBorderColor?: string;
-    buttonText?: string;
 }
 
 export interface CustomizableMenuProps {
