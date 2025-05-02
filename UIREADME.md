@@ -1,4 +1,4 @@
-# MercadoTiendas - Documentación de UI
+# MercadoTiendas -- Documentación de UI
 
 ## Estado Actual
 
