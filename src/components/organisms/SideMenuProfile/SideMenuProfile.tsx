@@ -198,9 +198,17 @@ const SideMenuProfile: React.FC = () => {
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Estado de la tienda</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/shop-config')}>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/settings')}>
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Configuración de la tienda</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/domain-config')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Configuración de Dominio</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/seo-metadata')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">SEO y Metadata</span>
                         </li>
                         <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/createshop')}>
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
