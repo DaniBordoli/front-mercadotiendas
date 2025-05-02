@@ -126,52 +126,60 @@ const SideMenuProfile: React.FC = () => {
                 
                 <div className="w-full mt-8">
                     <ul className="space-y-5">
-                        <li className="flex items-center ml-2 cursor-pointer">
+ <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/personal-info')}>
                             <FaRegUser className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Información Personal</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/purchase-history')}>
                             <FaRegClock className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Historial de Compras</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/favorites')}>
                             <FaRegHeart className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Favoritos</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
-                            <FaTruck  className="mr-3 text-gray-500" />
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/tracking')}>
+                            <FaTruck className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Seguimiento</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
-                            <FaRegStar  className="mr-3 text-gray-500" />
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/reputation')}>
+                            <FaRegStar className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Reputación</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
-                            <FaRegCreditCard  className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Métodos de Pago</span>
-                        </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
-                            <FaRegMap className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Direcciones</span>
-                        </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
+
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/subscription')}>
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Configuración</span>
+                            <span className="font-space text-gray-500">Suscripción</span>
                         </li>
-                        <li 
-                            className="flex items-center ml-2 cursor-pointer"
-                            onClick={() => navigate('/first-template')}
-                        >
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/billing')}>
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Template</span>
+                            <span className="font-space text-gray-500">Facturación</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer">
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/sales-management')}>
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500"
-                            onClick={() => navigate('/my-profile')}>Información de mi tienda</span>
+                            <span className="font-space text-gray-500">Gestión de ventas</span>
                         </li>
-                        
-                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity">
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/shop-state')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Estado de la tienda</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/settings')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Configuración de la tienda</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/domain-config')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Configuración de Dominio</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/seo-metadata')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">SEO y Metadata</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/createshop')}>
+                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Crear tienda</span>
+                        </li>
+                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLogout}>
                             <MdLogout className="mr-3" style={{ color: colors.primaryRed }} />
                             <span className="font-space font-medium" style={{ color: colors.primaryRed }}>Cerrar Sesión</span>
                         </li>

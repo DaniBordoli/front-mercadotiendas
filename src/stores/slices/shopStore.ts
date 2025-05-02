@@ -12,6 +12,7 @@ interface ShopState {
     createShop: (data: any) => Promise<void>;
     setShop: (shop: Shop | null) => void;
     clearError: () => void;
+    getShop: () => Promise<void>;
 }
 
 export const useShopStore = create<ShopState>((set, get) => ({
@@ -130,6 +131,33 @@ export const useShopStore = create<ShopState>((set, get) => ({
             console.error("Error caught in createShop store action:", error);
             const errorMessage = error instanceof Error ? error.message : 'Unknown error during shop creation';
             set({ error: errorMessage, loading: false });
+            throw error;
+        }
+    },
+
+    getShop: async () => {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        set({ loading: true, error: null });
+
+        try {
+            const response = await fetch(`${API_URL}/shops/me`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error fetching shop data');
+            }
+
+            const result = await response.json();
+            set({ shop: result.shop, loading: false });
+        } catch (error) {
+            set({ error: (error as Error).message, loading: false });
             throw error;
         }
     },

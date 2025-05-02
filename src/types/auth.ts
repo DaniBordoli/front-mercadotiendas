@@ -33,6 +33,13 @@ export interface Shop {
   brandName: string;
   contactEmail: string;
   shopPhone: string;
+  taxAdress: string;
+  preferredCurrency: string;
+  languageMain: string;
+  country?: string;
+  province?: string;
+  city?: string;
+  
   imageUrl?: string;
   owner: string;
   createdAt: string;
