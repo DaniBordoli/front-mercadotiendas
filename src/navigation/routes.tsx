@@ -16,19 +16,22 @@ import ResetPass from '../screens/ResetPass';
 import PersonalInfo from '../screens/PersonalInfo';
 import GoogleComplete from '../screens/GoogleComplete';
 import CreateShopAIScreen from '../screens/CreateShopAIScreen';
+import FirstTemplate from '../screens/templates/FirstTemplate';
+import SearchResultsPage from '../screens/SearchResultsPage';
+import ProductDetailPage from '../screens/ProductDetailPage';
 import PurchaseHistory from '../screens/PurchaseHistory';
 import Subscription from '../screens/Subscription';
 import Billing from '../screens/Billing';
 import SalesManagement from '../screens/SalesManagement';
 import ShopState from '../screens/ShopState';
 import ShopConfig from '../screens/ShopConfig';
+import ShopInfo from '../screens/ShopInfo';
+import SeoMetadata from '../screens/Seo-Metadata';
+import Settings from '../screens/Settings';
+import DomainInfo from '../screens/ShopInfo';
 
 
 export const publicRoutes = [
-  {
-    path: '/',
-    element: <Dashboard />
-  },
   {
     path: '/register',
     element: <Register />
@@ -57,13 +60,40 @@ export const publicRoutes = [
     path: '/activate-account',
     element: <AccountActivation />
   },
+  {
+    path: '/dashboard', 
+    element: <Dashboard />
+  },
+  {
+    path: '/complete-profile', 
+    element: <GoogleComplete />
+  },  
+  {
+    path: '/first-template', 
+    element: <FirstTemplate />
+  },
+  {
+    path: '/search', 
+    element: <SearchResultsPage />
+  },
+  {
+    path: '/producto/:productId', 
+    element: <ProductDetailPage />
+    path: '/domain-config', 
+    element: <DomainInfo />
+  },
+  {
+    path: '/seo-metadata', 
+    element: <SeoMetadata />
+  },
+  {
+    path: '/settings', 
+    element: <Settings />
+  },
 ];
 
+
 export const privateRoutes = [
-  {
-    path: '/complete-profile',
-    element: <ProtectedRoute><GoogleComplete /></ProtectedRoute>
-  },
   {
     path: '/createshop',
     element: <NoShopRoute><CreateShop /></NoShopRoute>
@@ -125,7 +155,11 @@ export const privateRoutes = [
 
 export const redirectRoutes = [
   {
+    path: '/',
+    element: <Navigate to="/dashboard" replace />
+  },
+  {
     path: '*',
-    element: <Navigate to="/" replace />
+    element: <Navigate to="/login" replace />
   }
 ];

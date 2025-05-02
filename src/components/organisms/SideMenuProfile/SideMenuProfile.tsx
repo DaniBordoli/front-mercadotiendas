@@ -1,23 +1,18 @@
 import * as React from 'react';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
-import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar } from 'react-icons/fa';
+import { FaEdit, FaRegUser, FaRegHeart , FaTruck , FaRegStar, FaRegCreditCard , FaRegMap} from 'react-icons/fa';
 import { HiOutlineQuestionMarkCircle } from "react-icons/hi2";
 import { FaRegClock } from "react-icons/fa6";
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
-import { fetchUserProfile, updateAvatar, logout } from '../../../stores/slices/authSlice';
+import { fetchUserProfile } from '../../../stores/slices/authSlice';
 
 const SideMenuProfile: React.FC = () => {
     const navigate = useNavigate();
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>("https://placehold.co/100x100");
-    const [, setToast] = useState({
-        show: false,
-        message: '',
-        type: 'success' as const
-    });
     const [userData, setUserData] = useState({ name: '', email: '' });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,12 +26,8 @@ const SideMenuProfile: React.FC = () => {
                     name: user.name || 'Usuario',
                     email: user.email || 'email@ejemplo.com'
                 });
-                if (user.avatar) {
-                    setImagePreview(user.avatar);
-                }
             } catch (error) {
-                // Silently handle error loading profile
-                return;
+                console.error('Error loading user profile:', error instanceof Error ? error.message : 'Unknown error');
             }
         };
 
@@ -71,23 +62,6 @@ const SideMenuProfile: React.FC = () => {
         };
 
         reader.readAsDataURL(file);
-
-        // Upload to server
-        (async () => {
-    
-            try {
-                const avatarUrl = await updateAvatar(file);
-                setImagePreview(avatarUrl);
-                setToast({
-                    show: true,
-                    message: 'Avatar actualizado correctamente',
-                    type: 'success'
-                });
-            } catch (error) {
-                setImagePreview(null);
-                alert('Error al subir el avatar');
-            }
-        })();
     };
 
     const handleRemoveImage = () => {
@@ -97,15 +71,6 @@ const SideMenuProfile: React.FC = () => {
 
     const handleEditProfileClick = () => {
         fileInputRef.current?.click();
-    };
-
-    const handleLogout = async () => {
-        try {
-            await logout();
-            navigate('/');
-        } catch (error) {
-            console.error('Error al cerrar sesión:', error);
-        }
     };
 
     return (
@@ -161,52 +126,52 @@ const SideMenuProfile: React.FC = () => {
                 
                 <div className="w-full mt-8">
                     <ul className="space-y-5">
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/personal-info')}>
+                        <li className="flex items-center ml-2 cursor-pointer">
                             <FaRegUser className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Información Personal</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/purchase-history')}>
+                        <li className="flex items-center ml-2 cursor-pointer">
                             <FaRegClock className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Historial de Compras</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/favorites')}>
+                        <li className="flex items-center ml-2 cursor-pointer">
                             <FaRegHeart className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Favoritos</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/tracking')}>
-                            <FaTruck className="mr-3 text-gray-500" />
+                        <li className="flex items-center ml-2 cursor-pointer">
+                            <FaTruck  className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Seguimiento</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/reputation')}>
-                            <FaRegStar className="mr-3 text-gray-500" />
+                        <li className="flex items-center ml-2 cursor-pointer">
+                            <FaRegStar  className="mr-3 text-gray-500" />
                             <span className="font-space text-gray-500">Reputación</span>
                         </li>
-
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/subscription')}>
-                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Suscripción</span>
+                        <li className="flex items-center ml-2 cursor-pointer">
+                            <FaRegCreditCard  className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Métodos de Pago</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/billing')}>
-                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Facturación</span>
+                        <li className="flex items-center ml-2 cursor-pointer">
+                            <FaRegMap className="mr-3 text-gray-500" />
+                            <span className="font-space text-gray-500">Direcciones</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/sales-management')}>
+                        <li className="flex items-center ml-2 cursor-pointer">
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Gestión de ventas</span>
+                            <span className="font-space text-gray-500">Configuración</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/shop-state')}>
+                        <li 
+                            className="flex items-center ml-2 cursor-pointer"
+                            onClick={() => navigate('/first-template')}
+                        >
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Estado de la tienda</span>
+                            <span className="font-space text-gray-500">Template</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/shop-config')}>
+                        <li className="flex items-center ml-2 cursor-pointer">
                             <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Configuración de la tienda</span>
+                            <span className="font-space text-gray-500"
+                            onClick={() => navigate('/my-profile')}>Información de mi tienda</span>
                         </li>
-                        <li className="flex items-center ml-2 cursor-pointer" onClick={() => navigate('/createshop')}>
-                            <HiOutlineQuestionMarkCircle className="mr-3 text-gray-500" />
-                            <span className="font-space text-gray-500">Crear tienda</span>
-                        </li>
-                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLogout}>
+                        
+                        <li className="flex items-center ml-2 cursor-pointer hover:opacity-80 transition-opacity">
                             <MdLogout className="mr-3" style={{ color: colors.primaryRed }} />
                             <span className="font-space font-medium" style={{ color: colors.primaryRed }}>Cerrar Sesión</span>
                         </li>

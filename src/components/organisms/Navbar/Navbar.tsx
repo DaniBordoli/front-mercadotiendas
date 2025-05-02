@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Logo } from '../../atoms/Logo';
 import { MdHelp } from "react-icons/md";
 import { IoMdInformationCircleOutline } from "react-icons/io";
@@ -6,11 +6,27 @@ import { FaShop, FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../stores/index';
 import { FaShoppingCart, FaRobot } from "react-icons/fa";
+import { useAuthStore, useSearchStore } from '../../../stores/index';
+import { FaShoppingCart } from "react-icons/fa";
+import { SearchSuggestions } from '../../molecules/SearchSuggestions';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { logout, isAuthenticated, user } = useAuthStore();
+  const { logout, isAuthenticated } = useAuthStore();
+  const {
+    searchTerm,
+    suggestions,
+    fetchSuggestions,
+    fetchSearchResults,
+    clearSuggestions,
+    setSearchTerm,
+  } = useSearchStore();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const categoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -21,6 +37,100 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    setSearchTerm(query);
+
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    if (query.trim() === '') {
+      clearSuggestions();
+      setShowSuggestions(false);
+      return;
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      fetchSuggestions(query);
+    }, 300);
+  };
+
+  const handleSuggestionClick = (suggestion: { id: string; name: string }) => {
+    console.log('[Navbar] Sugerencia clickeada:', suggestion);
+    const searchTermToSend = suggestion.name;
+    setSearchTerm(searchTermToSend);
+    clearSuggestions();
+    setShowSuggestions(false);
+    fetchSearchResults({ term: searchTermToSend });
+    navigate(`/search?q=${encodeURIComponent(searchTermToSend)}`);
+  };
+
+  const handleCategorySearch = (categoryTerm: string) => {
+    setSearchTerm(categoryTerm);
+    clearSuggestions();
+    setShowSuggestions(false);
+    fetchSearchResults({ term: categoryTerm });
+    navigate(`/search?q=${encodeURIComponent(categoryTerm)}`);
+    setIsCategoryMenuOpen(false);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (searchTerm.trim() !== '') {
+      console.log('[Navbar] Búsqueda enviada:', searchTerm);
+      clearSuggestions();
+      setShowSuggestions(false);
+      fetchSearchResults({ term: searchTerm });
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    }
+  };
+
+  const openCategoryMenu = () => {
+    if (categoryTimeoutRef.current) {
+      clearTimeout(categoryTimeoutRef.current);
+    }
+    setIsCategoryMenuOpen(true);
+  };
+
+  const closeCategoryMenu = () => {
+    categoryTimeoutRef.current = setTimeout(() => {
+      setIsCategoryMenuOpen(false);
+    }, 100);
+  };
+
+  useEffect(() => {
+    if (searchTerm.trim() !== '' && suggestions.length > 0) {
+      setShowSuggestions(true);
+    } else if (searchTerm.trim() === '') {
+      setShowSuggestions(false);
+    }
+  }, [suggestions, searchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!(event.target instanceof Element) || !event.target.closest('.search-container')) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (categoryTimeoutRef.current) {
+        clearTimeout(categoryTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <nav className="w-full bg-white shadow-md px-4 py-2 flex items-start justify-center z-50 fixed">
       <div className="container mx-auto flex justify-between max-w-7xl">
@@ -30,28 +140,51 @@ export const Navbar: React.FC = () => {
               <Logo size={28} color="skyblue" />
               <h1 className="text-xl font-bold ml-2 font-space">MercadoTiendas</h1>
             </div>
-            <div className="flex-1 max-w-4xl">
-              <div className="relative">
+            <div className="flex-1 max-w-4xl search-container">
+              <form onSubmit={handleSearchSubmit} className="relative">
                 <input
                   type="text"
                   placeholder="Buscar productos..."
                   className="w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onFocus={() => searchTerm.trim() !== '' && suggestions.length > 0 && setShowSuggestions(true)}
                 />
-              </div>
+                <SearchSuggestions 
+                  suggestions={suggestions}
+                  onSuggestionClick={handleSuggestionClick}
+                  isVisible={showSuggestions}
+                />
+              </form>
             </div>
           </div>
           <div className="flex gap-8 text-gray-600 text-sm justify-center mt-2 ml-52">
             <a href="#" className="hover:text-sky-500 transition-colors">Gestión de ventas</a>
-            <div className="relative group">
+            <div 
+              className="relative" 
+              onMouseEnter={openCategoryMenu} 
+              onMouseLeave={closeCategoryMenu}
+            >
               <a href="#" className="hover:text-sky-500 transition-colors">Categorias</a>
-              <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48">
-                <ul className="py-2">
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 1</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
-                </ul>
-              </div>
+              {isCategoryMenuOpen && (
+                <div 
+                  className="absolute bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48 z-10" 
+                  onMouseEnter={openCategoryMenu} 
+                  onMouseLeave={closeCategoryMenu}
+                >
+                  <ul className="py-2">
+                    <li 
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                      onClick={() => handleCategorySearch('laptop')}
+                    >
+                      Laptop
+                    </li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
+                  </ul>
+                </div>
+              )}
             </div>
             <a href="#" className="hover:text-sky-500 transition-colors">Cupones</a>
             <a href="#" className="hover:text-sky-500 transition-colors">Productos</a>

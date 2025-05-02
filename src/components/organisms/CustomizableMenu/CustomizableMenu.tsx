@@ -34,10 +34,6 @@ const CustomizableMenu: React.FC<CustomizableMenuProps> = ({ isOpen, onClose, ed
     ]);
     const [footerDescription, setFooterDescription] = React.useState<string>(editableVariables.footerDescription || "La plataforma de e-commerce social para emprendedores y creadores de contenido.");
     const [searchTitle, setSearchTitle] = React.useState(editableVariables.searchTitle || 'Encuentra lo que necesitas');
-    const [buttonBackgroundColor, setButtonBackgroundColor] = React.useState(editableVariables.buttonBackgroundColor || '#007BFF');
-    const [buttonTextColor, setButtonTextColor] = React.useState(editableVariables.buttonTextColor || '#FFFFFF');
-    const [buttonBorderColor, setButtonBorderColor] = React.useState(editableVariables.buttonBorderColor || '#0056b3');
-    const [buttonText, setButtonText] = React.useState(editableVariables.buttonText || 'Test Button');
 
     const handleSave = () => {
         if (editableVariables.onUpdate) {
@@ -57,10 +53,6 @@ const CustomizableMenu: React.FC<CustomizableMenuProps> = ({ isOpen, onClose, ed
                 footerSections,
                 footerDescription,
                 filterOptions: editableVariables.filterOptions,
-                buttonBackgroundColor,
-                buttonTextColor,
-                buttonBorderColor,
-                buttonText, 
             });
         }
         onClose();
@@ -297,39 +289,6 @@ const CustomizableMenu: React.FC<CustomizableMenuProps> = ({ isOpen, onClose, ed
                         ))}
                     </div>
                 );
-            case 'Button':
-                return (
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium mb-1">Button Background Color:</label>
-                        <input
-                            type="color"
-                            value={buttonBackgroundColor}
-                            onChange={(e) => setButtonBackgroundColor(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
-                        />
-                        <label className="block text-sm font-medium mb-1 mt-4">Button Text Color:</label>
-                        <input
-                            type="color"
-                            value={buttonTextColor}
-                            onChange={(e) => setButtonTextColor(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
-                        />
-                        <label className="block text-sm font-medium mb-1 mt-4">Button Border Color:</label>
-                        <input
-                            type="color"
-                            value={buttonBorderColor}
-                            onChange={(e) => setButtonBorderColor(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
-                        />
-                        <label className="block text-sm font-medium mb-1 mt-4">Button Text:</label>
-                        <input
-                            type="text"
-                            value={buttonText}
-                            onChange={(e) => setButtonText(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
-                        />
-                    </div>
-                );
             default:
                 return null;
         }
@@ -362,7 +321,6 @@ const CustomizableMenu: React.FC<CustomizableMenuProps> = ({ isOpen, onClose, ed
                     <option value="Cards">Cards</option>
                     <option value="Colors">Colors</option>
                     <option value="Footer">Footer</option>
-                    <option value="Button">Button</option>
                 </select>
                 {renderSection()}
                 <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded">

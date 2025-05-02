@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
 import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
@@ -62,34 +62,6 @@ export const fetchUserProfile = async () => {
   return responseData.data.user; // Return the user data
 };
 
-export const updateAvatar = async (file: File): Promise<string> => {
-  const apiUrl = `${API_URL}/users/avatar`;
-  const token = getStorageItem('token');
-
-  if (!token) {
-    console.error('No token provided');
-    throw new Error('No token provided');
-  }
-
-  const formData = new FormData();
-  formData.append('avatar', file);
-  const response = await fetch(apiUrl, {
-    method: 'PUT',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Error updating avatar');
-  }
-
-  const responseData = await response.json();
-  return responseData.data.avatar;
-};
-
 export const updateUserProfile = async (profileData: Record<string, string>): Promise<void> => {
   const apiUrl = `${API_URL}/users/profile`;
   const token = getStorageItem('token');
@@ -113,7 +85,8 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
     throw new Error(errorData.message || 'Error updating user profile');
   }
 
-  await response.json();
+  const responseData = await response.json();
+
 };
 
 const checkInitialAuthState = () => {
@@ -144,27 +117,6 @@ const checkInitialAuthState = () => {
 
 const initialState = checkInitialAuthState();
 
-export interface AuthState {
-  isAuthenticated: boolean;
-  token: string | null;
-  user: any | null;
-  isLoading: boolean;
-  error: string | null;
-  needsProfileCompletion?: boolean;
-}
-
-export type AuthStore = AuthState & {
-  loadProfile: () => void;
-  loginWithGoogle: (navigate?: (path: string) => void) => void;
-  login: (credentials: LoginCredentials) => void;
-  register: (data: RegisterData) => void;
-  createShop: (data: CreateShopData) => void;
-  logout: () => void;
-  clearError: () => void;
-  setToken: (token: string) => void;
-  clearToken: () => void;
-}
-
 export const useAuthStore = create<AuthStore>((set, get) => ({
   loadProfile: async () => {
     const token = get().token;
@@ -187,7 +139,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   token: initialState.token,
 
 
-  loginWithGoogle: async (navigate?: (path: string) => void) => {
+  loginWithGoogle: async () => {
+    const store = get();
+
     set({ isLoading: true, error: null });
     try {
       const result: UserCredential = await signInWithPopup(auth, googleProvider);
@@ -217,36 +171,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { token, user } = responseData.data;
       const isActivated = user?.isActivated === true;
       
-      // Si el usuario está activado pero le faltan datos del perfil
-      const needsProfileCompletion = isActivated && (
-        !user.country || !user.city || !user.birthDate || !user.province
-      );
-      
-      console.log('User:', user);
-      console.log('isActivated:', isActivated);
-      console.log('needsProfileCompletion:', needsProfileCompletion);
+      const needsProfileCompletion = isActivated && 
+        (!user.country || !user.city || !user.birthDate || !user.province);
   
       setStorageItem('token', token); 
       setStorageItem('user', JSON.stringify(user));
-      
-      console.log('Estableciendo estado en el store...');
       set({
         isAuthenticated: true,
         token,
         user,
         isLoading: false,
-        needsProfileCompletion
       });
 
       if (needsProfileCompletion) {
-        console.log('Redirigiendo a /complete-profile...');
-        if (navigate) {
-          navigate('/complete-profile');
-        } else {
-          window.location.href = '/complete-profile';
-        }
+        window.location.href = '/complete-profile'; 
       } else {
-        console.log('Cargando perfil...');
         await get().loadProfile();
       }
     } catch (error) {
@@ -385,6 +324,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   createShop: async (data: CreateShopData) => {
+    const currentUser = get().user;
     set({ isLoading: true, error: null });
     try {
       const token = getStorageItem('token');
@@ -438,8 +378,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ token: null, isAuthenticated: false });
   }
 }));
-
-export const logout = () => useAuthStore.getState().logout();
 
 export const fetchProvincesForArgentina = async (): Promise<string[]> => {
   try {

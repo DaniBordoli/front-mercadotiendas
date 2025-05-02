@@ -2,11 +2,7 @@ import React from 'react';
 import { DesignButtonProps } from './types';
 import { colors } from '../../../design/colors';
 
-export const DesignButton: React.FC<DesignButtonProps & {
-  customBackgroundColor?: string;
-  customTextColor?: string;
-  customBorderColor?: string;
-}> = ({
+export const DesignButton: React.FC<DesignButtonProps> = ({
   children,
   onClick,
   type = 'button',
@@ -18,9 +14,6 @@ export const DesignButton: React.FC<DesignButtonProps & {
   icon: Icon,
   iconPosition = 'left',
   variant = 'primary',
-  customBackgroundColor,
-  customTextColor,
-  customBorderColor,
 }) => {
   const baseClass = `design-button design-button--${variant}`;
   const sizeClass = `design-button--${size}`;
@@ -92,9 +85,9 @@ export const DesignButton: React.FC<DesignButtonProps & {
       onClick={onClick}
       className={`${baseClass} ${sizeClass} ${fullWidthClass} ${disabledClass} ${className} ${styles.font}`}
       style={{
-        backgroundColor: customBackgroundColor || styles.backgroundColor,
-        color: customTextColor || styles.color,
-        border: customBorderColor ? `2px solid ${customBorderColor}` : styles.border,
+        backgroundColor: styles.backgroundColor,
+        color: styles.color,
+        border: styles.border,
         width: fullWidth ? '100%' : 'auto',
         height: '44px',
         borderRadius: '0.5rem',
