@@ -4,6 +4,8 @@ import { MdHelp } from "react-icons/md";
 import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaShop, FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../../stores/index';
+import { FaShoppingCart, FaRobot } from "react-icons/fa";
 import { useAuthStore, useSearchStore } from '../../../stores/index';
 import { FaShoppingCart } from "react-icons/fa";
 import { SearchSuggestions } from '../../molecules/SearchSuggestions';
@@ -12,6 +14,7 @@ export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout, isAuthenticated, user } = useAuthStore();
   const { logout, isAuthenticated } = useAuthStore();
   const {
     searchTerm,
@@ -199,6 +202,26 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
               <IoMdInformationCircleOutline className="text-xl mr-2" />
               <span>Tutoriales</span>
+            </div>
+            <div
+              className={`flex items-center cursor-pointer transition-colors ${ 
+                user?.shop 
+                  ? 'text-gray-400'
+                  : 'hover:text-sky-500'
+              }`}
+              onClick={() => {
+                if (user?.shop) {
+                  if (window.confirm("Precaución: comenzarás a crear una nueva tienda desde cero. ¿Continuar?")) {
+                    navigate('/create-shop-ai');
+                  }
+                } else {
+                  navigate('/create-shop-ai');
+                }
+              }}
+              style={user?.shop ? { pointerEvents: 'auto' } : {}}
+            >
+              <FaRobot className="text-xl mr-2" />
+              <span>Crear tienda con IA</span>
             </div>
             <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
               <FaShop className="text-xl mr-2" />

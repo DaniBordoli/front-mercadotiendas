@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { API_URL } from '../../services/api';
 import { Shop } from '../../types/auth';
 import { useAuthStore } from '../';
+import { getStorageItem, setStorageItem } from '../../utils/storage';
 
 interface ShopState {
     shop: Shop | null;
@@ -85,30 +86,50 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     createShop: async (data: any) => {
-        const token = localStorage.getItem('token');
+        const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
-
         set({ loading: true, error: null });
-
         try {
-            const response = await fetch(`${API_URL}/users/profile`, {
-                method: 'PUT',
+            console.log("Sending data to backend for shop creation:", data);
+            const response = await fetch(`${API_URL}/shops`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ shop: data })
+                body: JSON.stringify(data)
             });
 
+            const result = await response.json();
+
             if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Error al crear la tienda');
+                console.error("Backend error response:", result);
+                throw new Error(result.message || 'Error al crear la tienda');
             }
 
-            const result = await response.json();
-            set({ shop: result.shop, loading: false });
+            if (!result.success || !result.data || !result.data.shop) {
+                console.error("Invalid success response structure:", result);
+                throw new Error("Respuesta inesperada del servidor al crear tienda.");
+            }
+
+            const newShop = result.data.shop as Shop;
+
+            // Update user state in authStore and local storage
+            const authStore = useAuthStore.getState();
+            if (authStore.user) {
+                const updatedUser = { ...authStore.user, shop: newShop };
+                setStorageItem('user', JSON.stringify(updatedUser));
+                useAuthStore.setState({ user: updatedUser });
+                console.log("Auth store user updated with new shop info.");
+            }
+
+            set({ shop: newShop, loading: false });
+            console.log("Shop created successfully in store:", newShop);
+
         } catch (error) {
-            set({ error: (error as Error).message, loading: false });
+            console.error("Error caught in createShop store action:", error);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error during shop creation';
+            set({ error: errorMessage, loading: false });
             throw error;
         }
     },

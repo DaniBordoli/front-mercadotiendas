@@ -23,6 +23,17 @@ export interface EditableVariables {
     footerSections?: { title: string; links: { text: string; url: string }[] }[];
     footerDescription?: string;
     searchTitle?: string; 
+    buttonBackgroundColor?: string;
+    buttonTextColor?: string;
+    buttonBorderColor?: string;
+    buttonText?: string;
+    // Additional fields for AI chat integration
+    storeName?: string;
+    storeDescription?: string;
+    storeSlogan?: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    footerElements?: { title: string; content: string }[];
 }
 
 export interface CustomizableMenuProps {
