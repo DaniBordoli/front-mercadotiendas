@@ -87,6 +87,26 @@ export const Sidebar: React.FC = () => {
 >
   Informacion de mi tienda
 </div>
+<div 
+  className="text-sm cursor-pointer px-4" 
+  onClick={() => navigate('/settings')}
+>
+  Configuración de mi tienda
+</div>
+<div 
+  className="text-sm cursor-pointer px-4" 
+  onClick={() => navigate('/domain-config')}
+>
+  Configurar Dominio
+</div>
+<div 
+  className="text-sm cursor-pointer px-4" 
+  onClick={() => navigate('/seo-metadata')}
+>
+ SEO y Metadata
+</div>
+
+
             <div className="text-sm cursor-pointer px-4">Activar formulario de contacto</div>
             {!user?.shop && (
               <div className="text-sm cursor-pointer px-4" onClick={() => navigate('/createshop')}>Crear tienda</div>
