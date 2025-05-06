@@ -29,6 +29,15 @@ import ShopInfo from '../screens/ShopInfo';
 import SeoMetadata from '../screens/Seo-Metadata';
 import Settings from '../screens/Settings';
 import DomainInfo from '../screens/ShopInfo';
+import DataSalesManagement from '../screens/DataSalesManagement';
+import DataDashboard from '../screens/DataDashboard';
+import DataPurchaseHistory from '../screens/DataPurchaseHistory';
+import DataBilling from '../screens/DataBilling';
+import DataSubscription from '../screens/DataSubscription';
+import DataShopState from '../screens/DataShopState';
+import DataCreateShop from '../screens/DataCreateShop';
+import DataShopConfig from '../screens/DataShopConfig';
+import DataPersonalInfo from '../screens/DataPersonalInfo';
 
 
 export const publicRoutes = [
@@ -91,6 +100,42 @@ export const publicRoutes = [
   {
     path: '/settings', 
     element: <Settings />
+  },
+  {
+    path: '/data-dashboard', 
+    element: <DataDashboard />
+  },
+  {
+    path: '/data-sales-management',
+    element: <DataSalesManagement /> 
+  },
+  {
+    path: '/data-purchase-history',
+    element: <DataPurchaseHistory />
+  },
+  {
+    path: '/data-billing',
+    element: <DataBilling />
+  },
+  {
+    path: '/data-subscription',
+    element: <DataSubscription />
+  },
+  {
+    path: '/data-shop-state',
+    element: <DataShopState />
+  },
+  {
+    path: '/data-create-shop',
+    element: <DataCreateShop />
+  },
+  {
+    path: '/data-shop-config',
+    element: <DataShopConfig />
+  },
+  {
+    path: '/data-profile',
+    element: <DataPersonalInfo />
   },
 ];
 

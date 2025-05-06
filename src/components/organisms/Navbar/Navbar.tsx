@@ -196,10 +196,7 @@ export const Navbar: React.FC = () => {
               <MdHelp className="text-xl mr-2" />
               <span>Enviar consulta</span>
             </div>
-            <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-              <IoMdInformationCircleOutline className="text-xl mr-2" />
-              <span>Tutoriales</span>
-            </div>
+          
             <div
               className={`flex items-center cursor-pointer transition-colors ${ 
                 user?.shop 
@@ -247,6 +244,8 @@ export const Navbar: React.FC = () => {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Mi plan</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Configurar dominio</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Data fiscal</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                    onClick={() => navigate('/data-dashboard')}>Panel de Gestión</li>
       
                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/my-profile')}>Informacion de tienda</li>

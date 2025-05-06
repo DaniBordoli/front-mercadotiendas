@@ -25,11 +25,13 @@ export const StatusTags: React.FC<StatusTagsProps> = ({ status, text, className 
 
   return (
     <span
-      className={`rounded-full font-semibold ${className || ''}`} 
+      className={`rounded-full font-space font-medium inline-flex justify-center items-center ${className || ''}`} 
       style={{
         ...styles[status],
         padding: '0.30rem 0.8rem',
         fontSize: '0.875rem',
+        minWidth: '80px', 
+        textAlign: 'center', 
       }}
     >
       {text || status}
