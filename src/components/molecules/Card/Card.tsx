@@ -61,10 +61,10 @@ export const Card: React.FC<CardProps> = ({
 };
 
 const cardData = [
-  { imageSrc: "https://placehold.co/600x400?text=Card+1" },
-  { imageSrc: "https://placehold.co/600x400?text=Card+2" },
-  { imageSrc: "https://placehold.co/600x400?text=Card+3" },
-  { imageSrc: "https://placehold.co/600x400?text=Card+4" },
+  { imageSrc: "https://images.pexels.com/photos/447570/pexels-photo-447570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+  { imageSrc: "https://images.pexels.com/photos/10274665/pexels-photo-10274665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+  { imageSrc: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+  { imageSrc: "https://images.pexels.com/photos/297933/pexels-photo-297933.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
 ];
 
 export const CardList: React.FC = () => {
