@@ -243,6 +243,8 @@ export const Navbar: React.FC = () => {
                     </li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/data-dashboard')}>Panel de Gestión</li>
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                    onClick={() => navigate('/shop-create')}>Crear mi Tienda</li>
       
                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/my-profile')}>Informacion de tienda</li>
