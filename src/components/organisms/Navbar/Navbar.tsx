@@ -241,9 +241,6 @@ export const Navbar: React.FC = () => {
                     >
                       Mi perfil
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Mi plan</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Configurar dominio</li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Data fiscal</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/data-dashboard')}>Panel de Gestión</li>
       

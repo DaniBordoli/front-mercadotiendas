@@ -25,7 +25,10 @@ const DataSideBar: React.FC = () => {
 
     return (
         <div className='h-screen w-[250px] bg-white shadow-md flex flex-col fixed'>
-            <div className='p-4 flex items-center gap-2'>
+            <div 
+                className='p-4 flex items-center gap-2 cursor-pointer' 
+                onClick={() => navigate('/dashboard')}
+            >
                 <Logo size={40} />
                 <h2 className='text-xl font-space'>Mercado Tiendas</h2>
             </div>

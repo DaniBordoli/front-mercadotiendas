@@ -9,8 +9,7 @@ export const StartSellingSection: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); 
   const navigate = useNavigate();
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const toggleModal = () => setIsModalOpen((prev) => !prev);
 
   return (
     <div className="selling-section w-full h-[400px] bg-[#F8F8F8] rounded-lg overflow-hidden mt-10">
@@ -30,13 +29,13 @@ export const StartSellingSection: React.FC = () => {
           variant="primary"
           icon={FaArrowRightLong}
           iconPosition="right"
-          onClick={handleOpenModal} 
+          onClick={toggleModal} // Use the toggle function
         >
           Crear mi tienda
         </DesignButton>
       </div>
 
-      {/* Modal */}
+      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg p-6 w-[90%] md:w-[50%] lg:w-[30%] shadow-lg">
@@ -44,7 +43,7 @@ export const StartSellingSection: React.FC = () => {
             <div className="flex flex-col gap-4">
               <DesignButton
                 variant="secondary"
-                onClick={() => navigate('/shop-create ')}
+                onClick={() => navigate('/shop-create')}
               >
                 Creación Manual
               </DesignButton>
@@ -57,10 +56,9 @@ export const StartSellingSection: React.FC = () => {
             </div>
             <button
               className="mt-4 text-sm text-gray-900 font-space w-full text-center"
-              onClick={handleCloseModal} 
+              onClick={toggleModal} // Use the toggle function
             >
               Cancelar
-              
             </button>
           </div>
         </div>
