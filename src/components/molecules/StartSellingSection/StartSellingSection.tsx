@@ -29,7 +29,7 @@ export const StartSellingSection: React.FC = () => {
           variant="primary"
           icon={FaArrowRightLong}
           iconPosition="right"
-          onClick={toggleModal} // Use the toggle function
+          onClick={toggleModal} 
         >
           Crear mi tienda
         </DesignButton>
@@ -56,7 +56,7 @@ export const StartSellingSection: React.FC = () => {
             </div>
             <button
               className="mt-4 text-sm text-gray-900 font-space w-full text-center"
-              onClick={toggleModal} // Use the toggle function
+              onClick={toggleModal} 
             >
               Cancelar
             </button>

@@ -15,7 +15,7 @@ const ShopConfig: React.FC = () => {
 
     return (
         <div className='min-h-screen bg-[#E5E7EB] flex pb-10'>
-            <div className='flex flex-row gap-6 max-w-[1280px] ml-56'>
+            <div className='flex flex-row gap-6 max-w-7xl  mx-auto'>
                 <div>
                     <SideMenuProfile />
                 </div>

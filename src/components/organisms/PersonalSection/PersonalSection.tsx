@@ -89,7 +89,7 @@ const PersonalSection: React.FC = () => {
 
     return (
         <div className='flex justify-center '>
-            <div className='w-[928px] h-auto mt-24 bg-white rounded-md shadow-md p-6'>
+            <div className='w-full max-w-[928px] h-auto mt-24 bg-white rounded-md shadow-md p-6'>
                 <div className="flex justify-between items-center mb-8">
                     <h1
                     style={{color: colors.darkGray}}
@@ -101,7 +101,7 @@ const PersonalSection: React.FC = () => {
                     </DesignButton>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="col-span-1">
                         <label className="block text-sm font-base font-space text-gray-500 mb-1">Nombre Completo</label>
                         <InputDefault placeholder="" value={values.fullName} onChange={(value) => setValues({ ...values, fullName: value })} />
