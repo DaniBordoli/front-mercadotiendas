@@ -38,7 +38,6 @@ import DataShopState from '../screens/DataShopState';
 import DataCreateShop from '../screens/DataCreateShop';
 import DataShopConfig from '../screens/DataShopConfig';
 import DataPersonalInfo from '../screens/DataPersonalInfo';
-import FirstLayout from '../screens/FirstLayout';
 import ShopCreate from '../screens/ShopCreate';
 
 
