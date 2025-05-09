@@ -5,7 +5,7 @@ import { StatusTags } from '../../atoms/StatusTags/StatusTags';
 const RecentOrderSection: React.FC = () => {
     return (
         <div className='flex justify-center'>
-            <div className='w-[928px] mt-8 bg-white rounded-md shadow-md p-6'>
+            <div className='w-full max-w-[928px] mt-8 bg-white rounded-md shadow-md p-6'>
                 <div className="flex justify-between items-center mb-8">
                     <h1 
                         style={{color: colors.darkGray}}

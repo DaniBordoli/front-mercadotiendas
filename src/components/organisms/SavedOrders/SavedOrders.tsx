@@ -5,7 +5,7 @@ import { DesignButton } from '../../atoms/DesignButton/DesignButton';
 const SavedOrders: React.FC = () => {
     return (
         <div className='flex justify-center'>
-            <div className='w-[928px] mt-8 bg-white rounded-md shadow-md p-6' style={{ minHeight: '400px' }}>
+            <div className='w-full max-w-[928px] mt-8 bg-white rounded-md shadow-md p-6' style={{ minHeight: '400px' }}>
                 <div className="flex justify-between items-center mb-8">
                     <h1 
                         style={{color: colors.darkGray}}
@@ -21,9 +21,9 @@ const SavedOrders: React.FC = () => {
                     </span>
                 </div>
                 
-                <div className="flex flex-row justify-between w-full">
+                <div className="flex flex-col md:flex-row justify-between w-full">
                     
-                    <div className="w-[430px] p-3 border rounded" style={{ borderColor: colors.lightGray }}>
+                    <div className="w-full md:w-[430px] p-3 border rounded" style={{ borderColor: colors.lightGray }}>
                         <div className="flex flex-col">
                             <img 
                                 src="https://placehold.co/420x200" 
@@ -44,7 +44,7 @@ const SavedOrders: React.FC = () => {
                         </div>
                     </div>
                     
-                    <div className="w-[430px] p-3 border rounded" style={{ borderColor: colors.lightGray }}>
+                    <div className="w-full md:w-[430px] p-3 border rounded" style={{ borderColor: colors.lightGray }}>
                         <div className="flex flex-col">
                             <img 
                                 src="https://placehold.co/420x200" 

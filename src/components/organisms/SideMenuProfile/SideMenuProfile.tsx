@@ -75,7 +75,7 @@ const SideMenuProfile: React.FC = () => {
 
     return (
         <div 
-            className="w-[288px] mt-24 bg-white rounded-md shadow-md p-6"
+            className="w-full max-w-[288px] mt-24 bg-white rounded-md shadow-md p-6"
             style={{ minHeight: '716px', height: 'auto' }}
         >
             <div className="flex flex-col items-center mb-6">

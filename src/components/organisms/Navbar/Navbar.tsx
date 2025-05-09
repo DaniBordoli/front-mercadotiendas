@@ -7,10 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import { FaShoppingCart, FaRobot } from "react-icons/fa";
 import { useAuthStore, useSearchStore } from '../../../stores/index';
 import { SearchSuggestions } from '../../molecules/SearchSuggestions';
+import { DesignButton } from '../../atoms/DesignButton';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { logout, isAuthenticated, user } = useAuthStore();
   const {
@@ -95,6 +97,8 @@ export const Navbar: React.FC = () => {
       setIsCategoryMenuOpen(false);
     }, 100);
   };
+
+  const toggleModal = () => setIsModalOpen((prev) => !prev);
 
   useEffect(() => {
     if (searchTerm.trim() !== '' && suggestions.length > 0) {
@@ -198,20 +202,12 @@ export const Navbar: React.FC = () => {
             </div>
           
             <div
-              className={`flex items-center cursor-pointer transition-colors ${ 
+              className={`flex items-center cursor-pointer transition-colors ${
                 user?.shop 
                   ? 'text-gray-400'
                   : 'hover:text-sky-500'
               }`}
-              onClick={() => {
-                if (user?.shop) {
-                  if (window.confirm("Precaución: comenzarás a crear una nueva tienda desde cero. ¿Continuar?")) {
-                    navigate('/create-shop-ai');
-                  }
-                } else {
-                  navigate('/create-shop-ai');
-                }
-              }}
+              onClick={() => toggleModal()}
               style={user?.shop ? { pointerEvents: 'auto' } : {}}
             >
               <FaRobot className="text-xl mr-2" />
@@ -244,7 +240,10 @@ export const Navbar: React.FC = () => {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/data-dashboard')}>Panel de Gestión</li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                    onClick={() => navigate('/shop-create')}>Crear mi Tienda</li>
+                    onClick={toggleModal} 
+                    >
+                      Crear mi Tienda
+                    </li>
       
                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/my-profile')}>Informacion de tienda</li>
@@ -278,6 +277,39 @@ export const Navbar: React.FC = () => {
     </div>
   )}
       </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 w-[90%] md:w-[50%] lg:w-[30%] shadow-lg">
+            <h3 className="text-lg font-bold mb-4 font-space text-center">¿Quieres ir por la creación manual o vía IA?</h3>
+            <div className="flex flex-col gap-4">
+              <DesignButton
+                variant="secondary"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  navigate('/shop-create');
+                }}
+              >
+                Creación Manual
+              </DesignButton>
+              <DesignButton
+                variant="secondary"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  navigate('/create-shop-ai');
+                }}
+              >
+                Creación vía IA
+              </DesignButton>
+            </div>
+            <button
+              className="mt-4 text-sm text-gray-900 font-space w-full text-center"
+              onClick={toggleModal}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

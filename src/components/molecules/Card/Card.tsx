@@ -74,8 +74,8 @@ export const CardList: React.FC = () => {
   };
 
   return (
-    <div className="text-center mt-8 px-4">
-      <div className="flex justify-center flex-wrap gap-4">
+    <div className="text-center mt-8">
+      <div className="flex justify-center flex-wrap">
         {cardData.map((card, index) => (
           <Card 
             key={index} 

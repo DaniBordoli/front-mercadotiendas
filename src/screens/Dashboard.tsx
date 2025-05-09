@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
                         Productos Destacados
                     </h2>
                 </div>
-                <div className="flex justify-start pl-32"> 
+                <div className=""> 
                     <CardList />
                 </div>
 
