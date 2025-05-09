@@ -29,8 +29,19 @@ REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 REACT_APP_FIREBASE_APP_ID=your-app-id
 ```
 
-## Password Recovery Flow
+## Authentication
 
+### Google Authentication
+The application supports authentication through Google accounts:
+- Users with verified emails in Firebase are automatically activated
+- Users with unverified emails will receive an activation code
+
+### Account Activation
+- New users receive an activation code via email upon registration
+- The activation status is preserved between sessions
+- Users must activate their account before accessing the platform
+
+### Password Recovery Flow
 The application includes a password recovery system that works as follows:
 
 1. User requests password reset on the login page
