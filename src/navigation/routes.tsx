@@ -39,6 +39,17 @@ import DataCreateShop from '../screens/DataCreateShop';
 import DataShopConfig from '../screens/DataShopConfig';
 import DataPersonalInfo from '../screens/DataPersonalInfo';
 import ShopCreate from '../screens/ShopCreate';
+import FirstLayout from '../screens/LayoutScreens/FirstLayout';
+import ShopLayout from '../screens/LayoutScreens/ShopLayout';
+import ProductDetailScreen from '../screens/LayoutScreens/ProductDetailScreen';
+import CartScreen from '../screens/LayoutScreens/CartScreen';
+import ShippingScreen from '../screens/LayoutScreens/ShippingScreen';
+import LoginScreen from '../screens/LayoutScreens/LoginScreen';
+import RegisterScreen from '../screens/LayoutScreens/RegisterScreen';
+import OrderConfirmed from '../screens/LayoutScreens/OrderConfirmed';
+import UserProfileScreen from '../screens/LayoutScreens/UserProfileScreen';
+import AboutUsScreen from '../screens/LayoutScreens/AboutUsScreen';
+import ContactScreen from '../screens/LayoutScreens/ContactScreen';
 
 
 export const publicRoutes = [
@@ -141,6 +152,50 @@ export const publicRoutes = [
   {
     path: '/shop-create',
     element: <ShopCreate />
+  },
+    {
+    path: '/first-layout',
+    element: <FirstLayout />
+  },
+  {
+    path: '/shop-layout',
+    element: <ShopLayout />
+  },
+  {
+    path: '/detail-layout',
+    element: <ProductDetailScreen />
+  },
+   {
+    path: '/cart-layout',
+    element: <CartScreen />
+  },
+    {
+    path: '/shipping-layout',
+    element: <ShippingScreen />
+  },
+  {
+    path: '/login-layout',
+    element: <LoginScreen />
+  },
+  {
+    path: '/register-layout',
+    element: <RegisterScreen />
+  },
+  {
+    path: '/order-layout',
+    element: <OrderConfirmed />
+  },
+  {
+    path: '/user-layout',
+    element: <UserProfileScreen />
+  },
+  {
+    path: '/aboutus-layout',
+    element: <AboutUsScreen />
+  },
+  {
+    path: '/contact-layout',
+    element: <ContactScreen />
   },
 ];
 
