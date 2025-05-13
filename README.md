@@ -1,6 +1,6 @@
 # MercadoTiendas
 
-Last updated: 2025-05-11 Frontend
+Last updated: 2025-05-13 Frontend
 
 Frontend de la aplicación MercadoTiendas, desarrollada con React y TypeScript.
 
