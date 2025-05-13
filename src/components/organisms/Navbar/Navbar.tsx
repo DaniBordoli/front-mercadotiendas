@@ -295,7 +295,7 @@ export const Navbar: React.FC = () => {
                 variant="secondary"
                 onClick={() => {
                   setIsModalOpen(false);
-                  navigate('/create-shop-ai');
+                  navigate('/layout-select');
                 }}
               >
                 Creación vía IA

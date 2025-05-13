@@ -5,16 +5,26 @@ import { FaPhone } from 'react-icons/fa6';
 import { IoMail } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  backgroundColor?: string;
+  textColor?: string;
+  footerDescription?: string;
+}
+
+const Footer: React.FC<FooterProps> = ({
+  backgroundColor = '#0B1120',
+  textColor = '#FFFFFF',
+  footerDescription = 'Your one-stop destination for fashion and accessories.',
+}) => {
   const navigate = useNavigate();
 
   return (
-    <footer className="bg-[#0B1120] text-white py-12">
+    <footer className="py-12" style={{ backgroundColor, color: textColor }}>
       <div className="container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
       
         <div>
           <h3 className="text-lg font-bold mb-4">ShopSmart</h3>
-          <p className="text-sm text-gray-400 mb-4">Your one-stop destination for fashion and accessories.</p>
+          <p className="text-sm mb-4">{footerDescription}</p>
           <div className="flex gap-4 text-gray-400">
             <FaFacebook className="text-xl cursor-pointer hover:text-white" />
             <FaInstagram className="text-xl cursor-pointer hover:text-white" />

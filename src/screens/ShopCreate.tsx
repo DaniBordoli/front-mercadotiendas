@@ -16,6 +16,7 @@ interface FormData {
     design: string | null;
     productCategory: string;
     currency: string;
+    layoutDesign?: string; 
 }
 
 const ShopCreate: React.FC = () => {
@@ -27,6 +28,7 @@ const ShopCreate: React.FC = () => {
         design: null,
         productCategory: '',
         currency: '',
+        layoutDesign: '', 
     });
 
     const navigate = useNavigate();
@@ -35,6 +37,11 @@ const ShopCreate: React.FC = () => {
     const handleNextStep = (data: Partial<FormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
         setCurrentStep((prevStep) => (prevStep < 4 ? prevStep + 1 : prevStep));
+    };
+
+    // Nuevo handler para guardar el layout seleccionado
+    const handleApplyLayoutName = (layoutName: string) => {
+        setFormData((prev) => ({ ...prev, layoutDesign: layoutName }));
     };
 
     const handleCreateShop = async () => {
@@ -48,6 +55,7 @@ const ShopCreate: React.FC = () => {
                 brandName: formData.storeName,
                 contactEmail: formData.email,
                 shopPhone: 'N/A',
+                layoutDesign: formData.layoutDesign || '',
             };
             await createShop(shopData);
             navigate('/dashboard');
@@ -58,7 +66,7 @@ const ShopCreate: React.FC = () => {
 
     return (
         <div className="min-h-screen flex justify-center">
-            <div className="flex flex-col flex-grow p-10 max-w-3xl">
+            <div className="flex flex-col flex-grow p-10 max-w-7xl">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Crea tu Tienda Online</h1>
                 <p className='text-gray-600 my-4 w-10/12'>Configura tu tienda en minutos y empieza a vender con nuestra plataforma potenciada por IA</p>
                 
@@ -102,6 +110,7 @@ const ShopCreate: React.FC = () => {
                     {currentStep === 1 && (
                         <DesignSelectionForm 
                             onApply={() => handleNextStep({ design: 'modern' })}
+                            onApplyLayoutName={handleApplyLayoutName}
                         />
                     )}
                     {currentStep === 2 && (
