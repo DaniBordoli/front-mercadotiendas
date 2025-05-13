@@ -50,6 +50,7 @@ import OrderConfirmed from '../screens/LayoutScreens/OrderConfirmed';
 import UserProfileScreen from '../screens/LayoutScreens/UserProfileScreen';
 import AboutUsScreen from '../screens/LayoutScreens/AboutUsScreen';
 import ContactScreen from '../screens/LayoutScreens/ContactScreen';
+import LayoutSelection from '../screens/LayoutSelection';
 
 
 export const publicRoutes = [
@@ -196,6 +197,10 @@ export const publicRoutes = [
   {
     path: '/contact-layout',
     element: <ContactScreen />
+  },
+   {
+    path: '/layout-select',
+    element: <LayoutSelection />
   },
 ];
 

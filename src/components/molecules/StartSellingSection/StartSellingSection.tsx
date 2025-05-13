@@ -49,7 +49,7 @@ export const StartSellingSection: React.FC = () => {
               </DesignButton>
               <DesignButton
                 variant="secondary"
-                onClick={() => navigate('/create-shop-ai')} 
+                onClick={() => navigate('/layout-select')} 
               >
                 Creación vía IA
               </DesignButton>
