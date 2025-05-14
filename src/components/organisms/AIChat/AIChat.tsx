@@ -125,7 +125,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       } else {
         // Only ask the next question if the chat is NOT complete
         const nextQuestionIndex = currentQuestionIndex + 1;
-        if (nextQuestionIndex < TEMPLATE_QUESTIONS.length) {
+        const aiReplyHasQuestion = aiResponse.reply.includes('?') || aiResponse.reply.includes('¿');
+        if (nextQuestionIndex < TEMPLATE_QUESTIONS.length && !aiReplyHasQuestion) {
           const nextQuestionMessage: Message = {
             id: Date.now().toString() + '-ai-q' + nextQuestionIndex,
             text: TEMPLATE_QUESTIONS[nextQuestionIndex],
@@ -134,12 +135,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
           };
           messagesToAddAfterReply.push(nextQuestionMessage);
           setCurrentQuestionIndex(nextQuestionIndex);
-        } else {
-          // This else block might now be redundant if isFinalStep handles the end properly
-          // Consider removing or adjusting if isFinalStep is reliable
-          console.warn("[AIChat] Reached end of questions but isFinalStep was false.");
-          // Maybe trigger completion anyway?
-          // onChatComplete();
+        } else if (nextQuestionIndex < TEMPLATE_QUESTIONS.length) {
+          setCurrentQuestionIndex(nextQuestionIndex);
         }
       }
 
@@ -232,4 +229,4 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       </div>
     </>
   );
-}; 
+};

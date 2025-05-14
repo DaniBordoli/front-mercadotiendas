@@ -20,13 +20,6 @@ const Dashboard: React.FC = () => {
                 </div>
             
                 <div className="mt-24 flex justify-center mb-4 w-full"> 
-                    <div className="w-10/12">
-                        <InputDefault 
-                            className="w-full" 
-                            placeholder="Buscar productos, tiendas y más..." 
-                            icon={<FaSearch className="text-gray-500" />}
-                        />
-                    </div>
                 </div>
                 
 

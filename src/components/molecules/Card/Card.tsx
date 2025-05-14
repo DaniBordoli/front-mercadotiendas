@@ -13,7 +13,7 @@ interface CardProps {
 
 export const Card: React.FC<CardProps> = ({ 
   imageSrc, 
-  title = "Título no disponible",
+  title = "Jacket",
   price,
   category = "General",
   onClick 
@@ -29,7 +29,7 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div 
-      className="card ml-6 w-84 h-96 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col"
+      className="card ml-6 w-84 h-108 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col"
       onClick={handleCardClick}
     >
       <figure className="m-0 w-full h-60 flex-shrink-0">
@@ -44,10 +44,10 @@ export const Card: React.FC<CardProps> = ({
           style={{ color: colors.mediumGray }}
           className="text-xs font-light mb-1">{category}</p>
         <h5 
-          className="card-title mb-1 font-semibold text-left text-base line-clamp-2">
+          className="card-title mb-1 font-semibold text-left text-base font-space line-clamp-2">
           {title}
         </h5>
-        <p className="text-lg font-bold mb-2">{formattedPrice}</p>
+        <p className="text-lg mb-2 font-space">{formattedPrice}</p>
         
         <div className="flex justify-center w-full mt-auto">
           <DesignButton 

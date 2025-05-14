@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import HeroSection from '../../components/FirstLayoutComponents/HeroSection';
 import CategorySection from '../../components/FirstLayoutComponents/CategorySection';
@@ -8,6 +8,8 @@ import NewsletterSection from '../../components/FirstLayoutComponents/Newsletter
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { AIChat } from '../../components/organisms/AIChat/AIChat';
+
+const LOCAL_STORAGE_KEY = 'firstLayoutEditableVariables';
 
 const defaultEditableVariables: FirstLayoutEditableVariables = {
   navbarLinks: [
@@ -52,7 +54,16 @@ const defaultEditableVariables: FirstLayoutEditableVariables = {
 };
 
 const FirstLayout: React.FC = () => {
-  const [editableVariables, setEditableVariables] = useState<FirstLayoutEditableVariables>(defaultEditableVariables);
+
+  const [editableVariables, setEditableVariables] = useState<FirstLayoutEditableVariables>(() => {
+    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : defaultEditableVariables;
+  });
+
+  
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(editableVariables));
+  }, [editableVariables]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     setEditableVariables(prev => ({
@@ -86,17 +97,30 @@ const FirstLayout: React.FC = () => {
         backgroundColor={editableVariables.heroBackgroundColor}
         description={editableVariables.heroDescription}
       />
-      <CategorySection title={editableVariables.categorySectionTitle} />
+      <CategorySection
+        title={editableVariables.categorySectionTitle}
+        backgroundColor={editableVariables.mainBackgroundColor}
+        titleColor={editableVariables.textColor}
+      />
       <FeaturedProducts
         cardImage={editableVariables.placeholderCardImage}
         title={editableVariables.featuredProductsTitle}
-        backgroundColor={editableVariables.mainBackgroundColor}
+        backgroundColor={editableVariables.heroBackgroundColor}
         cardButtonText={editableVariables.featuredProductsCardButtonText}
         cardButtonColor={editableVariables.featuredProductsCardButtonColor}
         cardButtonTextColor={editableVariables.featuredProductsCardButtonTextColor}
+        titleColor={editableVariables.textColor}
       />
-      <PurpleSection />
-      <NewsletterSection />
+      <PurpleSection
+        titleColor={editableVariables.textColor}
+        buttonColor={editableVariables.buttonBackgroundColor}
+        buttonTextColor={editableVariables.buttonTextColor}
+        backgroundColor={editableVariables.primaryColor}
+      />
+      <NewsletterSection
+        backgroundColor={editableVariables.mainBackgroundColor}
+        titleColor={editableVariables.textColor}
+      />
       <Footer
         backgroundColor={editableVariables.footerBackgroundColor}
         textColor={editableVariables.footerTextColor}
