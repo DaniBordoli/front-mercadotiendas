@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Logo } from '../../atoms/Logo';
-import { MdHelp } from "react-icons/md";
-import { IoMdInformationCircleOutline } from "react-icons/io";
 import { FaShop, FaUser } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaRobot } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
 import { useAuthStore, useSearchStore } from '../../../stores/index';
 import { SearchSuggestions } from '../../molecules/SearchSuggestions';
 import { DesignButton } from '../../atoms/DesignButton';
+import { FaRegUserCircle } from "react-icons/fa";
+import { RiRobot2Line } from "react-icons/ri";
+import { FaRegCircleQuestion } from "react-icons/fa6";
+import { BsShop } from "react-icons/bs";
+// Importar el icono de lupa
+import { FaSearch } from "react-icons/fa";
+import { InputDefault } from '../../atoms/InputDefault/InputDefault';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -134,22 +139,22 @@ export const Navbar: React.FC = () => {
 
   return (
     <nav className="w-full bg-white shadow-md px-4 py-2 flex items-start justify-center z-50 fixed">
-      <div className="container mx-auto flex justify-between max-w-7xl">
+      <div className="container flex justify-between max-w-3xl mx-auto">
         <div className="flex flex-col max-w-5xl mx-auto">
           <div className="flex items-center gap-6 mb-2 w-full">
             <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
               <Logo size={28} color="skyblue" />
-              <h1 className="text-xl font-bold ml-2 font-space">MercadoTiendas</h1>
+              <h1 className="text-xl ml-2 font-space">MercadoTiendas</h1>
             </div>
             <div className="flex-1 max-w-4xl search-container">
               <form onSubmit={handleSearchSubmit} className="relative">
-                <input
+                <InputDefault
                   type="text"
                   placeholder="Buscar productos..."
-                  className="w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                   value={searchTerm}
-                  onChange={handleSearchChange}
-                  onFocus={() => searchTerm.trim() !== '' && suggestions.length > 0 && setShowSuggestions(true)}
+                  onChange={handleSearchChange ? (v) => handleSearchChange({ target: { value: v } } as any) : undefined}
+                  icon={<FaSearch className="text-gray-400" />}
+                  className="w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
                 />
                 <SearchSuggestions 
                   suggestions={suggestions}
@@ -193,12 +198,12 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="flex items-start space-x-6 mt-1 ml-auto pr-4">
+      <div className="flex items-start space-x-6 mt-1 pr-4">
         {isAuthenticated ? (
           <>
             <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-              <MdHelp className="text-xl mr-2" />
-              <span>Enviar consulta</span>
+              <FaRegCircleQuestion className="text-xl mr-2" />
+              <span>Consulta</span>
             </div>
           
             <div
@@ -210,11 +215,11 @@ export const Navbar: React.FC = () => {
               onClick={() => toggleModal()}
               style={user?.shop ? { pointerEvents: 'auto' } : {}}
             >
-              <FaRobot className="text-xl mr-2" />
-              <span>Crear tienda con IA</span>
+              <RiRobot2Line className="text-xl mr-2" />
+              <span>Crear tienda</span>
             </div>
             <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
-              <FaShop className="text-xl mr-2" />
+              <BsShop className="text-xl mr-2" />
               <span>Ver mi tienda</span>
             </div>
             <div 
@@ -223,7 +228,7 @@ export const Navbar: React.FC = () => {
               }`}
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
-              <FaUser className="text-xl mr-2" />
+              <FaRegUserCircle className="text-xl mr-2" />
               <span>Mi cuenta</span>
               {isDropdownOpen && (
                 <div 
@@ -235,7 +240,7 @@ export const Navbar: React.FC = () => {
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                       onClick={() => navigate('/personal-info')}
                     >
-                      Mi perfil
+                      Mi cuenta
                     </li>
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                     onClick={() => navigate('/data-dashboard')}>Panel de Gestión</li>
@@ -271,7 +276,7 @@ export const Navbar: React.FC = () => {
         className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
         onClick={handleLoginClick}
       >
-        <FaUser className="text-xl mr-2" />
+        <FaRegUserCircle className="text-xl mr-2" />
         <span>Ingresa</span>
       </div>
     </div>
