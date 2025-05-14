@@ -4,7 +4,137 @@ import { DesignButton } from '../components/atoms/DesignButton';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault';
 import { SelectDefault } from '../components/atoms/SelectDefault';
+import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
+import Toast from '../components/atoms/Toast';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 const DataPersonalInfo: React.FC = () => {
+    // Estado para los valores de los inputs
+    const [values, setValues] = React.useState({
+        fullName: '',
+        email: '',
+        birthDate: '',
+        countryCode: '+54',
+        phone: '',
+        country: '',
+        city: '',
+        address: ''
+    });
+    const [validationErrors, setValidationErrors] = React.useState<Record<string, string>>({});
+    const [toast, setToast] = React.useState({
+        show: false,
+        message: '',
+        type: 'success' as 'success' | 'error' | 'info'
+    });
+    const [profileImage, setProfileImage] = React.useState<string | null>(null);
+    const [profileImageFile, setProfileImageFile] = React.useState<File | null>(null);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    // Cargar datos del usuario al montar
+    React.useEffect(() => {
+        const loadUserProfile = async () => {
+            try {
+                const user = await fetchUserProfile();
+                setValues({
+                    fullName: user.name || '',
+                    email: user.email || '',
+                    birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
+                    countryCode: user.countryCode || '+54',
+                    phone: user.phone || '',
+                    country: user.country || '',
+                    city: user.city || '',
+                    address: user.address || ''
+                });
+                setProfileImage(user.profileImageUrl || "https://placehold.co/100x100");
+            } catch (error) {
+                // Manejo de error opcional
+            }
+        };
+        loadUserProfile();
+    }, []);
+
+    const validateForm = (values: Record<string, string>): Record<string, string> => {
+        const errors: Record<string, string> = {};
+        if (!values.fullName?.trim()) {
+            errors.fullName = 'Nombre completo es requerido';
+        }
+        if (!values.email?.trim()) {
+            errors.email = 'Email es requerido';
+        }
+        return errors;
+    };
+
+    const handleSaveChanges = async () => {
+        setValidationErrors({});
+        const errors = validateForm(values);
+        if (Object.keys(errors).length > 0) {
+            setValidationErrors(errors);
+            return;
+        }
+        try {
+            // Adaptar payload según backend
+            const { fullName, ...restValues } = values;
+            const payload: any = {
+                ...restValues,
+                name: fullName,
+            };
+            // Si hay imagen nueva, agregarla al payload (ajustar según backend)
+            if (profileImageFile) {
+                payload.profileImage = profileImageFile;
+            }
+            await updateUserProfile(payload);
+            setToast({
+                show: true,
+                message: 'Perfil actualizado',
+                type: 'success'
+            });
+        } catch (error) {
+            setToast({
+                show: true,
+                message: 'Error al actualizar',
+                type: 'error'
+            });
+        }
+    };
+
+    // Imagen de perfil (SideMenuProfile logic)
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > MAX_FILE_SIZE) {
+            alert('La imagen no debe superar los 10MB');
+            e.target.value = '';
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor selecciona un archivo de imagen válido');
+            e.target.value = '';
+            return;
+        }
+
+        setProfileImageFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProfileImage(reader.result as string);
+        };
+        reader.onerror = () => {
+            alert('Error al cargar la imagen');
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleRemoveImage = () => {
+        setProfileImage("https://placehold.co/100x100");
+        setProfileImageFile(null);
+    };
+
+    const handleEditProfileClick = () => {
+        fileInputRef.current?.click();
+    };
+
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
@@ -12,28 +142,48 @@ const DataPersonalInfo: React.FC = () => {
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Datos Personales</h1>
                 <div className="p-6 bg-white rounded-md border" style={{ borderColor: '#E5E7EB' }}>
                     <div className="flex ml-[16%] items-center gap-6">
-                        
-                        <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span className="text-gray-500 text-xl">IMG</span>
+                        <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mb-4 relative group">
+                            <img
+                                src={profileImage || "https://placehold.co/100x100"}
+                                alt="Perfil"
+                                className="w-full h-full object-cover"
+                            />
+                            {profileImageFile && (
+                                <button
+                                    type="button"
+                                    onClick={handleRemoveImage}
+                                    className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                >
+                                    <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
-                       
                         <div className="flex flex-col">
                             <h2 className="text-lg font-space font-medium text-gray-800 mb-2">Foto de Perfil</h2>
                             <div className="flex gap-4">
-                                <DesignButton variant="primary" onClick={() => console.log('Cambiar foto')}>
+                                <DesignButton variant="primary" onClick={handleEditProfileClick}>
                                     Cambiar foto
                                 </DesignButton>
-                                <DesignButton variant="neutral" onClick={() => console.log('Eliminar')}>
+                                <input
+                                    ref={fileInputRef}
+                                    id="image-upload"
+                                    name="image-upload"
+                                    type="file"
+                                    className="sr-only"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
+                                <DesignButton variant="neutral" onClick={handleRemoveImage}>
                                     Eliminar
                                 </DesignButton>
                             </div>
                         </div>
                     </div>
 
-                   
                     <div className="w-8/12 ml-[16%] items-center border-t border-gray-300 my-6"></div>
 
-                   
                     <div className="flex flex-col items-center gap-6">
                         <div className="flex gap-4 w-full justify-center">
                             <div className="w-4/12">
@@ -43,7 +193,12 @@ const DataPersonalInfo: React.FC = () => {
                                 <InputDefault
                                     placeholder="Ingresa tu Nombre"
                                     className="w-full"
+                                    value={values.fullName}
+                                    onChange={val => setValues(v => ({ ...v, fullName: val }))}
                                 />
+                                {validationErrors.fullName && (
+                                    <p className="text-red-500 text-xs">{validationErrors.fullName}</p>
+                                )}
                             </div>
                             <div className="w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
@@ -53,7 +208,13 @@ const DataPersonalInfo: React.FC = () => {
                                     type="email"
                                     placeholder="tu@email.com"
                                     className="w-full"
+                                    value={values.email}
+                                    onChange={val => setValues(v => ({ ...v, email: val }))}
+                                    disabled
                                 />
+                                {validationErrors.email && (
+                                    <p className="text-red-500 text-xs">{validationErrors.email}</p>
+                                )}
                             </div>
                         </div>
 
@@ -65,29 +226,19 @@ const DataPersonalInfo: React.FC = () => {
                                 <InputDefault
                                     type="date"
                                     className="w-full"
+                                    value={values.birthDate}
+                                    onChange={val => setValues(v => ({ ...v, birthDate: val }))}
                                 />
                             </div>
-                            <div className="w-1/12">
-                                <label className="block text-sm font-space font-medium text-gray-600 mb-2">
-                                    Código de país
-                                </label>
-                                <SelectDefault
-                                    options={[
-                                        { value: '+54', label: '+54' },
-                                        { value: '+1', label: '+1' },
-                                        { value: '+44', label: '+44' },
-                                    ]}
-                                    placeholder="+54"
-                                    className="w-full"
-                                />
-                            </div>
-                            <div className="w-[370px]">
+                            <div className="w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Número de teléfono
                                 </label>
                                 <InputDefault
                                     placeholder="Ingresa tu número"
                                     className="w-full"
+                                    value={values.phone}
+                                    onChange={val => setValues(v => ({ ...v, phone: val }))}
                                 />
                             </div>
                         </div>
@@ -105,6 +256,8 @@ const DataPersonalInfo: React.FC = () => {
                                     ]}
                                     placeholder="Argentina"
                                     className="w-full"
+                                    value={values.country}
+                                    onChange={val => setValues(v => ({ ...v, country: val }))}
                                 />
                             </div>
                             <div className="w-4/12">
@@ -114,6 +267,8 @@ const DataPersonalInfo: React.FC = () => {
                                 <InputDefault
                                     placeholder="Ingresa tu ciudad"
                                     className="w-full"
+                                    value={values.city}
+                                    onChange={val => setValues(v => ({ ...v, city: val }))}
                                 />
                             </div>
                         </div>
@@ -125,13 +280,13 @@ const DataPersonalInfo: React.FC = () => {
                             <InputDefault
                                 placeholder="Ingresa tu dirección completa"
                                 className="w-full"
+                                value={values.address}
+                                onChange={val => setValues(v => ({ ...v, address: val }))}
                             />
                         </div>
 
-                       
                         <div className="w-8/12 border-t border-gray-300 my-6"></div>
 
-                        
                         <div className="w-full">
                             <h2 className="text-lg font-space font-medium text-gray-800 mb-4" style={{ marginLeft: '16%' }}>
                                 Cambiar contraseña
@@ -161,13 +316,20 @@ const DataPersonalInfo: React.FC = () => {
                         </div>
 
                         <div className="flex justify-end mt-6 w-full">
-                            <DesignButton variant="primary" onClick={() => console.log('Guardar cambios')}>
+                            <DesignButton variant="primary" onClick={handleSaveChanges}>
                                 Guardar cambios
                             </DesignButton>
                         </div>
                     </div>
                 </div>
             </div>
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={() => setToast(prev => ({ ...prev, show: false }))}
+                duration={3000}
+            />
         </div>
     );
 };

@@ -5,9 +5,9 @@ import './styles.css';
 const Carousel: React.FC = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const slides = [
-        "https://vastphotos.com/files/uploads/photos/11289/wyoming-landscape-photos-m.jpg?v=20220712043521",
-        "https://himalayan-masters.com/wp-content/uploads/2025/03/Mount-Everest-Picture.webp",
-        "https://www.sjrwmd.com/img/2024/05/Min-Aung-Mayat-Ko-District-logo-tree-May-2024-1200x400.jpg",
+        '/BannerMainDashboard/BannerBlackFriday.png',
+        '/BannerMainDashboard/BannerSeasonDiscount.png',
+        '/BannerMainDashboard/BannerWinterSeason.png',
     ];
 
     const handlePrev = () => {

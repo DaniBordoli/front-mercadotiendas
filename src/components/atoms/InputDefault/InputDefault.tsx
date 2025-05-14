@@ -21,7 +21,7 @@ export const InputDefault: React.FC<InputDefaultProps> = ({
   icon,
 }) => {
   return (
-    <div className="relative w-full">
+    <div className={`relative ${icon ? 'flex items-center' : ''}`}>
       {icon && (
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
           {icon}

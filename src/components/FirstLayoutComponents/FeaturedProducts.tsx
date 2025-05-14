@@ -7,15 +7,17 @@ interface FeaturedProductsProps {
   cardButtonText?: string;
   cardButtonColor?: string;
   cardButtonTextColor?: string;
+  titleColor?: string;
 }
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   cardImage = 'https://placehold.co/300x400',
   title = 'Featured Products',
-  backgroundColor = '#fff',
+  backgroundColor = '#F9FAFB', // Igual que HeroSection
   cardButtonText = 'Add to Cart',
   cardButtonColor = '#3B82F6',
   cardButtonTextColor = '#FFFFFF',
+  titleColor = "#000",
 }) => {
   const products = [
     { id: 1, title: 'Product 1', price: '$49.99', image: cardImage },
@@ -25,8 +27,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   ];
 
   return (
-    <div className="bg-gray-50 py-12" style={{ backgroundColor }}>
-      <h2 className="text-2xl font-bold text-center mb-8">{title}</h2>
+    <div className="py-12" style={{ backgroundColor }}>
+      <h2 className="text-2xl font-bold text-center mb-8" style={{ color: titleColor }}>{title}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-28">
         {products.map((product) => (
           <div key={product.id} className="relative bg-white rounded-sm my-8 shadow-md overflow-hidden w-[290] mx-auto">
