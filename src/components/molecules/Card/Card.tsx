@@ -51,7 +51,9 @@ export const Card: React.FC<CardProps> = ({
         
         <div className="flex justify-center w-full mt-auto">
           <DesignButton 
-          variant="primary">
+            variant="primary"
+            className="w-full"
+          >
             Comprar
           </DesignButton>
         </div>
@@ -64,7 +66,6 @@ const cardData = [
   { imageSrc: "https://images.pexels.com/photos/447570/pexels-photo-447570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
   { imageSrc: "https://images.pexels.com/photos/10274665/pexels-photo-10274665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
   { imageSrc: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
-  { imageSrc: "https://images.pexels.com/photos/297933/pexels-photo-297933.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
 ];
 
 export const CardList: React.FC = () => {

@@ -53,7 +53,7 @@ const DataPurchaseHistory: React.FC = () => {
                     </div>
                     <DesignButton
                         onClick={() => console.log('Aplicar Filtros')}
-                        className="ml-auto w-80"
+                        className="ml-auto"
                         variant='primary'
                     >
                         Aplicar Filtros

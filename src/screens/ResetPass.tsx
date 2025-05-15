@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoTienda from '../public/assets/logoTienda.png';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { MdMailOutline } from "react-icons/md";
@@ -46,80 +45,72 @@ const ResetPass = () => {
 
   return (
     <div className="bg-white h-screen flex flex-col items-center">
-      <div className="mt-28 mr-20 flex items-center space-x-6">
-        <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
-        <div className="flex flex-col">
-          <span className="font-bold text-4xl">Mercado Tiendas</span>
-          <span
-            className="font-space font-bold text-4xl tracking-[5px] mt-2"
-            style={{ color: colors.primaryRed }}
-          >
-            Live shopping
-          </span>
+      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+        <div className="flex items-center justify-center w-full">
+          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
         </div>
-      </div>
-        
-      <div className="mt-10 w-full max-w-md px-4">
-        <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
-          Recuperar contraseña
-        </h2>
-        
-        {success ? (
-          <div className="mt-4">
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-              ¡Correo enviado! Si el correo está en la base de datos, recibirás un correo con instrucciones para restablecer tu contraseña.
-            </div>
-            <DesignButton
-              fullWidth={true}
-              variant='primary'
-              onClick={() => navigate('/login')}
-            >
-              Volver al inicio de sesión
-            </DesignButton>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
-              Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña.
-            </p>
-            
-            <div className="mb-4">
-              <label className="block mb-2 font-space text-darkGray">
-                Correo electrónico
-              </label>
-              <InputDefault
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="nombre@ejemplo.com"
-                className='w-full'
-                icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
-              />
-              {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-            </div>
-            
-            <div className="mt-8">
+        <div className="mt-6 w-full max-w-md px-4">
+          <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
+            Recuperar contraseña
+          </h2>
+          
+          {success ? (
+            <div className="mt-4">
+              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                ¡Correo enviado! Si el correo está en la base de datos, recibirás un correo con instrucciones para restablecer tu contraseña.
+              </div>
               <DesignButton
                 fullWidth={true}
-                type="submit"
-                disabled={isLoading}
                 variant='primary'
+                onClick={() => navigate('/login')}
               >
-                {isLoading ? "Enviando..." : "Enviar instrucciones"}
+                Volver al inicio de sesión
               </DesignButton>
             </div>
-          </form>
-        )}
-        
-        <div className="flex justify-center mt-8 font-space text-sm">
-          <span style={{color: colors.mediumGray}}>¿Recordaste tu contraseña?</span>
-          <span 
-            className="ml-1 cursor-pointer"
-            style={{ color: colors.primaryRed }}
-            onClick={() => navigate('/login')}
-          >
-            Iniciar sesión
-          </span>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
+                Ingresa tu correo electrónico y te enviaremos instrucciones para restablecer tu contraseña.
+              </p>
+              
+              <div className="mb-4">
+                <label className="block mb-2 font-space text-darkGray">
+                  Correo electrónico
+                </label>
+                <InputDefault
+                  type="email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  placeholder="nombre@ejemplo.com"
+                  className='w-full'
+                  icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
+                />
+                {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+              </div>
+              
+              <div className="mt-8">
+                <DesignButton
+                  fullWidth={true}
+                  type="submit"
+                  disabled={isLoading}
+                  variant='primary'
+                >
+                  {isLoading ? "Enviando..." : "Enviar instrucciones"}
+                </DesignButton>
+              </div>
+            </form>
+          )}
+          
+          <div className="flex justify-center mt-8 font-space text-sm">
+            <span style={{color: colors.mediumGray}}>¿Recordaste tu contraseña?</span>
+            <span 
+              className="ml-1 cursor-pointer"
+              style={{ color: colors.primaryRed }}
+              onClick={() => navigate('/login')}
+            >
+              Iniciar sesión
+            </span>
+          </div>
         </div>
       </div>
     </div>
