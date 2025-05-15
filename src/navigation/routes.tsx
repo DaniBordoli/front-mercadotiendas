@@ -13,18 +13,12 @@ import ProfileScreen from '../screens/ProfileScreen';
 import PersonalForm from '../screens/PersonalForm';
 import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
-import PersonalInfo from '../screens/PersonalInfo';
 import GoogleComplete from '../screens/GoogleComplete';
 import CreateShopAIScreen from '../screens/CreateShopAIScreen';
 import FirstTemplate from '../screens/templates/FirstTemplate';
 import SearchResultsPage from '../screens/SearchResultsPage';
 import ProductDetailPage from '../screens/ProductDetailPage';
-import PurchaseHistory from '../screens/PurchaseHistory';
-import Subscription from '../screens/Subscription';
-import Billing from '../screens/Billing';
-import SalesManagement from '../screens/SalesManagement';
-import ShopState from '../screens/ShopState';
-import ShopConfig from '../screens/ShopConfig';
+
 import ShopInfo from '../screens/ShopInfo';
 import SeoMetadata from '../screens/Seo-Metadata';
 import Settings from '../screens/Settings';
@@ -225,39 +219,6 @@ export const privateRoutes = [
   {
     path: '/personal-form',
     element: <ShopRequiredRoute><PersonalForm /></ShopRequiredRoute>
-  },
-  {
-    path: '/personal-info',
-    element: <ShopRequiredRoute><PersonalInfo /></ShopRequiredRoute>
-  }
-  ,
-  {
-    path: '/purchase-history',
-    element: <ShopRequiredRoute><PurchaseHistory /></ShopRequiredRoute>
-  },
-  {
-    path: '/subscription',
-    element: <ShopRequiredRoute><Subscription /></ShopRequiredRoute>
-  }
-  ,
-  {
-    path: '/Billing',
-    element: <ShopRequiredRoute><Billing /></ShopRequiredRoute>
-  }
-  ,
-  {
-    path: '/sales-management',
-    element: <ShopRequiredRoute><SalesManagement /></ShopRequiredRoute>
-  }
-  ,
-  {
-    path: '/shop-state',
-    element: <ShopRequiredRoute><ShopState /></ShopRequiredRoute>
-  }
-  ,
-  {
-    path: '/shop-config',
-    element: <ShopRequiredRoute><ShopConfig /></ShopRequiredRoute>
   },
   {
     path: '/create-shop-ai',
