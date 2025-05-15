@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Navbar } from '../components/organisms/Navbar';
+import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { MdOutlineRestore } from 'react-icons/md';
 import { DesignButton } from '../components/atoms/DesignButton';
@@ -19,10 +19,10 @@ const SeoMetadata = () => {
     };
 
     return (
-        <div>
-            <Navbar />
-            <div className="h-screen bg-gray-100 p-5">
-                <div className="w-4/5 mt-24 mx-auto bg-white p-5 rounded-lg shadow-md">
+        <div className="min-h-screen bg-gray-100 flex">
+            <DataSideBar />
+            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+                <div className="w-4/5 mx-auto bg-white p-5 rounded-lg shadow-md mt-8">
                     <h1 className="text-left text-xl font-space">SEO y Metadata</h1>
                     <div className="mt-6">
                         <div className="flex justify-between items-center mb-2">

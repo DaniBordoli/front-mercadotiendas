@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Navbar } from '../components/organisms/Navbar';
+import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { DropDownSections } from '../components/organisms/DropDownSections';
-import ShopInfo from './ShopInfo';
 
 const Settings = () => {
     const [openSection, setOpenSection] = React.useState<string | null>(null);
@@ -11,13 +10,12 @@ const Settings = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100"> 
-            <Navbar />
-            <div className="p-5">
-                <div className="w-4/5 mt-24 mx-auto bg-white p-5 rounded-lg shadow-md">
+        <div className="min-h-screen bg-gray-100 flex">
+            <DataSideBar />
+            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+                <div className="w-4/5 mx-auto bg-white p-5 rounded-lg shadow-md mt-8">
                     <h1 className="text-left text-xl font-space">Configuración</h1>
                     <DropDownSections openSection={openSection} toggleSection={toggleSection} />
-                   
                 </div>
             </div>
         </div>

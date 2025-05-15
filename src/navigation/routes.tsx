@@ -1,28 +1,21 @@
 import { Navigate } from 'react-router-dom';
 import Register from '../screens/Register';
 import Login from '../screens/Login';
-import CreateShop from '../screens/CreateShop';
 import Dashboard from '../screens/Dashboard';
-import InfoTienda from '../screens/InfoTienda';
 import VerifyPassword from '../screens/VerifyPassword';
 import AccountActivation from '../screens/AccountActivation';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
-import ProfileScreen from '../screens/ProfileScreen';
-import PersonalForm from '../screens/PersonalForm';
-import RedesTienda from '../screens/RedesTienda';
 import ResetPass from '../screens/ResetPass';
 import GoogleComplete from '../screens/GoogleComplete';
 import CreateShopAIScreen from '../screens/CreateShopAIScreen';
 import FirstTemplate from '../screens/templates/FirstTemplate';
 import SearchResultsPage from '../screens/SearchResultsPage';
 import ProductDetailPage from '../screens/ProductDetailPage';
-
-import ShopInfo from '../screens/ShopInfo';
 import SeoMetadata from '../screens/Seo-Metadata';
 import Settings from '../screens/Settings';
-import DomainInfo from '../screens/ShopInfo';
+import DomainInfo from '../screens/DomainInfo';
 import DataSalesManagement from '../screens/DataSalesManagement';
 import DataDashboard from '../screens/DataDashboard';
 import DataPurchaseHistory from '../screens/DataPurchaseHistory';
@@ -200,26 +193,6 @@ export const publicRoutes = [
 
 
 export const privateRoutes = [
-  {
-    path: '/createshop',
-    element: <NoShopRoute><CreateShop /></NoShopRoute>
-  },
-  {
-    path: '/my-shop',
-    element: <ShopRequiredRoute><InfoTienda /></ShopRequiredRoute>
-  },
-  {
-    path: '/informacion-tienda-redes',
-    element: <ShopRequiredRoute><RedesTienda /></ShopRequiredRoute>
-  },
-  {
-    path: '/my-profile',
-    element: <ShopRequiredRoute><ProfileScreen /></ShopRequiredRoute>
-  },
-  {
-    path: '/personal-form',
-    element: <ShopRequiredRoute><PersonalForm /></ShopRequiredRoute>
-  },
   {
     path: '/create-shop-ai',
     element: <ProtectedRoute><CreateShopAIScreen /></ProtectedRoute>
