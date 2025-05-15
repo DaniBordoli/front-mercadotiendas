@@ -1,0 +1,22 @@
+
+@media (max-width: 768px) {
+  .category-card {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .category-container {
+    background: #fff !important;
+  }
+  .category-title {
+    text-transform: capitalize !important;
+    color: #888 !important;
+  }
+}
+
+
+@media (min-width: 769px) {
+  .category-title {
+    text-transform: uppercase;
+    color: inherit;
+  }
+}

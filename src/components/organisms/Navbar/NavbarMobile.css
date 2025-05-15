@@ -1,0 +1,42 @@
+
+@media (max-width: 768px) {
+  .navbar-desktop {
+    display: none !important;
+  }
+  .navbar-mobile {
+    display: flex !important;
+  }
+}
+
+.navbar-mobile {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  position: relative;
+  z-index: 50;
+}
+
+.navbar-mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navbar-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.navbar-mobile-profile {
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: #eee;
+  border: 1px solid #e5e7eb;
+}

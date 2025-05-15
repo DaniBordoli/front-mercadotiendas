@@ -16,40 +16,49 @@ const Dashboard: React.FC = () => {
         <div className="flex flex-col h-screen">
             <Navbar /> 
             <div className="flex-1"> 
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center md:mt-14 mt-0 md:mb-4 mb-0">
                 </div>
-            
-                <div className="mt-24 flex justify-center mb-4 w-full"> 
-                </div>
-                
 
-                <div className='my-12'>
-                    <Carousel />
+               
+                <div className="only-mobile">
+                    <div className="">
+                        <Carousel />
+                    </div>
+                    <div className="w-full mt-8 px-0">
+                        <CategoryCards />
+                    </div>
+                    <div className="w-full mt-8 px-0">
+                        <WideCard />
+                    </div>
                 </div>
-                
-                <div className="w-10/12 mx-auto">
-                    <h2 
-                        className="text-xl font-space text-left"
-                        style={{ color: colors.mediumGray }}
-                    >
-                        Productos Destacados
-                    </h2>
-                </div>
-                <div className=""> 
-                    <CardList />
+
+               
+                <div className="only-desktop">
+                    <div className="my-12">
+                        <Carousel />
+                    </div>
+                    <div className="w-10/12 mx-auto">
+                        <h2 
+                            className="text-xl font-space text-left"
+                            style={{ color: colors.mediumGray }}
+                        >
+                            Productos Destacados
+                        </h2>
+                    </div>
+                    <div>
+                        <CardList />
+                    </div>
+                    <div className="w-full mt-8 px-0">
+                        <CategoryCards />
+                        <WideCard />
+                    </div>
                 </div>
 
                 <div className="w-full mt-8 px-0"> 
-                    <CategoryCards />
-
-                    <WideCard/>
-
                     <StartSellingSection /> 
-
                     <BenefitsSection />
                     <Footer />
                 </div>
-                
             </div>
         </div>
     )
