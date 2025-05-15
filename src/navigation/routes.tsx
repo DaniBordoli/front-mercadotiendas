@@ -138,14 +138,6 @@ export const publicRoutes = [
     element: <DataPersonalInfo />
   },
   {
-    path: '/shop-create',
-    element: <ShopCreate />
-  },
-    {
-    path: '/first-layout',
-    element: <FirstLayout />
-  },
-  {
     path: '/shop-layout',
     element: <ShopLayout />
   },
@@ -185,10 +177,6 @@ export const publicRoutes = [
     path: '/contact-layout',
     element: <ContactScreen />
   },
-   {
-    path: '/layout-select',
-    element: <LayoutSelection />
-  },
 ];
 
 
@@ -196,6 +184,20 @@ export const privateRoutes = [
   {
     path: '/create-shop-ai',
     element: <ProtectedRoute><CreateShopAIScreen /></ProtectedRoute>
+  },
+   {
+    path: '/first-layout',
+    element: <ProtectedRoute><FirstLayout /></ProtectedRoute>
+  }
+  ,
+   {
+    path: '/layout-select',
+    element: <ProtectedRoute><LayoutSelection /></ProtectedRoute>
+  }
+  ,
+   {
+    path: '/shop-create',
+    element: <ProtectedRoute><ShopCreate /></ProtectedRoute>
   }
 ];
 
