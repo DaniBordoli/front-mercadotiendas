@@ -5,19 +5,17 @@ import { FaRobot } from 'react-icons/fa';
 import { DesignButton } from '../atoms/DesignButton';
 
 interface MainFormProps {
-    onNext: (data: { storeName: string; email: string; password: string }) => void;
+    onNext: (data: { storeName: string; email: string }) => void;
 }
 
 const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
     const [formData, setFormData] = useState({
         storeName: '',
         email: '',
-        password: '',
     });
     const [errors, setErrors] = useState({
         storeName: false,
         email: false,
-        password: false,
     });
 
     const handleInputChange = (field: string, value: string) => {
@@ -29,7 +27,6 @@ const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
         const newErrors = {
             storeName: !formData.storeName.trim(),
             email: !formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email),
-            password: !formData.password.trim() || formData.password.length < 8,
         };
         setErrors(newErrors);
         return !Object.values(newErrors).some((error) => error);
@@ -67,19 +64,6 @@ const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
                     onChange={(value) => handleInputChange('email', value)}
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">Introduce un correo válido.</p>}
-            </div>
-            <div className="mb-4">
-                <label className="block text-sm font-space text-gray-800 mb-2">
-                    Contraseña
-                </label>
-                <InputDefault 
-                    type="password" 
-                    placeholder="Mínimo 8 caracteres" 
-                    className={`w-full ${errors.password ? 'border-red-500' : ''}`}
-                    value={formData.password}
-                    onChange={(value) => handleInputChange('password', value)}
-                />
-                {errors.password && <p className="text-red-500 text-sm mt-1">La contraseña debe tener al menos 8 caracteres.</p>}
             </div>
 
             <div className="flex bg-gray-100 p-4 rounded-md mt-6 flex-col">

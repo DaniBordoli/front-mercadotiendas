@@ -220,7 +220,8 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
               <BsShop className="text-xl mr-2" />
-              <span>Ver mi tienda</span>
+              <span
+              onClick={() => navigate('/first-layout')}>Ver mi tienda</span>
             </div>
             <div 
               className={`relative flex items-center cursor-pointer transition-colors ${
@@ -247,9 +248,6 @@ export const Navbar: React.FC = () => {
                     >
                       Crear mi Tienda
                     </li>
-      
-                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                    onClick={() => navigate('/my-profile')}>Informacion de tienda</li>
                     <li 
                       className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
                       onClick={handleLogout}
