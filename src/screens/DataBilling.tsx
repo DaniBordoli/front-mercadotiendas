@@ -53,7 +53,7 @@ const DataBilling: React.FC = () => {
                     <div className="ml-auto flex gap-4">
                         <DesignButton
                             onClick={() => console.log('Exportar CSV')}
-                            className="w-80"
+                     
                             variant="neutral"
                              icon={FaDownload}
                             iconPosition="left"
@@ -62,7 +62,7 @@ const DataBilling: React.FC = () => {
                         </DesignButton>
                         <DesignButton
                             onClick={() => console.log('Exportar PDF')}
-                            className="w-80"
+                          
                             variant="primary"
                             icon={FaFilePdf}
                             iconPosition="left"

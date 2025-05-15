@@ -98,7 +98,6 @@ export const DesignButton: React.FC<DesignButtonProps & {
       className={`${baseClass} ${sizeClass} ${fullWidthClass} ${disabledClass} ${className} ${styles.font}`}
       style={{
         ...styles,
-        width: fullWidth ? '100%' : 'auto',
         height: '44px',
         borderRadius: '0.5rem',
         textAlign: 'center',

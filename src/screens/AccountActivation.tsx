@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { API_URL } from '../services/api';
 import { useAuthStore } from '../stores';
 import { Loading } from '../components/molecules/Loading';
-import logoTienda from '../public/assets/logoTienda.png';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
@@ -131,86 +130,78 @@ function AccountActivation() {
 
   return (
     <div className="bg-white h-screen flex flex-col items-center">
-      <div className="mt-28 mr-20 flex items-center space-x-6">
-        <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
-        <div className="flex flex-col">
-          <span className="font-bold text-4xl">Mercado Tiendas</span>
-          <span
-            className="font-space font-bold text-4xl tracking-[5px] mt-2"
-            style={{ color: colors.primaryRed }}
-          >
-            Live shopping
-          </span>
+      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+        <div className="flex items-center justify-center w-full">
+          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
         </div>
-      </div>
-        
-      <div className="mt-10 w-full max-w-md px-4">
-        <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
-          Activación de Cuenta
-        </h2>
-        
-        <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
-          Hemos enviado un código de activación a <strong>{email || 'tu correo'}</strong>. 
-          Por favor, ingresa el código para activar tu cuenta.
-        </p>
+        <div className="mt-6 w-full max-w-md px-4">
+          <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
+            Activación de Cuenta
+          </h2>
+          
+          <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
+            Hemos enviado un código de activación a <strong>{email || 'tu correo'}</strong>. 
+            Por favor, ingresa el código para activar tu cuenta.
+          </p>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm w-full">
-            {error}
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm w-full">
+              {error}
+            </div>
+          )}
+
+          {resendSuccess && (
+            <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm w-full">
+              ¡Código reenviado con éxito!
+            </div>
+          )}
+
+          <div className="mb-4">
+            <label className="block mb-2 font-space text-darkGray">
+              Código de activación
+            </label>
+            <InputDefault
+              type="text"
+              value={activationCode}
+              onChange={handleActivationCodeChange}
+              placeholder="Ingresa el código de 6 dígitos"
+              className='w-full'
+              icon={<FaKey style={{ color: colors.mediumGray }} />}
+            />
           </div>
-        )}
 
-        {resendSuccess && (
-          <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm w-full">
-            ¡Código reenviado con éxito!
-          </div>
-        )}
-
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Código de activación
-          </label>
-          <InputDefault
-            type="text"
-            value={activationCode}
-            onChange={handleActivationCodeChange}
-            placeholder="Ingresa el código de 6 dígitos"
-            className='w-full'
-            icon={<FaKey style={{ color: colors.mediumGray }} />}
-          />
-        </div>
-
-        <div className="mt-8">
-          <DesignButton
-            fullWidth={true}
-            variant='primary'
-            onClick={handleActivation}
-            disabled={isLoading}
-          >
-            {isLoading ? "Activando..." : "Activar Cuenta"}
-          </DesignButton>
-
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={handleResendCode}
-              disabled={resendLoading}
-              className="font-space text-sm"
-              style={{ color: colors.primaryRed }}
+          <div className="mt-8">
+            <DesignButton
+              className='w-full'
+              variant='primary'
+              onClick={handleActivation}
+              disabled={isLoading}
             >
-              {resendLoading ? "Reenviando..." : "Reenviar código"}
-            </button>
+              {isLoading ? "Activando..." : "Activar Cuenta"}
+            </DesignButton>
+
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={handleResendCode}
+                disabled={resendLoading}
+                className="font-space text-sm"
+                style={{ color: colors.primaryRed }}
+              >
+                {resendLoading ? "Reenviando..." : "Reenviar código"}
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <div className="flex justify-center mt-8 font-space text-sm">
-          <span style={{color: colors.mediumGray}}>¿Ya tienes una cuenta activada?</span>
-          <span 
-            className="ml-1 cursor-pointer"
-            style={{ color: colors.primaryRed }}
-            onClick={() => navigate('/login')}
-          >
-            Iniciar sesión
-          </span>
+          
+          <div className="flex justify-center mt-8 font-space text-sm">
+            <span style={{color: colors.mediumGray}}>¿Ya tienes una cuenta activada?</span>
+            <span 
+              className="ml-1 cursor-pointer"
+              style={{ color: colors.primaryRed }}
+              onClick={() => navigate('/login')}
+            >
+              Iniciar sesión
+            </span>
+          </div>
         </div>
       </div>
     </div>

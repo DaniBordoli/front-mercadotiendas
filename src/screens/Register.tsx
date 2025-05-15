@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoTienda from '../public/assets/logoTienda.png';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { MdMailOutline, MdPersonOutline } from "react-icons/md";
@@ -99,99 +98,91 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-white h-screen flex flex-col items-center">
-      <div className="mt-28 mr-20 flex items-center space-x-6">
-        <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
-        <div className="flex flex-col">
-          <span className="font-bold text-4xl">Mercado Tiendas</span>
-          <span
-            className="font-space font-bold text-4xl tracking-[5px] mt-2"
-            style={{ color: colors.primaryRed }}
-          >
-            Live shopping
-          </span>
+    <div className="flex flex-col items-center mb-4">
+      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+        <div className="flex items-center justify-center w-full">
+          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
         </div>
-      </div>
-      <div className="mt-10 flex items-center space-x-10">
-        <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/login')}>
-          <span className="text-lg font-space">Iniciar sesión</span>
-          <div
-            className="w-[200px] h-0.5 mt-1"
-            style={{ backgroundColor: colors.lightGray }}
-          ></div>
-        </div>
-        <div className="flex flex-col items-center">
-          <span style={{color: colors.primaryRed}} className="text-lg font-space">Crear cuenta</span>
-          <div
-            className="w-[200px] h-0.5 mt-1"
-            style={{ backgroundColor: colors.primaryRed }}
-          ></div>
-        </div>
-      </div>
-      
-      <form className="mt-10 w-full max-w-md px-4" onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Nombre completo
-          </label>
-          <InputDefault
-            type="text"
-            placeholder="Ingresa tu nombre completo*"
-            className="w-full"
-            icon={<MdPersonOutline style={{ color: colors.mediumGray }} />}
-            value={values.fullName}
-            onChange={(value: string) => {
-              clearError();
-              setValidationErrors((prev) => ({ ...prev, fullName: '' }));
-              setValues((prev) => ({ ...prev, fullName: value }));
-            }}
-          />
-          {validationErrors.fullName && (
-            <span className="text-red-500 text-sm">{validationErrors.fullName}</span>
-          )}
+        <div className="mt-6 flex items-center space-x-10">
+          <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/login')}>
+            <span className="text-lg font-space">Iniciar sesión</span>
+            <div
+              className="w-[200px] h-0.5 mt-1"
+              style={{ backgroundColor: colors.lightGray }}
+            ></div>
+          </div>
+          <div className="flex flex-col items-center">
+            <span style={{color: colors.primaryRed}} className="text-lg font-space">Crear cuenta</span>
+            <div
+              className="w-[200px] h-0.5 mt-1"
+              style={{ backgroundColor: colors.primaryRed }}
+            ></div>
+          </div>
         </div>
         
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Correo electrónico
-          </label>
-          <InputDefault
-            type="email"
-            placeholder="Ingresa tu Email*"
-            className="w-full"
-            icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
-            value={values.email}
-            onChange={(value: string) => {
-              clearError();
-              setValidationErrors((prev) => ({ ...prev, email: '' }));
-              setValues((prev) => ({ ...prev, email: value }));
-            }}
-          />
-          {validationErrors.email && (
-            <span className="text-red-500 text-sm">{validationErrors.email}</span>
-          )}
-        </div>
-        
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Fecha de nacimiento
-          </label>
-          <input
-            type="date"
-            placeholder="Selecciona tu fecha de nacimiento"
-            className="w-full border border-gray-300 rounded-md p-2"
-            value={values.birthDate}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              clearError();
-              setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
-              setValues((prev) => ({ ...prev, birthDate: e.target.value }));
-            }}
-          />
-          {validationErrors.birthDate && (
-            <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
-          )}
-        </div>
-        
+        <form className="mt-10 w-full max-w-md px-4" onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block mb-2 font-space text-darkGray">
+              Nombre completo
+            </label>
+            <InputDefault
+              type="text"
+              placeholder="Ingresa tu nombre completo*"
+              className="w-full"
+              icon={<MdPersonOutline style={{ color: colors.mediumGray }} />}
+              value={values.fullName}
+              onChange={(value: string) => {
+                clearError();
+                setValidationErrors((prev) => ({ ...prev, fullName: '' }));
+                setValues((prev) => ({ ...prev, fullName: value }));
+              }}
+            />
+            {validationErrors.fullName && (
+              <span className="text-red-500 text-sm">{validationErrors.fullName}</span>
+            )}
+          </div>
+          
+          <div className="mb-4">
+            <label className="block mb-2 font-space text-darkGray">
+              Correo electrónico
+            </label>
+            <InputDefault
+              type="email"
+              placeholder="Ingresa tu Email*"
+              className="w-full"
+              icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
+              value={values.email}
+              onChange={(value: string) => {
+                clearError();
+                setValidationErrors((prev) => ({ ...prev, email: '' }));
+                setValues((prev) => ({ ...prev, email: value }));
+              }}
+            />
+            {validationErrors.email && (
+              <span className="text-red-500 text-sm">{validationErrors.email}</span>
+            )}
+          </div>
+          
+          <div className="mb-4">
+            <label className="block mb-2 font-space text-darkGray">
+              Fecha de nacimiento
+            </label>
+            <input
+              type="date"
+              placeholder="Selecciona tu fecha de nacimiento"
+              className="w-full border border-gray-300 rounded-md p-2"
+              value={values.birthDate}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                clearError();
+                setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
+                setValues((prev) => ({ ...prev, birthDate: e.target.value }));
+              }}
+            />
+            {validationErrors.birthDate && (
+              <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
+            )}
+          </div>
+          
             <div className="mb-4">
               <label className="block mb-2 font-space text-darkGray">País</label>
               <select
@@ -316,7 +307,7 @@ const Register = () => {
         
         <div className="mt-8">
           <DesignButton
-            fullWidth={true}
+           className='w-full'
             variant="primary"
             type="submit"
             disabled={isLoading}
@@ -325,7 +316,7 @@ const Register = () => {
           </DesignButton>
         </div>     
         
-        <div className="flex justify-center my-8 font-space text-sm">
+        <div className="flex justify-center my-4 font-space text-sm">
           <span style={{color: colors.mediumGray}}>¿Ya tenés cuenta?</span>
           <span 
             className="ml-1 cursor-pointer"
@@ -336,6 +327,7 @@ const Register = () => {
           </span>
         </div>
       </form>
+      </div>
     </div>
   );
 }

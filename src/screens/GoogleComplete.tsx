@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logoTienda from '../public/assets/logoTienda.png';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
@@ -98,128 +97,120 @@ const GoogleComplete = () => {
 
     return (
         <div className="bg-white h-screen flex flex-col items-center">
-            <div className="mt-28 mr-20 flex items-center space-x-6">
-                <img src={logoTienda} alt="Logo Tienda" className="w-32 h-32" />
-                <div className="flex flex-col">
-                    <span className="font-bold text-4xl">Mercado Tiendas</span>
-                    <span
-                        className="font-space font-bold text-4xl tracking-[5px] mt-2"
-                        style={{ color: colors.primaryRed }}
-                    >
-                        Live shopping
-                    </span>
+            <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+                <div className="flex items-center justify-center w-full">
+                    <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
                 </div>
-            </div>
-            
-            <div className="mt-10 w-full max-w-md px-4">
-                <h2 className="text-2xl font-bold mb-6 text-center">Completa tu perfil</h2>
-                <p className="text-center text-gray-600 mb-8">
-                    Necesitamos algunos datos adicionales para completar tu registro
-                </p>
-                
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label className="block mb-2 font-space text-darkGray">
-                            Fecha de nacimiento
-                        </label>
-                        <input
-                            type="date"
-                            placeholder="Selecciona tu fecha de nacimiento"
-                            className="w-full border border-gray-300 rounded-md p-2"
-                            value={values.birthDate}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                clearError();
-                                setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
-                                setValues((prev) => ({ ...prev, birthDate: e.target.value }));
-                            }}
-                        />
-                        {validationErrors.birthDate && (
-                            <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
-                        )}
-                    </div>
+                <div className="mt-6 w-full max-w-md px-4">
+                    <h2 className="text-2xl font-bold mb-6 text-center">Completa tu perfil</h2>
+                    <p className="text-center text-gray-600 mb-8">
+                        Necesitamos algunos datos adicionales para completar tu registro
+                    </p>
                     
-                    <div className="mb-4">
-                        <label className="block mb-2 font-space text-darkGray">
-                            Ciudad
-                        </label>
-                        <InputDefault
-                            type="text"
-                            placeholder="Ingresa tu ciudad"
-                            className="w-full"
-                            value={values.city}
-                            onChange={(value: string) => {
-                                clearError();
-                                setValidationErrors((prev) => ({ ...prev, city: '' }));
-                                setValues((prev) => ({ ...prev, city: value }));
-                            }}
-                        />
-                        {validationErrors.city && (
-                            <span className="text-red-500 text-sm">{validationErrors.city}</span>
-                        )}
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-2 font-space text-darkGray">
-                            Provincia
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md p-2"
-                            value={values.province}
-                            onChange={(e) => {
-                                clearError();
-                                setValidationErrors((prev) => ({ ...prev, province: '' }));
-                                setValues((prev) => ({ ...prev, province: e.target.value }));
-                            }}
-                            disabled={!values.country || provinces.length === 0}
-                        >
-                            <option value="">Selecciona tu provincia</option>
-                            {provinces.map((province, index) => (
-                                <option key={index} value={province}>
-                                    {province}
-                                </option>
-                            ))}
-                        </select>
-                        {validationErrors.province && (
-                            <span className="text-red-500 text-sm">{validationErrors.province}</span>
-                        )}
-                    </div>
-                    
-                    <div className="mb-4">
-                        <label className="block mb-2 font-space text-darkGray">
-                            País
-                        </label>
-                        <select
-                            className="w-full border border-gray-300 rounded-md p-2"
-                            value={values.country}
-                            onChange={(e) => {
-                                clearError();
-                                setValidationErrors((prev) => ({ ...prev, country: '' }));
-                                setValues((prev) => ({ ...prev, country: e.target.value }));
-                            }}
-                        >
-                            <option value="">Selecciona tu país</option>
-                            {countries.map((country, index) => (
-                                <option key={index} value={country.name}>
-                                    {country.name}
-                                </option>
-                            ))}
-                        </select>
-                        {validationErrors.country && (
-                            <span className="text-red-500 text-sm">{validationErrors.country}</span>
-                        )}
-                    </div>
-                    
-                    <div className="mt-8">
-                        <DesignButton
-                            fullWidth={true}
-                            variant="primary"
-                            type="submit"
-                            disabled={isLoading}
-                        >
-                            {isLoading ? 'Guardando...' : 'Completar perfil'}
-                        </DesignButton>
-                    </div>
-                </form>
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4">
+                            <label className="block mb-2 font-space text-darkGray">
+                                Fecha de nacimiento
+                            </label>
+                            <input
+                                type="date"
+                                placeholder="Selecciona tu fecha de nacimiento"
+                                className="w-full border border-gray-300 rounded-md p-2"
+                                value={values.birthDate}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    clearError();
+                                    setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
+                                    setValues((prev) => ({ ...prev, birthDate: e.target.value }));
+                                }}
+                            />
+                            {validationErrors.birthDate && (
+                                <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
+                            )}
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label className="block mb-2 font-space text-darkGray">
+                                Ciudad
+                            </label>
+                            <InputDefault
+                                type="text"
+                                placeholder="Ingresa tu ciudad"
+                                className="w-full"
+                                value={values.city}
+                                onChange={(value: string) => {
+                                    clearError();
+                                    setValidationErrors((prev) => ({ ...prev, city: '' }));
+                                    setValues((prev) => ({ ...prev, city: value }));
+                                }}
+                            />
+                            {validationErrors.city && (
+                                <span className="text-red-500 text-sm">{validationErrors.city}</span>
+                            )}
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label className="block mb-2 font-space text-darkGray">
+                                Provincia
+                            </label>
+                            <select
+                                className="w-full border border-gray-300 rounded-md p-2"
+                                value={values.province}
+                                onChange={(e) => {
+                                    clearError();
+                                    setValidationErrors((prev) => ({ ...prev, province: '' }));
+                                    setValues((prev) => ({ ...prev, province: e.target.value }));
+                                }}
+                                disabled={!values.country || provinces.length === 0}
+                            >
+                                <option value="">Selecciona tu provincia</option>
+                                {provinces.map((province, index) => (
+                                    <option key={index} value={province}>
+                                        {province}
+                                    </option>
+                                ))}
+                            </select>
+                            {validationErrors.province && (
+                                <span className="text-red-500 text-sm">{validationErrors.province}</span>
+                            )}
+                        </div>
+                        
+                        <div className="mb-4">
+                            <label className="block mb-2 font-space text-darkGray">
+                                País
+                            </label>
+                            <select
+                                className="w-full border border-gray-300 rounded-md p-2"
+                                value={values.country}
+                                onChange={(e) => {
+                                    clearError();
+                                    setValidationErrors((prev) => ({ ...prev, country: '' }));
+                                    setValues((prev) => ({ ...prev, country: e.target.value }));
+                                }}
+                            >
+                                <option value="">Selecciona tu país</option>
+                                {countries.map((country, index) => (
+                                    <option key={index} value={country.name}>
+                                        {country.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {validationErrors.country && (
+                                <span className="text-red-500 text-sm">{validationErrors.country}</span>
+                            )}
+                        </div>
+                        
+                        <div className="mt-8">
+                            <DesignButton
+                                className='w-full'
+                                variant="primary"
+                                type="submit"
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Guardando...' : 'Completar perfil'}
+                            </DesignButton>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

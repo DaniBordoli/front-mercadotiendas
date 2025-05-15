@@ -15,14 +15,14 @@ export const WideCard: React.FC = () => {
       <div className="flex justify-center items-center gap-4 md:gap-5 lg:gap-6 mt-4 px-4">
         <div className="wide-card-image w-[42%] h-50 bg-white rounded-lg shadow-sm overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1746107637791-d4e92dd80e77?q=80&w=1942&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="/BannerMainDashboard/DashboardLive1.png"
             alt="Live stream 1"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="wide-card-image w-[42%] h-50 bg-white rounded-lg shadow-sm overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1746107637791-d4e92dd80e77?q=80&w=1942&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            src="/BannerMainDashboard/DashboardLive2.png"
             alt="Live stream 2"
             className="w-full h-full object-cover"
           />

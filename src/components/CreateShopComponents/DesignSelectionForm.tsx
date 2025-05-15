@@ -3,14 +3,14 @@ import { DesignButton } from '../atoms/DesignButton';
 
 interface DesignSelectionFormProps {
     onApply: () => void;
-    onApplyLayoutName?: (layoutName: string) => void; // Nuevo prop opcional
+    onApplyLayoutName?: (layoutName: string) => void; 
 }
 
 const layouts = [
     {
         name: 'Minimal Modern',
         description: 'Ideal para moda',
-        img: 'https://placehold.co/400x200?text=Minimal+Modern',
+        img: '/templatePreview/template1.png',
         tag: 'Popular',
         tagColor: 'bg-red-100 text-red-500',
         previewRoute: '/first-layout',
@@ -18,7 +18,7 @@ const layouts = [
     {
         name: 'Classic Elegant',
         description: 'Ideal para joyería',
-        img: 'https://placehold.co/400x200?text=Classic+Elegant',
+        img: '/templatePreview/template2.png',
         tag: 'Nuevo',
         tagColor: 'bg-green-100 text-green-600',
         previewRoute: undefined,
@@ -26,7 +26,7 @@ const layouts = [
     {
         name: 'Tech Modern',
         description: 'Ideal para electrónica',
-        img: 'https://placehold.co/400x200?text=Tech+Modern',
+        img: '/templatePreview/template3.png',
         tag: null,
         tagColor: '',
         previewRoute: undefined,
@@ -34,7 +34,7 @@ const layouts = [
     {
         name: 'Artisan Boutique',
         description: 'Ideal para artesanías',
-        img: 'https://placehold.co/400x200?text=Artisan+Boutique',
+        img: '/templatePreview/template4.png',
         tag: null,
         tagColor: '',
         previewRoute: undefined,
