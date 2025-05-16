@@ -1,5 +1,7 @@
 # MercadoTiendas
 
+Deployment status: [![Netlify Status](https://api.netlify.com/api/v1/badges/your-badge-id/deploy-status)](https://app.netlify.com/sites/your-site-name/deploys)
+
 Last updated: 2025-05-13 Frontend
 
 Frontend de la aplicación MercadoTiendas, desarrollada con React y TypeScript.
