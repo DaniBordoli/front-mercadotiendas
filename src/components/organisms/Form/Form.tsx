@@ -4,7 +4,7 @@ import { FormField } from '../../molecules/FormField';
 import { FormProps } from './types';
 import { FormFieldProps } from '../../molecules/FormField/types';
 
-export const Form: React.FC<FormProps> = ({
+export const Form: React.FC<FormProps & { submitComponent?: React.ReactNode }> = ({
   fields,
   values,
   onSubmit,
@@ -12,7 +12,8 @@ export const Form: React.FC<FormProps> = ({
   errors = {},
   submitText = 'Submit',
   className = '',
-  loading = false
+  loading = false,
+  submitComponent
 }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,18 +55,21 @@ export const Form: React.FC<FormProps> = ({
           );
         })}
       </div>
-      
-      <Button
-        type="submit"
-        variant="primary"
-        fullWidth
-        disabled={loading}
-        loading={loading}
-        size="large"
-        className="mt-4 sm:mt-6"
-      >
-        {submitText}
-      </Button>
+      {submitComponent ? (
+        submitComponent
+      ) : (
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          disabled={loading}
+          loading={loading}
+          size="large"
+          className="mt-4 sm:mt-6"
+        >
+          {submitText}
+        </Button>
+      )}
     </form>
   );
 };

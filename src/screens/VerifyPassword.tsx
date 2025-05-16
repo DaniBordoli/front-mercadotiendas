@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CenteredBox } from '../components/templates/CenteredBox';
 import { Form } from '../components/organisms/Form';
-import { Logo } from '../components/atoms/Logo';
 import { resetPassword } from '../stores/slices/authSlice';
+import { DesignButton } from '../components/atoms/DesignButton';
 
 function VerifyPassword() {
   const navigate = useNavigate();
@@ -43,47 +42,69 @@ function VerifyPassword() {
   ];
 
   return (
-    <CenteredBox height="600px">
-      <div className="flex items-center mb-4 mt-10">
-        <Logo size={48} color="skyblue" className="mr-2" />
-        <h1 className="text-2xl font-bold text-sky-500">MercadoTiendas</h1>
+    <div className="bg-white h-screen flex flex-col items-center">
+      <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+        <div className="flex flex-col items-center justify-center w-full">
+          <img
+            src="/logoLogin/logoLogin.png"
+            alt="Logo MercadoTiendas"
+            className="w-60 h-auto"
+          />
+
+        </div>
+        <div className="mt-6 w-full max-w-md px-4 flex flex-col items-center">
+          <h1 className="text-2xl font-medium my-4 text-center">
+            Restablece tu contraseña
+          </h1>
+          <p className="text-gray-600 text-center w-11/12 text-sm mb-6">
+            Ingresa la nueva contraseña
+          </p>
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {success ? (
+            <p className="text-green-500 text-sm mb-4 text-center">
+              ¡Contraseña restablecida con éxito! Serás redirigido al inicio de sesión.
+            </p>
+          ) : (
+            <Form
+              fields={fields}
+              values={values}
+              onChange={(name, value) =>
+                setValues((prev) => ({ ...prev, [name]: value }))
+              }
+              onSubmit={handleSubmit}
+              submitComponent={
+                <div className="mt-8 w-full">
+                  <DesignButton
+                    className="w-full"
+                    type="submit"
+                    variant="primary"
+                  >
+                    Continuar
+                  </DesignButton>
+                </div>
+              }
+            />
+          )}
+          <p className="mt-4 text-sm font-medium text-black text-center">
+            ¿No recibiste el código?{' '}
+            <button
+              type="button"
+              className="text-red-500 hover:text-red-700 font-medium"
+              onClick={() => {}}
+            >
+              Enviar nuevamente
+            </button>
+          </p>
+          <button
+            type="button"
+            className="mt-4 font-semibold text-red-500 hover:text-red-700"
+            onClick={() => navigate('/login')}
+          >
+            Volver al inicio
+          </button>
+        </div>
       </div>
-      <h1 className="text-2xl font-medium my-4">Restablece tu contraseña</h1>
-      <p className="text-gray-600 text-center w-11/12 text-sm mb-6">
-        Ingresa la nueva contraseña
-      </p>
-      {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-      {success ? (
-        <p className="text-green-500 text-sm mb-4">
-          ¡Contraseña restablecida con éxito! Serás redirigido al inicio de sesión.
-        </p>
-      ) : (
-        <Form
-          fields={fields}
-          values={values}
-          onChange={(name, value) => setValues((prev) => ({ ...prev, [name]: value }))}
-          onSubmit={handleSubmit}
-          submitText="Continuar"
-        />
-      )}
-      <p className="mt-4 text-sm font-medium text-black">
-        ¿No recibiste el código?{' '}
-        <button
-          type="button"
-          className="text-sky-600 hover:text-sky-700 font-medium"
-          onClick={() => {}}
-        >
-          Enviar nuevamente
-        </button>
-      </p>
-      <button
-        type="button"
-        className="mt-4 font-semibold text-sky-600 hover:text-sky-700"
-        onClick={() => navigate('/login')}
-      >
-        Volver al inicio
-      </button>
-    </CenteredBox>
+    </div>
   );
 }
 
