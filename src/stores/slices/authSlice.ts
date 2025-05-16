@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
 import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
-import { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, UserCredential } from 'firebase/auth';
+import { 
+  signInWithPopup, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  UserCredential,
+  sendPasswordResetEmail
+} from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
 
@@ -22,18 +29,59 @@ export const forgotPassword = async (email: string): Promise<void> => {
 };
 
 export const resetPassword = async (token: string, password: string): Promise<void> => {
-  const apiUrl = `${API_URL}/auth/reset-password/${token}`;
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ password }),
-  });
+  try {
+    // 1. Verificar el token y obtener el email asociado
+    const verifyUrl = `${API_URL}/auth/verify-reset-token/${token}`;
+    const verifyResponse = await fetch(verifyUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Error al restablecer la contraseña');
+    const responseData = await verifyResponse.json();
+
+    if (!verifyResponse.ok) {
+      throw new Error(responseData.message || 'Token inválido');
+    }
+
+    if (!responseData.data?.email) {
+      throw new Error('No se pudo obtener el email del usuario');
+    }
+
+    const { email } = responseData.data;
+
+    // 2. Enviar email de reset a Firebase y actualizar en el backend
+    try {
+      // Primero enviamos el email de reset de Firebase
+      await sendPasswordResetEmail(auth, email);
+      
+      // Luego actualizamos en el backend
+      const apiUrl = `${API_URL}/auth/reset-password/${token}`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Error al restablecer la contraseña');
+      }
+
+      // Informar al usuario que debe usar el enlace de Firebase
+      return Promise.reject(new Error('Se ha enviado un correo de Firebase para completar el cambio de contraseña. Por favor, revise su bandeja de entrada.'));
+    } catch (error) {
+      if (error instanceof FirebaseError) {
+        throw new Error(`Error al enviar el correo de restablecimiento de Firebase: ${error.message}`);
+      }
+      throw error;
+    }
+
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Error desconocido al restablecer la contraseña');
   }
 };
 
