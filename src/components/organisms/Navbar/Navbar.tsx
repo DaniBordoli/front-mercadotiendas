@@ -141,15 +141,15 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="navbar-desktop w-full bg-white shadow-md px-4 py-2 flex items-start justify-center z-50 fixed">
-        <div className="container flex justify-between max-w-3xl mx-auto">
-          <div className="flex flex-col max-w-5xl mx-auto">
-            <div className="flex items-center gap-6 mb-2 w-full">
+      <nav className="navbar-desktop w-full bg-white px-4 py-2 flex items-start justify-center z-50 fixed border-b border-gray-200">
+        <div className="container flex w-full max-w-3xl mx-auto">
+          <div className="flex flex-col w-full">
+            <div className="flex items-center gap-4 mb-1 w-full">
               <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
                 <Logo size={28} color="skyblue" />
                 <h1 className="text-xl ml-2 font-space">MercadoTiendas</h1>
               </div>
-              <div className="flex-1 max-w-4xl search-container">
+              <div className="flex-1 w-full search-container max-w-xs sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl">
                 <form onSubmit={handleSearchSubmit} className="relative">
                   <InputDefault
                     type="text"
@@ -167,44 +167,12 @@ export const Navbar: React.FC = () => {
                 </form>
               </div>
             </div>
-            <div className="flex gap-8 text-gray-600 text-sm justify-center mt-2 ml-52">
-              <a href="#" className="hover:text-sky-500 transition-colors">Gestión de ventas</a>
-              <div 
-                className="relative" 
-                onMouseEnter={openCategoryMenu} 
-                onMouseLeave={closeCategoryMenu}
-              >
-                <a href="#" className="hover:text-sky-500 transition-colors">Categorias</a>
-                {isCategoryMenuOpen && (
-                  <div 
-                    className="absolute bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48 z-10" 
-                    onMouseEnter={openCategoryMenu} 
-                    onMouseLeave={closeCategoryMenu}
-                  >
-                    <ul className="py-2">
-                      <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                        onClick={() => handleCategorySearch('laptop')}
-                      >
-                        Laptop
-                      </li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-              <a href="#" className="hover:text-sky-500 transition-colors">Cupones</a>
-              <a href="#" className="hover:text-sky-500 transition-colors">Productos</a>
-              <a href="#" className="hover:text-sky-500 transition-colors">Ofertas</a>
-            </div>
           </div>
         </div>
         <div className="flex items-start space-x-6 mt-1 pr-4">
           {isAuthenticated ? (
             <>
-              <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
+              <div className="flex items-center cursor-pointer px-2 hover:text-red-500 transition-colors">
                 <FaRegCircleQuestion className="text-xl mr-2" />
                 <span>Consulta</span>
               </div>
@@ -213,7 +181,7 @@ export const Navbar: React.FC = () => {
                 className={`flex items-center cursor-pointer transition-colors ${
                   user?.shop 
                     ? 'text-gray-400'
-                    : 'hover:text-sky-500'
+                    : 'hover:text-red-500'
                 }`}
                 onClick={() => toggleModal()}
                 style={user?.shop ? { pointerEvents: 'auto' } : {}}
@@ -221,40 +189,24 @@ export const Navbar: React.FC = () => {
                 <RiRobot2Line className="text-xl mr-2" />
                 <span>Crear tienda</span>
               </div>
-              <div className="flex items-center cursor-pointer hover:text-sky-500 transition-colors">
+              <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
                 <BsShop className="text-xl mr-2" />
                 <span
                 onClick={() => navigate('/first-layout')}>Ver mi tienda</span>
               </div>
-              <div 
-                className={`relative flex items-center cursor-pointer transition-colors ${
-                  isDropdownOpen ? 'text-sky-500' : 'hover:text-sky-500'
-                }`}
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
+              <div className={`relative flex items-center cursor-pointer transition-colors ${isDropdownOpen ? 'text-red-500' : 'hover:text-red-500'}`} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                 <FaRegUserCircle className="text-xl mr-2" />
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
-                  <div 
-                    className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100"
-                    style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}
-                  >
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>
                     <ul className="py-2">
-                      <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                        onClick={() => navigate('/data-dashboard')}
-                      >
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
                         Mi cuenta
                       </li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                      onClick={toggleModal} 
-                      >
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal} >
                         Crear mi Tienda
                       </li>
-                      <li 
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                        onClick={handleLogout}
-                      >
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={handleLogout}>
                         Cerrar Sesión
                       </li>
                     </ul>
@@ -265,14 +217,14 @@ export const Navbar: React.FC = () => {
      ) : (
       <div className="flex items-center space-x-6">
         <div 
-          className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
+          className="flex items-center cursor-pointer hover:text-red-500 transition-colors"
           onClick={() => navigate('/cart')}
         >
           <FaShoppingCart className="text-xl mr-2" />
           <span>Ver mi carrito</span>
         </div>
         <div 
-          className="flex items-center cursor-pointer hover:text-sky-500 transition-colors"
+          className="flex items-center cursor-pointer hover:text-red-500 transition-colors"
           onClick={handleLoginClick}
         >
           <FaRegUserCircle className="text-xl mr-2" />
@@ -315,6 +267,42 @@ export const Navbar: React.FC = () => {
           </div>
         )}
       </nav>
+      {/* Desktop Menu Below Navbar */}
+      <div className="hidden md:flex w-full justify-center mt-[70px]">
+        <div className="flex gap-8 text-gray-600 text-sm justify-center">
+          <a href="#" className="hover:text-red-500 transition-colors">Gestión de ventas</a>
+          <div 
+            className="relative"
+            onMouseEnter={openCategoryMenu}
+            onMouseLeave={closeCategoryMenu}
+          >
+            <a href="#" className="hover:text-red-500 transition-colors">Categorias</a>
+            {isCategoryMenuOpen && (
+              <div 
+                className="absolute bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48 z-10"
+                onMouseEnter={openCategoryMenu}
+                onMouseLeave={closeCategoryMenu}
+              >
+                <ul className="py-2">
+                  <li 
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                    onClick={() => handleCategorySearch('laptop')}
+                  >
+                    Laptop
+                  </li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
+                </ul>
+              </div>
+            )}
+          </div>
+          <a href="#" className="hover:text-red-500 transition-colors">Cupones</a>
+          <a href="#" className="hover:text-red-500 transition-colors">Productos</a>
+          <a href="#" className="hover:text-red-500 transition-colors">Ofertas</a>
+        </div>
+      </div>
+      <div className="hidden md:block w-full mt-4 h-px bg-gray-200" /> {/* Línea debajo de menú */}
       {/* Mobile Navbar */}
       <nav className="navbar-mobile">
         <div className="navbar-mobile-logo" onClick={() => navigate('/dashboard')}>
