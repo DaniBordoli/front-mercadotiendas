@@ -1,0 +1,15 @@
+
+.carousel-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .carousel-desktop {
+    display: none !important;
+  }
+  .carousel-mobile {
+    display: block !important;
+    width: 100%;
+  
+  }
+}

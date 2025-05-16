@@ -1,0 +1,39 @@
+
+
+@media (max-width: 768px) {
+  .wide-card-container {
+    height: auto !important;
+    min-height: 320px;
+  }
+  
+
+  .wide-card-desktop {
+    display: none !important;
+  }
+  
+
+  .wide-card-mobile {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 12px;
+  }
+  
+
+  .wide-card-mobile-image {
+    width: 50% !important;
+    height: 260px !important;
+    border-radius: 8px;
+  }
+}
+
+
+@media (min-width: 769px) {
+  .wide-card-mobile {
+    display: none !important;
+  }
+  
+  .wide-card-desktop {
+    display: flex !important;
+  }
+}
