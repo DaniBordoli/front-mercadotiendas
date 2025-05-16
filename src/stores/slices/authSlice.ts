@@ -200,11 +200,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   login: async (credentials: LoginCredentials) => {
     set({ isLoading: true, error: null });
     try {
+      console.log('[Auth] Iniciando proceso de login con email...');
+      console.log('[Auth] API_URL:', API_URL);
+
       const result = await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      console.log('[Auth] Firebase login exitoso, obteniendo token...');
       const idToken = await result.user.getIdToken();
+      console.log('[Auth] Token obtenido correctamente');
       
-  
       const apiUrl = `${API_URL}/auth/authenticate`;
+      console.log('[Auth] Intentando autenticar en backend:', apiUrl);
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -212,9 +217,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token: idToken }),
+      }).catch(error => {
+        console.error('[Auth] Error en fetch:', error);
+        throw error;
       });
       
+      console.log('[Auth] Respuesta del backend recibida, status:', response.status);
       const responseData = await response.json();
+      console.log('[Auth] Datos de respuesta:', responseData);
+
       if (!response.ok) {
         throw new Error(responseData.message || 'Invalid credentials');
       }
