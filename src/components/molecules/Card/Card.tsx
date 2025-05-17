@@ -63,9 +63,21 @@ export const Card: React.FC<CardProps> = ({
 };
 
 const cardData = [
-  { imageSrc: "https://images.pexels.com/photos/447570/pexels-photo-447570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
-  { imageSrc: "https://images.pexels.com/photos/10274665/pexels-photo-10274665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
-  { imageSrc: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" },
+  { 
+    imageSrc: "https://images.pexels.com/photos/447570/pexels-photo-447570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    title: "Reloj negro elegante",
+    price: 350
+  },
+  { 
+    imageSrc: "https://images.pexels.com/photos/10274665/pexels-photo-10274665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    title: "Chaqueta marrón de cuero",
+    price: 100
+  },
+  { 
+    imageSrc: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+    title: "Camiseta negra básica",
+    price: 60
+  },
 ];
 
 export const CardList: React.FC = () => {
@@ -81,6 +93,8 @@ export const CardList: React.FC = () => {
           <Card 
             key={index} 
             imageSrc={card.imageSrc} 
+            title={card.title}
+            price={card.price}
             onClick={() => handleCardClick(index)}
           />
         ))}
