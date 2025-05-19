@@ -137,6 +137,29 @@ export const updateUserProfile = async (profileData: Record<string, string>): Pr
 
 };
 
+export const updateAvatar = async (avatarFile: File): Promise<void> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  const formData = new FormData();
+  formData.append('avatar', avatarFile);
+
+  const response = await fetch(`${API_URL}/users/avatar`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Error al actualizar el avatar');
+  }
+};
+
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
   const userStr = getStorageItem('user'); // Keep reading user for potential initial display
