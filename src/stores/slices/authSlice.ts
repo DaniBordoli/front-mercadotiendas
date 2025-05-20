@@ -188,6 +188,30 @@ const checkInitialAuthState = () => {
 
 const initialState = checkInitialAuthState();
 
+let logoutTimer: ReturnType<typeof setTimeout> | null = null;
+
+/**
+ * Inicia un temporizador para desloguear al usuario después de `timeoutMs` milisegundos.
+ * Si ya existe un temporizador, lo reinicia.
+ * @param timeoutMs Tiempo en milisegundos antes de desloguear (por ejemplo, 30 minutos = 1800000)
+ */
+export const startAutoLogoutTimer = (timeoutMs: number, logoutCallback: () => void) => {
+  clearAutoLogoutTimer();
+  logoutTimer = setTimeout(() => {
+    logoutCallback();
+  }, timeoutMs);
+};
+
+/**
+ * Limpia el temporizador de auto-logout si existe.
+ */
+export const clearAutoLogoutTimer = () => {
+  if (logoutTimer) {
+    clearTimeout(logoutTimer);
+    logoutTimer = null;
+  }
+}
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
   loadProfile: async () => {
     const token = get().token;
@@ -443,6 +467,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     removeStorageItem('token');
     removeStorageItem('user');
     set({ token: null, isAuthenticated: false, user: null });
+    clearAutoLogoutTimer();
   },
 
   clearError: () => {
@@ -458,7 +483,25 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     removeStorageItem('token');
     removeStorageItem('user');
     set({ token: null, isAuthenticated: false });
-  }
+  },
+
+  /**
+   * Llama a este método para iniciar el temporizador de auto-logout.
+   * Por ejemplo: useAuthStore.getState().startAutoLogout()
+   * El tiempo por defecto es 1 minuto (60,000 ms).
+   */
+  startAutoLogout: (timeoutMs: number = 60000) => {
+    startAutoLogoutTimer(timeoutMs, () => {
+      get().logout();
+    });
+  },
+
+  /**
+   * Llama a este método para limpiar el temporizador de auto-logout.
+   */
+  clearAutoLogout: () => {
+    clearAutoLogoutTimer();
+  },
 }));
 
 export const fetchProvincesForArgentina = async (): Promise<string[]> => {
