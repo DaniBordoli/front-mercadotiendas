@@ -488,9 +488,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   /**
    * Llama a este método para iniciar el temporizador de auto-logout.
    * Por ejemplo: useAuthStore.getState().startAutoLogout()
-   * El tiempo por defecto es 1 minuto (60,000 ms).
+   * El tiempo por defecto es 30 minutos (1800000 ms).
    */
-  startAutoLogout: (timeoutMs: number = 60000) => {
+  startAutoLogout: (timeoutMs: number = 1800000) => {
     startAutoLogoutTimer(timeoutMs, () => {
       get().logout();
     });
