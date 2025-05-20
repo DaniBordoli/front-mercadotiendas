@@ -4,7 +4,7 @@ import { DesignButton } from '../components/atoms/DesignButton';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault';
 import { SelectDefault } from '../components/atoms/SelectDefault';
-import { fetchUserProfile, updateUserProfile } from '../stores/slices/authSlice';
+import { fetchUserProfile, updateUserProfile, updateAvatar } from '../stores/slices/authSlice';
 import Toast from '../components/atoms/Toast';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -16,7 +16,7 @@ const DataPersonalInfo: React.FC = () => {
         email: '',
         birthDate: '',
         countryCode: '+54',
-        phone: '',
+        userPhone: '',
         country: '',
         city: '',
         address: ''
@@ -41,12 +41,12 @@ const DataPersonalInfo: React.FC = () => {
                     email: user.email || '',
                     birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
                     countryCode: user.countryCode || '+54',
-                    phone: user.phone || '',
+                    userPhone: user.userPhone || '',
                     country: user.country || '',
                     city: user.city || '',
                     address: user.address || ''
                 });
-                setProfileImage(user.profileImageUrl || "https://placehold.co/100x100");
+                setProfileImage(user.avatar || "https://placehold.co/100x100"); // Cambiado a user.avatar
             } catch (error) {
                 // Manejo de error opcional
             }
@@ -73,17 +73,19 @@ const DataPersonalInfo: React.FC = () => {
             return;
         }
         try {
-            // Adaptar payload según backend
+            // 1. Actualizar datos de perfil (sin imagen)
             const { fullName, ...restValues } = values;
             const payload: any = {
                 ...restValues,
                 name: fullName,
             };
-            // Si hay imagen nueva, agregarla al payload (ajustar según backend)
-            if (profileImageFile) {
-                payload.profileImage = profileImageFile;
-            }
             await updateUserProfile(payload);
+
+            // 2. Si hay imagen nueva, subirla aparte
+            if (profileImageFile) {
+                await updateAvatar(profileImageFile);
+            }
+
             setToast({
                 show: true,
                 message: 'Perfil actualizado',
@@ -237,8 +239,8 @@ const DataPersonalInfo: React.FC = () => {
                                 <InputDefault
                                     placeholder="Ingresa tu número"
                                     className="w-full"
-                                    value={values.phone}
-                                    onChange={val => setValues(v => ({ ...v, phone: val }))}
+                                    value={values.userPhone}
+                                    onChange={val => setValues(v => ({ ...v, userPhone: val }))}
                                 />
                             </div>
                         </div>
@@ -285,7 +287,7 @@ const DataPersonalInfo: React.FC = () => {
                             />
                         </div>
 
-                        <div className="w-8/12 border-t border-gray-300 my-6"></div>
+                        <div className="w-8/12 border-t border-gray-300 my-2"></div>
 
                         <div className="w-full">
                             <h2 className="text-lg font-space font-medium text-gray-800 mb-4" style={{ marginLeft: '16%' }}>
