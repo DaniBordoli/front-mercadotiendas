@@ -13,6 +13,7 @@ import { BsShop } from "react-icons/bs";
 // Importar el icono de lupa
 import { FaSearch } from "react-icons/fa";
 import { InputDefault } from '../../atoms/InputDefault/InputDefault';
+import { useCartStore } from '../../../stores/cartStore';
 import './NavbarMobile.css';
 
 export const Navbar: React.FC = () => {
@@ -32,6 +33,8 @@ export const Navbar: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const categoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const cartItems = useCartStore(state => state.items);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleLogout = () => {
     logout();
@@ -172,11 +175,24 @@ export const Navbar: React.FC = () => {
         <div className="flex items-start space-x-6 mt-1 pr-4">
           {isAuthenticated ? (
             <>
-              <div className="flex items-center cursor-pointer px-2 hover:text-red-500 transition-colors">
-                <FaRegCircleQuestion className="text-xl mr-2" />
-                <span>Consulta</span>
+              <div 
+                className="flex items-center cursor-pointer px-2 hover:text-red-500 transition-colors relative"
+                onClick={() => navigate('/cart-list')}
+              >
+                <span className="relative mr-2">
+                  {cartCount > 0 && (
+                    <span
+                      className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                      style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                    >
+                      {cartCount}
+                    </span>
+                  )}
+                  <FaShoppingCart className="text-xl" />
+                </span>
+                <span>Mi carrito</span>
               </div>
-            
+              
               <div
                 className={`flex items-center cursor-pointer transition-colors ${
                   user?.shop 
@@ -203,6 +219,9 @@ export const Navbar: React.FC = () => {
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
                         Mi cuenta
                       </li>
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
+                        Mi carrito
+                      </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal} >
                         Crear mi Tienda
                       </li>
@@ -210,6 +229,7 @@ export const Navbar: React.FC = () => {
                         Cerrar Sesión
                       </li>
                     </ul>
+                    
                   </div>
                 )}
               </div>
@@ -217,10 +237,20 @@ export const Navbar: React.FC = () => {
      ) : (
       <div className="flex items-center space-x-6">
         <div 
-          className="flex items-center cursor-pointer hover:text-red-500 transition-colors"
-          onClick={() => navigate('/cart')}
+          className="flex items-center cursor-pointer hover:text-red-500 transition-colors relative"
+          onClick={() => navigate('/cart-list')}
         >
-          <FaShoppingCart className="text-xl mr-2" />
+          <span className="relative mr-2">
+            {cartCount > 0 && (
+              <span
+                className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {cartCount}
+              </span>
+            )}
+            <FaShoppingCart className="text-xl" />
+          </span>
           <span>Ver mi carrito</span>
         </div>
         <div 

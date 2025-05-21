@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchStore } from '../stores';
+import { useCartStore } from '../stores/cartStore';
 import { Navbar } from '../components/organisms/Navbar';
 import { Footer } from '../components/organisms/Footer';
 import { FaStar, FaRegStar, FaChevronLeft, FaChevronRight, FaMinus, FaPlus, FaTruck, FaShieldAlt, FaCreditCard, FaHeart, FaSpinner } from 'react-icons/fa';
@@ -53,6 +54,7 @@ const ProductDetailPage: React.FC = () => {
     isLoadingReviews,
     addReview,
   } = useSearchStore();
+  const addToCart = useCartStore(state => state.addToCart);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -99,7 +101,7 @@ const ProductDetailPage: React.FC = () => {
 
   const handleAddToCart = () => {
       if (!selectedProduct) return;
-      console.log(`Añadiendo ${quantity} de ${selectedProduct.name} (ID: ${selectedProduct.id}) al carrito.`);
+      addToCart(selectedProduct, quantity);
   };
 
   const handleOpenReviewForm = () => {
@@ -392,4 +394,4 @@ const ProductDetailPage: React.FC = () => {
   );
 };
 
-export default ProductDetailPage; 
+export default ProductDetailPage;
