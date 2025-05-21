@@ -38,6 +38,10 @@ import UserProfileScreen from '../screens/LayoutScreens/UserProfileScreen';
 import AboutUsScreen from '../screens/LayoutScreens/AboutUsScreen';
 import ContactScreen from '../screens/LayoutScreens/ContactScreen';
 import LayoutSelection from '../screens/LayoutSelection';
+import CartList from '../screens/CartList';
+import CartCheckout from '../screens/CartCheckout'
+import CartSummary from '../screens/CartSummary';
+import CartCompleted from '../screens/CartCompleted';
 
 
 export const publicRoutes = [
@@ -176,6 +180,22 @@ export const publicRoutes = [
   {
     path: '/contact-layout',
     element: <ContactScreen />
+  },
+    {
+    path: '/cart-list',
+    element: <CartList />
+  },
+   {
+    path: '/cart-checkout',
+    element: <CartCheckout />
+  },
+   {
+    path: '/cart-summary',
+    element: <CartSummary />
+  },
+  {
+    path: '/cart-completed',
+    element: <CartCompleted />
   },
 ];
 
