@@ -194,16 +194,13 @@ export const Navbar: React.FC = () => {
               </div>
               
               <div
-                className={`flex items-center cursor-pointer transition-colors ${
-                  user?.shop 
-                    ? 'text-gray-400'
-                    : 'hover:text-red-500'
+                className={`flex items-center cursor-pointer transition-color'
                 }`}
                 onClick={() => toggleModal()}
                 style={user?.shop ? { pointerEvents: 'auto' } : {}}
               >
                 <RiRobot2Line className="text-xl mr-2" />
-                <span>Crear tienda</span>
+                <span>{user?.shop ? 'Editar tienda' : 'Crear tienda'}</span>
               </div>
               <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
                 <BsShop className="text-xl mr-2" />
@@ -266,26 +263,44 @@ export const Navbar: React.FC = () => {
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg p-6 w-[90%] md:w-[50%] lg:w-[30%] shadow-lg">
-              <h3 className="text-lg font-bold mb-4 font-space text-center">¿Quieres ir por la creación manual o vía IA?</h3>
+              <h3 className="text-lg font-bold mb-4 font-space text-center">
+                {user?.shop
+                  ? '¿Quieres editar tu tienda vía IA?'
+                  : '¿Quieres ir por la creación manual o vía IA?'}
+              </h3>
               <div className="flex flex-col gap-4">
-                <DesignButton
-                  variant="secondary"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    navigate('/shop-create');
-                  }}
-                >
-                  Creación Manual
-                </DesignButton>
-                <DesignButton
-                  variant="secondary"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    navigate('/layout-select');
-                  }}
-                >
-                  Creación vía IA
-                </DesignButton>
+                {user?.shop ? (
+                  <DesignButton
+                    variant="secondary"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      navigate('/layout-select');
+                    }}
+                  >
+                    Editar vía IA
+                  </DesignButton>
+                ) : (
+                  <>
+                    <DesignButton
+                      variant="secondary"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        navigate('/shop-create');
+                      }}
+                    >
+                      Creación Manual
+                    </DesignButton>
+                    <DesignButton
+                      variant="secondary"
+                      onClick={() => {
+                        setIsModalOpen(false);
+                        navigate('/layout-select');
+                      }}
+                    >
+                      Creación vía IA
+                    </DesignButton>
+                  </>
+                )}
               </div>
               <button
                 className="mt-4 text-sm text-gray-900 font-space w-full text-center"
