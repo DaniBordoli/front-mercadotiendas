@@ -52,6 +52,12 @@ export const DesignButton: React.FC<DesignButtonProps & {
           border: `2px solid ${colors.lightGray}`,
           font: ''
         };
+      case 'green':
+        return {
+          backgroundColor: '#DFFBE9',
+          color: '#18813A',
+          font: ''
+        };
       default:
         return {
           backgroundColor: colors.primaryRed,
@@ -78,6 +84,8 @@ export const DesignButton: React.FC<DesignButtonProps & {
       e.currentTarget.style.backgroundColor = `${colors.primaryRed}0D`;
     } else if (variant === 'neutral') {
       e.currentTarget.style.backgroundColor = `${colors.mediumGray}0D`;
+    } else if (variant === 'green') {
+      e.currentTarget.style.backgroundColor = '#C8F6D7';
     }
   };
 
@@ -88,6 +96,8 @@ export const DesignButton: React.FC<DesignButtonProps & {
       e.currentTarget.style.backgroundColor = `${colors.primaryRed}00`;
     } else if (variant === 'neutral') {
       e.currentTarget.style.backgroundColor = `${colors.mediumGray}00`;
+    } else if (variant === 'green') {
+      e.currentTarget.style.backgroundColor = '#DFFBE9';
     }
   };
 

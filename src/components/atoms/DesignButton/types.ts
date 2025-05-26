@@ -1,7 +1,7 @@
 import { IconType } from 'react-icons';
 import { ButtonHTMLAttributes } from 'react';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'neutral';
+export type ButtonVariant = 'primary' | 'secondary' | 'neutral' | 'green';
 export type ButtonSize = 'small' | 'medium' | 'large';
 
 export interface DesignButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
