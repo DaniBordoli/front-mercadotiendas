@@ -42,6 +42,9 @@ import CartList from '../screens/CartList';
 import CartCheckout from '../screens/CartCheckout'
 import CartSummary from '../screens/CartSummary';
 import CartCompleted from '../screens/CartCompleted';
+import MyProductsSection from '../screens/MyProductsSection';
+import EditProductScreen from '../screens/EditProductScreen';
+import NewProductScreen from '../screens/NewProductScreen';
 
 
 export const publicRoutes = [
@@ -196,6 +199,18 @@ export const publicRoutes = [
   {
     path: '/cart-completed',
     element: <CartCompleted />
+  },
+    {
+    path: '/data-products',
+    element: <MyProductsSection />
+  },
+  {
+    path: '/edit-products',
+    element: <EditProductScreen />
+  },
+  {
+    path: '/new-product',
+    element: <NewProductScreen />
   },
 ];
 

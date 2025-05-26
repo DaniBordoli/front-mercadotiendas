@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Logo } from '../../atoms/Logo/Logo';
-import { FaUser, FaTachometerAlt, FaShoppingCart, FaCreditCard, FaShoppingBag } from 'react-icons/fa';
+import { FaUser, FaTachometerAlt, FaShoppingCart, FaCreditCard, FaShoppingBag, FaBox } from 'react-icons/fa';
 import { GoGraph } from 'react-icons/go';
 import { IoDocumentText, IoChevronDown, IoToggleSharp } from "react-icons/io5";
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -21,6 +21,7 @@ const DataSideBar: React.FC = () => {
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
         { key: 'profile', label: 'Datos Personales', icon: <FaUser className="text-lg" />, path: '/data-profile' },
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
+        { key: 'products', label: 'Mis productos', icon: <FaBox className="text-lg" />, path: '/data-products', match: (pathname: string) => pathname.startsWith('/data-products') || pathname.startsWith('/edit-products') },
         { key: 'subscription', label: 'Suscripción', icon: <FaCreditCard className="text-lg" />, path: '/data-subscription' },
         { key: 'billing', label: 'Facturación', icon: <IoDocumentText className="text-lg" />, path: '/data-billing' },
         { key: 'sellManagement', label: 'Gestión de Ventas', icon: <GoGraph className="text-lg" />, path: '/data-sales-management' },
@@ -51,32 +52,38 @@ const DataSideBar: React.FC = () => {
                 <Logo size={40} />
                 <h2 className='text-xl font-space'>Mercado Tiendas</h2>
             </div>
-            <hr className='border-gray-300' />
+           
             <div className='flex flex-col mt-4 relative'>
-                {menuOptions.map((option) => (
-                    <div key={option.key} className="relative">
-                        {location.pathname === option.path && (
-                            <motion.div
-                                className="absolute inset-0"
-                                style={{ backgroundColor: `${colors.primaryRed}1A` }}
-                                layoutId="activeBackground"
-                                initial={{ x: '-100%' }}
-                                animate={{ x: 0 }}
-                                transition={{ duration: 0.1 }}
-                            />
-                        )}
-                        <button
-                            className={`relative flex items-center gap-3 p-3 ${
-                                location.pathname === option.path ? 'text-[${colors.primaryRed}]' : ''
-                            }`}
-                            style={location.pathname === option.path ? { color: colors.primaryRed } : {}}
-                            onClick={() => navigate(option.path)}
-                        >
-                            {option.icon}
-                            <span className='font-space'>{option.label}</span>
-                        </button>
-                    </div>
-                ))}
+                {menuOptions.map((option) => {
+                   
+                    const isActive = option.match
+                        ? option.match(location.pathname)
+                        : location.pathname === option.path;
+                    return (
+                        <div key={option.key} className="relative">
+                            {isActive && (
+                                <motion.div
+                                    className="absolute inset-0"
+                                    style={{ backgroundColor: `${colors.primaryRed}1A` }}
+                                    layoutId="activeBackground"
+                                    initial={{ x: '-100%' }}
+                                    animate={{ x: 0 }}
+                                    transition={{ duration: 0.1 }}
+                                />
+                            )}
+                            <button
+                                className={`relative flex items-center gap-3 p-3 ${
+                                    isActive ? 'text-[${colors.primaryRed}]' : ''
+                                }`}
+                                style={isActive ? { color: colors.primaryRed } : {}}
+                                onClick={() => navigate(option.path)}
+                            >
+                                {option.icon}
+                                <span className='font-space'>{option.label}</span>
+                            </button>
+                        </div>
+                    );
+                })}
                 {/* Dropdown de Mi Tienda */}
                 <div className="relative">
                    
