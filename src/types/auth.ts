@@ -79,4 +79,27 @@ export type AuthStore = AuthState & {
   clearError: () => void;
   setToken: (token: string) => void;
   clearToken: () => void;
+  createProduct: (
+    data: {
+      nombre: string;
+      descripcion: string;
+      sku: string;
+      estado: string;
+      precio: string;
+      categoria: string;
+      subcategoria: string;
+    }
+  ) => Promise<any>;
+  fetchProducts: () => Promise<any[]>;
+  deleteProduct: (id: string) => Promise<void>;
+  updateProduct: (id: string, data: {
+    nombre?: string;
+    sku?: string;
+    descripcion?: string;
+    precio?: string;
+    stock?: string;
+    categoria?: string;
+    estado?: string;
+  }) => Promise<any>;
+  fetchProductById: (id: string) => Promise<any>;
 }

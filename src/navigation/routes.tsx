@@ -205,7 +205,7 @@ export const publicRoutes = [
     element: <MyProductsSection />
   },
   {
-    path: '/edit-products',
+    path: '/edit-products/:id',
     element: <EditProductScreen />
   },
   {
