@@ -463,6 +463,160 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
+  /**
+   * 
+   * @param data Los datos del producto a crear.
+   */
+  createProduct: async (
+    data: {
+      nombre: string;
+      descripcion: string;
+      sku: string;
+      estado: string;
+      precio: string;
+      categoria: string;
+      subcategoria: string;
+    }
+  ): Promise<any> => {
+    set({ isLoading: true, error: null });
+    try {
+      const token = getStorageItem('token');
+      if (!token) {
+        throw new Error('No hay token de autenticación');
+      }
+
+      const apiUrl = `${API_URL}/products`;
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+    
+        console.error('Error backend createProduct:', responseData);
+        throw new Error(responseData.message || 'Error al crear el producto');
+      }
+      set({ isLoading: false });
+      return responseData;
+    } catch (error) {
+   
+      console.error('Error en createProduct:', error);
+      set({
+        error: error instanceof Error ? error.message : 'Error al crear el producto',
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene la lista de productos del usuario autenticado.
+   */
+  fetchProducts: async (): Promise<any[]> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchProducts:', responseData);
+      throw new Error(responseData.message || 'Error al obtener los productos');
+    }
+   
+    return responseData.data || [];
+  },
+
+  /**
+   * Elimina un producto por su ID.
+   */
+  deleteProduct: async (id: string): Promise<void> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/${id}`;
+    const response = await fetch(apiUrl, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend deleteProduct:', responseData);
+      throw new Error(responseData.message || 'Error al eliminar el producto');
+    }
+    
+  },
+
+  updateProduct: async (
+    id: string,
+    data: {
+      nombre?: string;
+      sku?: string;
+      descripcion?: string;
+      precio?: string;
+      stock?: string;
+      categoria?: string;
+      estado?: string;
+    }
+  ): Promise<any> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/${id}`;
+    const response = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend updateProduct:', responseData);
+      throw new Error(responseData.message || 'Error al actualizar el producto');
+    }
+    return responseData.data;
+  },
+
+  fetchProductById: async (id: string): Promise<any> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/${id}`;
+    console.log('fetchProductById URL:', apiUrl, 'id:', id);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchProductById:', responseData);
+      throw new Error(responseData.message || 'Error al obtener el producto');
+    }
+    return responseData.data;
+  },
+
   logout: () => {
     removeStorageItem('token');
     removeStorageItem('user');

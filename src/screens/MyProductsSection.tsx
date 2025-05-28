@@ -6,6 +6,8 @@ import { TbEdit } from "react-icons/tb";
 import DataSideBar from '../components/organisms/DataSideBar/DataSideBar'
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa6';
+import { useAuthStore } from '../stores/slices/authSlice';
+import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
 
 const estadoOptions = [
   { value: '', label: 'Todos' },
@@ -27,33 +29,50 @@ const stockOptions = [
   { value: 'sinStock', label: 'Sin stock' },
 ];
 
-const productos = [
-  {
-    img: '',
-    nombre: 'Reloj de Cuero Clásico',
-    sku: 'RL-001',
-    precio: '$299.99',
-    stock: 45,
-    estado: 'Activo',
-    categoria: 'Accesorios',
-    fecha: '2024-02-15',
-    estadoColor: 'text-green-600',
-  },
-  {
-    img: '',
-    nombre: 'Zapatillas Deportivas Pro',
-    sku: 'ZP-100',
-    precio: '$149.50',
-    stock: 28,
-    estado: 'Pendiente',
-    categoria: 'Calzado',
-    fecha: '2024-02-15',
-    estadoColor: 'text-blue-500',
-  },
-];
-
 const MyProductsSection: React.FC = () => {
   const navigate = useNavigate();
+  const fetchProducts = useAuthStore(state => state.fetchProducts);
+  const deleteProduct = useAuthStore(state => state.deleteProduct);
+  const [productos, setProductos] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [productToDelete, setProductToDelete] = React.useState<any | null>(null);
+
+  React.useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const prods = await fetchProducts();
+        setProductos(prods);
+      } catch (err) {
+        setProductos([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, [fetchProducts]);
+
+  const openDeleteModal = (product: any) => {
+    setProductToDelete(product);
+    setDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setProductToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!productToDelete) return;
+    try {
+      await deleteProduct(productToDelete._id);
+      setProductos(prev => prev.filter(p => p._id !== productToDelete._id));
+      closeDeleteModal();
+    } catch (err: any) {
+      alert(err?.message || 'Error al eliminar el producto');
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -123,41 +142,68 @@ const MyProductsSection: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {productos.map((prod, idx) => (
-                  <tr key={prod.sku} className="border-t last:border-b rounded-xl hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 flex items-center gap-3">
-                      <div className="w-[40px] h-[40px] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">60×60</div>
-                      <span className="font-space text-sm text-gray-800">{prod.nombre}</span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 font-space">{prod.sku}</td>
-                    <td className="px-4 py-3 font-space">{prod.precio}</td>
-                    <td className="px-4 py-3 font-space">{prod.stock}</td>
-                    <td className="px-4 py-3 font-space">
-                      <span className={`font-medium ${prod.estadoColor}`}>{prod.estado}</span>
-                    </td>
-                    <td className="px-4 py-3 font-space">{prod.categoria}</td>
-                    <td className="px-4 py-3 font-space">{prod.fecha}</td>
-                    <td className="px-4 py-3 flex items-center gap-3">
-                      <button
-                        className="hover:text-primaryRed"
-                        onClick={() => navigate('/edit-products')}
-                      >
-                        <TbEdit className="text-lg text-gray-500" />
-                      </button>
-                      <button className="hover:text-primaryRed">
-                        <FaEyeSlash className="text-lg text-gray-500" />
-                      </button>
-                      <button className="text-red-500 hover:text-red-700">
-                        <FaTrash className="" />
-                      </button>
-                    </td>
+                {loading ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-6 text-gray-400">Cargando productos...</td>
                   </tr>
-                ))}
+                ) : productos.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="text-center py-6 text-gray-400">No hay productos.</td>
+                  </tr>
+                ) : (
+                  productos.map((prod, idx) => (
+                    <tr key={prod._id || prod.sku || idx} className="border-t last:border-b rounded-xl hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 flex items-center gap-3">
+                        <div className="w-[40px] h-[40px] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">60×60</div>
+                        <span className="font-space text-sm text-gray-800">{prod.nombre}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 font-space">{prod.sku}</td>
+                      <td className="px-4 py-3 font-space">{prod.precio}</td>
+                      <td className="px-4 py-3 font-space">{prod.stock ?? '-'}</td>
+                      <td className="px-4 py-3 font-space">
+                        <span className="font-medium text-green-600">{prod.estado}</span>
+                      </td>
+                      <td className="px-4 py-3 font-space">{prod.categoria}</td>
+                      <td className="px-4 py-3 font-space">
+                        {prod.createdAt ? new Date(prod.createdAt).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="px-4 py-3 flex items-center gap-3">
+                        <button
+                          className="hover:text-primaryRed"
+                          onClick={() => navigate(`/edit-products/${prod._id}`)}
+                        >
+                          <TbEdit className="text-lg text-gray-500" />
+                        </button>
+                        <button className="hover:text-primaryRed">
+                          <FaEyeSlash className="text-lg text-gray-500" />
+                        </button>
+                        <button
+                          className="text-red-500 hover:text-red-700"
+                          onClick={() => openDeleteModal(prod)}
+                        >
+                          <FaTrash className="" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
       </div>
+      {deleteModalOpen && productToDelete && (
+        <ProductDeleteModal
+          onClose={closeDeleteModal}
+          onDelete={handleDelete}
+          product={{
+            nombre: productToDelete.nombre,
+            sku: productToDelete.sku,
+            precio: productToDelete.precio,
+            estado: productToDelete.estado,
+          }}
+        />
+      )}
     </div>
   );
 };

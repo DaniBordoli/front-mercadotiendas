@@ -9,6 +9,8 @@ import StepBasicInfo from '../components/organisms/NewProductComponents/StepBasi
 import ImageStep from '../components/organisms/NewProductComponents/ImageStep';
 import VariantsStep from '../components/organisms/NewProductComponents/VariantsStep';
 import ProductSuccessModal from '../components/organisms/NewProductComponents/ProductSuccessModal';
+import { useAuthStore } from '../stores/slices/authSlice';
+
 const steps = [
   { label: 'Información Básica' },
   { label: 'Imágenes' },
@@ -19,14 +21,52 @@ const NewProductScreen: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = React.useState(1);
   const [showModal, setShowModal] = React.useState(false);
+  const [createdProduct, setCreatedProduct] = React.useState<any | null>(null);
 
-  const handlePublish = () => setShowModal(true);
+  const [basicInfo, setBasicInfo] = React.useState({
+    nombre: '',
+    descripcion: '',
+    sku: '',
+    estado: 'activo',
+    precio: '',
+    categoria: '',
+    subcategoria: '',
+  });
+
+  const handleBasicInfoChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
+  ) => {
+    if ('target' in e) {
+      const { name, value } = e.target;
+      setBasicInfo(prev => ({ ...prev, [name]: value }));
+    } else {
+      setBasicInfo(prev => ({ ...prev, [e.name]: e.value }));
+    }
+  };
+
+  const createProduct = useAuthStore(state => state.createProduct);
+
+  const handlePublish = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Datos enviados a createProduct:', basicInfo);
+      const result = await createProduct(basicInfo);
+      setCreatedProduct({
+        nombre: result.data?.nombre || basicInfo.nombre,
+        sku: result.data?.sku || basicInfo.sku,
+        precio: result.data?.precio || basicInfo.precio,
+        estado: result.data?.estado || basicInfo.estado,
+      });
+      setShowModal(true);
+    } catch (err) {
+      alert('Error al crear el producto');
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
       <DataSideBar />
       <div className="flex flex-col flex-grow ml-[250px]">
-
         <div className="w-full flex items-center justify-between px-8 h-[80px] bg-white border-b border-gray-200">
           <div className="flex items-center gap-2">
             <button
@@ -51,7 +91,7 @@ const NewProductScreen: React.FC = () => {
             </DesignButton>
           </div>
         </div>
-       
+
         <div className="w-full flex items-center px-8 py-6 bg-white border-b border-gray-100">
           <div className="flex items-center gap-8">
             {steps.map((s, idx) => {
@@ -99,12 +139,23 @@ const NewProductScreen: React.FC = () => {
             })}
           </div>
         </div>
-        
-        {step === 1 && <StepBasicInfo onNext={() => setStep(2)} />}
+
+        {step === 1 && (
+          <StepBasicInfo
+            onNext={() => setStep(2)}
+            values={basicInfo}
+            onChange={handleBasicInfoChange}
+          />
+        )}
         {step === 2 && <ImageStep onNext={() => setStep(3)} />}
         {step === 3 && <VariantsStep />}
-      
-        {showModal && <ProductSuccessModal onClose={() => setShowModal(false)} />}
+
+        {showModal && createdProduct && (
+          <ProductSuccessModal
+            onClose={() => setShowModal(false)}
+            product={createdProduct}
+          />
+        )}
       </div>
     </div>
   );

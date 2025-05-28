@@ -7,7 +7,8 @@ import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { FaEye, FaPowerOff, FaRegFolderOpen, FaRegTrashCan, FaRegImages, FaArrowLeft } from 'react-icons/fa6';
 import { colors } from '../design/colors';
 import { RiPencilFill } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAuthStore } from '../stores/slices/authSlice';
 
 const categoriaOptions = [
   { value: '', label: 'Seleccionar' },
@@ -39,6 +40,74 @@ const variantes = [
 const EditProductScreen: React.FC = () => {
   const [hasVariants, setHasVariants] = React.useState(true);
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const fetchProductById = useAuthStore(state => state.fetchProductById);
+  const updateProduct = useAuthStore(state => state.updateProduct);
+
+  const [product, setProduct] = React.useState<any | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const loadProduct = async () => {
+      setLoading(true);
+      try {
+        const found = await fetchProductById(id as string);
+        if (found) {
+          setProduct({
+            _id: found._id,
+            nombre: found.nombre || '',
+            sku: found.sku || '',
+            descripcion: found.descripcion || '',
+            precio: found.precio || '',
+            stock: found.stock?.toString() || '',
+            categoria: found.categoria || '',
+            estado: found.estado || 'activo',
+          });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) loadProduct();
+  }, [id, fetchProductById]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setProduct((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setProduct((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    if (!product) return;
+    try {
+      await updateProduct(product._id, {
+        nombre: product.nombre,
+        sku: product.sku,
+        descripcion: product.descripcion,
+        precio: product.precio,
+        stock: product.stock,
+        categoria: product.categoria,
+        estado: product.estado,
+      });
+      alert('Producto actualizado correctamente');
+    } catch (err: any) {
+      alert(err?.message || 'Error al actualizar el producto');
+    }
+  };
+
+  if (loading || !product) {
+    return (
+      <div className="min-h-screen flex">
+        <DataSideBar />
+        <div className="flex flex-col flex-grow ml-[250px] items-center justify-center">
+          <span className="text-gray-400">Cargando producto...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -102,21 +171,41 @@ const EditProductScreen: React.FC = () => {
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Nombre del producto *</label>
-                    <input className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none" defaultValue="Remera básica unisex" />
+                    <input
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+                      name="nombre"
+                      value={product.nombre}
+                      onChange={handleInputChange}
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">SKU *</label>
-                    <input className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none" defaultValue="RB-001" />
+                    <input
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+                      name="sku"
+                      value={product.sku}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
                 <div className="mb-4">
                   <label className="block text-xs font-space text-gray-500 mb-1">Descripción</label>
-                  <textarea className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none min-h-[60px]" />
+                  <textarea
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none min-h-[60px]"
+                    name="descripcion"
+                    value={product.descripcion}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Precio *</label>
-                    <input className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none" defaultValue="2700" />
+                    <input
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+                      name="precio"
+                      value={product.precio}
+                      onChange={handleInputChange}
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Descuento</label>
@@ -124,17 +213,30 @@ const EditProductScreen: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Stock *</label>
-                    <input className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none" defaultValue="24" />
+                    <input
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+                      name="stock"
+                      value={product.stock}
+                      onChange={handleInputChange}
+                    />
                   </div>
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Categoría *</label>
-                    <SelectDefault options={categoriaOptions} value={''} />
+                    <SelectDefault
+                      options={categoriaOptions}
+                      value={product.categoria}
+                      onChange={val => handleSelectChange('categoria', val)}
+                    />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Estado *</label>
-                    <SelectDefault options={estadoOptions} value={'activo'} />
+                    <SelectDefault
+                      options={estadoOptions}
+                      value={product.estado}
+                      onChange={val => handleSelectChange('estado', val)}
+                    />
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mb-4">
@@ -231,7 +333,7 @@ const EditProductScreen: React.FC = () => {
               <DesignButton variant="neutral">
                 Cancelar
               </DesignButton>
-              <DesignButton variant="primary">
+              <DesignButton variant="primary" onClick={handleSave}>
                 Guardar cambios
               </DesignButton>
             </div>
