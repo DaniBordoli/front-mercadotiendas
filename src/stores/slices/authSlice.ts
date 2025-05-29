@@ -160,6 +160,85 @@ export const updateAvatar = async (avatarFile: File): Promise<void> => {
   }
 };
 
+export const updateProductImage = async (productId: string, imageFile: File): Promise<string> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  const formData = new FormData();
+  formData.append('productImage', imageFile); 
+
+  const response = await fetch(`${API_URL}/products/${productId}/image`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      
+    },
+    body: formData,
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al actualizar la imagen del producto');
+  }
+  
+  return responseData.data.productImage;
+};
+
+/**
+ * Sube una o varias imágenes al producto.
+ */
+export const addProductImages = async (productId: string, imageFiles: File[]): Promise<string[]> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  const formData = new FormData();
+  imageFiles.forEach(file => {
+    formData.append('productImages', file); // backend espera 'productImages'
+  });
+
+  const response = await fetch(`${API_URL}/products/${productId}/images`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al subir imágenes del producto');
+  }
+  // Devuelve el array actualizado de URLs de imágenes
+  return responseData.data.productImages;
+};
+
+/**
+ * Elimina una imagen específica del producto.
+ */
+export const deleteProductImage = async (productId: string, imageUrl: string): Promise<string[]> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  const response = await fetch(`${API_URL}/products/${productId}/images`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ imageUrl }),
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al eliminar la imagen del producto');
+  }
+  // Devuelve el array actualizado de URLs de imágenes
+  return responseData.data.productImages;
+};
+
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
   const userStr = getStorageItem('user'); // Keep reading user for potential initial display
@@ -468,15 +547,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    * @param data Los datos del producto a crear.
    */
   createProduct: async (
-    data: {
-      nombre: string;
-      descripcion: string;
-      sku: string;
-      estado: string;
-      precio: string;
-      categoria: string;
-      subcategoria: string;
-    }
+    data: any // Puede ser FormData o un objeto normal
   ): Promise<any> => {
     set({ isLoading: true, error: null });
     try {
@@ -486,24 +557,34 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }
 
       const apiUrl = `${API_URL}/products`;
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+      let response;
+      if (data instanceof FormData) {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // No poner 'Content-Type' aquí
+          },
+          body: data,
+        });
+      } else {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+      }
       const responseData = await response.json();
       if (!response.ok) {
-    
         console.error('Error backend createProduct:', responseData);
         throw new Error(responseData.message || 'Error al crear el producto');
       }
       set({ isLoading: false });
       return responseData;
     } catch (error) {
-   
       console.error('Error en createProduct:', error);
       set({
         error: error instanceof Error ? error.message : 'Error al crear el producto',

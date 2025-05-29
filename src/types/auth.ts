@@ -100,6 +100,7 @@ export type AuthStore = AuthState & {
     stock?: string;
     categoria?: string;
     estado?: string;
+    
   }) => Promise<any>;
   fetchProductById: (id: string) => Promise<any>;
 }

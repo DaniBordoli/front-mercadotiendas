@@ -11,6 +11,7 @@ interface ProductDeleteModalProps {
     sku: string;
     precio: string;
     estado: string;
+    productImages?: string[];
   };
 }
 
@@ -40,7 +41,15 @@ const ProductDeleteModal: React.FC<ProductDeleteModalProps> = ({ onClose, onDele
           </div>
         </div>
         <div className="flex items-center gap-3 bg-[#FAFBFC] border border-gray-100 rounded-xl px-4 py-3 mb-6">
-          <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">60 × 60</div>
+          {product.productImages && product.productImages.length > 0 ? (
+            <img
+              src={product.productImages[0]}
+              alt={product.nombre}
+              className="w-12 h-12 object-cover rounded-md bg-gray-200"
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">60 × 60</div>
+          )}
           <div className="flex flex-col flex-1">
             <span className="font-space font-medium text-gray-800">{product.nombre}</span>
             <span className="text-xs text-gray-400 font-space">SKU: {product.sku}</span>
