@@ -25,19 +25,15 @@ interface ProductListItemProps {
 
 // Componente Helper para Rating
 const RatingStars: React.FC<{ rating?: number }> = ({ rating }) => {
-  if (rating === undefined || rating < 0 || rating > 5) {
-    return null; // No mostrar si el rating no es válido o no existe
-  }
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0; // No implementaremos medias estrellas por simplicidad ahora
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
+  // Si no hay rating, mostrar 0 estrellas y (0.0)
+  const safeRating = typeof rating === 'number' && rating >= 0 && rating <= 5 ? rating : 0;
+  const fullStars = Math.floor(safeRating);
+  const emptyStars = 5 - fullStars;
   return (
     <div className="flex items-center text-yellow-500">
       {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} />)}
-      {/* {hasHalfStar && <FaStarHalfAlt key="half" />} // Para futura implementación */}
       {[...Array(emptyStars)].map((_, i) => <FaRegStar key={`empty-${i}`} />)}
-      <span className="text-gray-500 text-xs ml-1">({rating.toFixed(1)})</span>
+      <span className="text-gray-500 text-xs ml-1">({safeRating.toFixed(1)})</span>
     </div>
   );
 };
@@ -135,4 +131,4 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({ product, onCli
       </div>
     </div>
   );
-}; 
+};

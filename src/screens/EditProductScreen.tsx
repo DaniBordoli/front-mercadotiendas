@@ -8,7 +8,9 @@ import { FaEye, FaPowerOff, FaRegFolderOpen, FaRegTrashCan, FaRegImages, FaArrow
 import { colors } from '../design/colors';
 import { RiPencilFill } from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuthStore } from '../stores/slices/authSlice';
+import { useAuthStore, addProductImages, deleteProductImage } from '../stores/slices/authSlice';
+import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
+import Toast from '../components/atoms/Toast';
 
 const categoriaOptions = [
   { value: '', label: 'Seleccionar' },
@@ -43,9 +45,22 @@ const EditProductScreen: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const fetchProductById = useAuthStore(state => state.fetchProductById);
   const updateProduct = useAuthStore(state => state.updateProduct);
+  const deleteProduct = useAuthStore(state => state.deleteProduct);
 
   const [product, setProduct] = React.useState<any | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [uploadingImage, setUploadingImage] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [productImageFile, setProductImageFile] = React.useState<File | null>(null);
+  const [productImages, setProductImages] = React.useState<string[]>([]);
+  const [newImageFiles, setNewImageFiles] = React.useState<File[]>([]);
+  const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [toast, setToast] = React.useState({
+    show: false,
+    message: '',
+    type: 'error' as 'success' | 'error' | 'info',
+  });
 
   React.useEffect(() => {
     const loadProduct = async () => {
@@ -63,6 +78,7 @@ const EditProductScreen: React.FC = () => {
             categoria: found.categoria || '',
             estado: found.estado || 'activo',
           });
+          setProductImages(found.productImages || (found.productImage ? [found.productImage] : []));
         }
       } finally {
         setLoading(false);
@@ -80,9 +96,73 @@ const EditProductScreen: React.FC = () => {
     setProduct((prev: any) => ({ ...prev, [name]: value }));
   };
 
+  const handleProductImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => file.type.startsWith('image/'));
+    if (validFiles.length !== files.length) {
+      setToast({
+        show: true,
+        message: 'Solo se permiten archivos de imagen',
+        type: 'error',
+      });
+      return;
+    }
+   
+    if (productImages.length + validFiles.length > 3) {
+      setToast({
+        show: true,
+        message: 'Máximo 3 imágenes',
+        type: 'error',
+      });
+      return;
+    }
+    setNewImageFiles(prev => [...prev, ...validFiles]);
+    // Preview local
+    const readers = validFiles.map(file => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => reject();
+        reader.readAsDataURL(file);
+      });
+    });
+    Promise.all(readers).then(imgs => {
+      setProductImages(prev => [...prev, ...imgs]);
+    });
+  };
+
+  const handleRemoveProductImage = async (idx: number) => {
+    const imageToRemove = productImages[idx];
+   
+    if (imageToRemove && imageToRemove.startsWith('http')) {
+      try {
+        const updatedImages = await deleteProductImage(product._id, imageToRemove);
+        setProductImages(updatedImages);
+      } catch (err: any) {
+        setToast({
+          show: true,
+          message: err?.message || 'Error al eliminar la imagen',
+          type: 'error',
+        });
+      }
+    } else {
+      
+      setProductImages(prev => prev.filter((_, i) => i !== idx));
+      setNewImageFiles(prev => prev.filter((_, i) => i !== idx));
+    }
+  };
+
   const handleSave = async () => {
     if (!product) return;
+    setUploadingImage(true);
     try {
+      let updatedImages: string[] = [...productImages];
+     
+      if (newImageFiles.length > 0) {
+        updatedImages = await addProductImages(product._id, newImageFiles);
+        setNewImageFiles([]);
+        setProductImages(updatedImages);
+      }
       await updateProduct(product._id, {
         nombre: product.nombre,
         sku: product.sku,
@@ -92,9 +172,64 @@ const EditProductScreen: React.FC = () => {
         categoria: product.categoria,
         estado: product.estado,
       });
-      alert('Producto actualizado correctamente');
+      setToast({
+        show: true,
+        message: 'Producto actualizado correctamente',
+        type: 'success',
+      });
     } catch (err: any) {
-      alert(err?.message || 'Error al actualizar el producto');
+      setToast({
+        show: true,
+        message: err?.message || 'Error al actualizar el producto',
+        type: 'error',
+      });
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !product) return;
+    if (!file.type.startsWith('image/')) {
+      setToast({
+        show: true,
+        message: 'Por favor selecciona un archivo de imagen válido',
+        type: 'error',
+      });
+      e.target.value = '';
+      return;
+    }
+    setProductImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.onerror = () => {
+      setToast({
+        show: true,
+        message: 'Error al cargar la imagen',
+        type: 'error',
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const openDeleteModal = () => setDeleteModalOpen(true);
+  const closeDeleteModal = () => setDeleteModalOpen(false);
+
+  const handleDelete = async () => {
+    if (!product) return;
+    try {
+      await deleteProduct(product._id);
+      closeDeleteModal();
+      navigate('/data-products');
+    } catch (err: any) {
+      setToast({
+        show: true,
+        message: err?.message || 'Error al eliminar el producto',
+        type: 'error',
+      });
     }
   };
 
@@ -156,7 +291,8 @@ const EditProductScreen: React.FC = () => {
                   Ver en tienda
                 </DesignButton>
                 <DesignButton variant="secondary"
-                icon={FaTrash}>
+                icon={FaTrash}
+                onClick={openDeleteModal}>
                   Eliminar producto
                 </DesignButton>
               </div>
@@ -304,20 +440,36 @@ const EditProductScreen: React.FC = () => {
                   <span className="text-lg font-semibold font-space">Imágenes</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
-                  <div className="relative">
-                    <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308" alt="img1" className="w-16 h-16 rounded object-cover" />
-                    <button className="absolute -top-2 -right-2 bg-white border border-gray-200 rounded-full p-1 shadow">
-                      <FaTrash className="text-xs text-red-500" />
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <img src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d" alt="img2" className="w-16 h-16 rounded object-cover" />
-                    <button className="absolute -top-2 -right-2 bg-white border border-gray-200 rounded-full p-1 shadow">
-                      <FaTrash className="text-xs text-red-500" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded cursor-pointer border border-dashed border-gray-300">
+                  {productImages.map((img, idx) => (
+                    <div className="relative" key={idx}>
+                      <img
+                        src={img}
+                        alt={`img${idx}`}
+                        className="w-16 h-16 rounded object-cover"
+                      />
+                      <button
+                        className="absolute -top-2 -right-2 bg-white border border-gray-200 rounded-full p-1 shadow"
+                        onClick={() => handleRemoveProductImage(idx)}
+                        type="button"
+                        title="Eliminar imagen"
+                      >
+                        <FaTrash className="text-xs text-red-500" />
+                      </button>
+                    </div>
+                  ))}
+                  <div
+                    className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded cursor-pointer border border-dashed border-gray-300"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
                     <FaPlus className="text-gray-400 text-lg" />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      multiple
+                      onChange={handleProductImagesChange}
+                    />
                   </div>
                 </div>
                 <span className="text-xs text-gray-400 font-space">Arrastrá para ordenar tus imágenes</span>
@@ -340,6 +492,26 @@ const EditProductScreen: React.FC = () => {
           </div>
         </div>
       </div>
+      {deleteModalOpen && product && (
+        <ProductDeleteModal
+          onClose={closeDeleteModal}
+          onDelete={handleDelete}
+          product={{
+            nombre: product.nombre,
+            sku: product.sku,
+            precio: product.precio,
+            estado: product.estado,
+            productImages: productImages || [],
+          }}
+        />
+      )}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(prev => ({ ...prev, show: false }))}
+        duration={3000}
+      />
     </div>
   );
 };

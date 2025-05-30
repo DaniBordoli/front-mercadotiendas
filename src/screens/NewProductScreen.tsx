@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -10,6 +10,7 @@ import ImageStep from '../components/organisms/NewProductComponents/ImageStep';
 import VariantsStep from '../components/organisms/NewProductComponents/VariantsStep';
 import ProductSuccessModal from '../components/organisms/NewProductComponents/ProductSuccessModal';
 import { useAuthStore } from '../stores/slices/authSlice';
+import Toast from '../components/atoms/Toast';
 
 const steps = [
   { label: 'Información Básica' },
@@ -22,6 +23,11 @@ const NewProductScreen: React.FC = () => {
   const [step, setStep] = React.useState(1);
   const [showModal, setShowModal] = React.useState(false);
   const [createdProduct, setCreatedProduct] = React.useState<any | null>(null);
+  const [toast, setToast] = React.useState({
+    show: false,
+    message: '',
+    type: 'error' as 'success' | 'error' | 'info',
+  });
 
   const [basicInfo, setBasicInfo] = React.useState({
     nombre: '',
@@ -32,6 +38,10 @@ const NewProductScreen: React.FC = () => {
     categoria: '',
     subcategoria: '',
   });
+
+  // Estado para imágenes
+  const [productImages, setProductImages] = React.useState<(File | string)[]>([]);
+  const variantsRef = useRef<{ getVariants: () => { color?: string[], talle?: string[] } }>(null);
 
   const handleBasicInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
@@ -48,18 +58,48 @@ const NewProductScreen: React.FC = () => {
 
   const handlePublish = async () => {
     try {
-      const token = localStorage.getItem('token');
-      console.log('Datos enviados a createProduct:', basicInfo);
-      const result = await createProduct(basicInfo);
+      const variants = variantsRef.current?.getVariants() || {};
+    
+      const colorArr = Array.isArray(variants.color) ? variants.color : [];
+      const talleArr = Array.isArray(variants.talle) ? variants.talle : [];
+      let formData: FormData | null = null;
+      if (productImages.length > 0) {
+        formData = new FormData();
+        Object.entries(basicInfo).forEach(([key, value]) => {
+          formData!.append(key, value);
+        });
+       
+        formData!.append('color', JSON.stringify(colorArr));
+        formData!.append('talle', JSON.stringify(talleArr));
+        productImages.forEach((img) => {
+          if (img instanceof File) {
+            formData!.append('productImages', img);
+          }
+        });
+      }
+      
+      const dataToSend = formData
+        ? (formData as any)
+        : {
+            ...basicInfo,
+            color: colorArr,
+            talle: talleArr,
+          };
+      const result = await createProduct(dataToSend);
       setCreatedProduct({
         nombre: result.data?.nombre || basicInfo.nombre,
         sku: result.data?.sku || basicInfo.sku,
         precio: result.data?.precio || basicInfo.precio,
         estado: result.data?.estado || basicInfo.estado,
+        productImages: result.data?.productImages || [],
       });
       setShowModal(true);
     } catch (err) {
-      alert('Error al crear el producto');
+      setToast({
+        show: true,
+        message: 'Error al crear el producto',
+        type: 'error',
+      });
     }
   };
 
@@ -80,8 +120,7 @@ const NewProductScreen: React.FC = () => {
             <h1 className="text-2xl font-space">Nuevo Producto</h1>
           </div>
           <div className="flex items-center gap-2">
-            <DesignButton variant="neutral">Cancelar</DesignButton>
-            <DesignButton variant="secondary">Guardar Borrador</DesignButton>
+            <DesignButton variant="neutral" onClick={() => navigate('/data-products')}>Cancelar</DesignButton>
             <DesignButton
               variant="primary"
               disabled={step !== 3}
@@ -147,8 +186,16 @@ const NewProductScreen: React.FC = () => {
             onChange={handleBasicInfoChange}
           />
         )}
-        {step === 2 && <ImageStep onNext={() => setStep(3)} />}
-        {step === 3 && <VariantsStep />}
+        {step === 2 && (
+          <ImageStep 
+            onNext={() => setStep(3)}
+            productImages={productImages}
+            setProductImages={setProductImages}
+          />
+        )}
+        {step === 3 && (
+          <VariantsStep ref={variantsRef} />
+        )}
 
         {showModal && createdProduct && (
           <ProductSuccessModal
@@ -156,6 +203,13 @@ const NewProductScreen: React.FC = () => {
             product={createdProduct}
           />
         )}
+        <Toast
+          show={toast.show}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(prev => ({ ...prev, show: false }))}
+          duration={3000}
+        />
       </div>
     </div>
   );

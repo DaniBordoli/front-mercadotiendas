@@ -154,7 +154,23 @@ const MyProductsSection: React.FC = () => {
                   productos.map((prod, idx) => (
                     <tr key={prod._id || prod.sku || idx} className="border-t last:border-b rounded-xl hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 flex items-center gap-3">
-                        <div className="w-[40px] h-[40px] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">60×60</div>
+                        {prod.productImages && prod.productImages.length > 0 ? (
+                          <img
+                            src={prod.productImages[0]}
+                            alt={prod.nombre}
+                            className="w-[40px] h-[40px] object-cover rounded-md bg-gray-200"
+                          />
+                        ) : prod.productImage ? (
+                          <img
+                            src={prod.productImage}
+                            alt={prod.nombre}
+                            className="w-[40px] h-[40px] object-cover rounded-md bg-gray-200"
+                          />
+                        ) : (
+                          <div className="w-[40px] h-[40px] bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-400 font-space">
+                            60×60
+                          </div>
+                        )}
                         <span className="font-space text-sm text-gray-800">{prod.nombre}</span>
                       </td>
                       <td className="px-4 py-3 text-gray-400 font-space">{prod.sku}</td>
@@ -201,6 +217,7 @@ const MyProductsSection: React.FC = () => {
             sku: productToDelete.sku,
             precio: productToDelete.precio,
             estado: productToDelete.estado,
+            productImages: productToDelete.productImages || [],
           }}
         />
       )}

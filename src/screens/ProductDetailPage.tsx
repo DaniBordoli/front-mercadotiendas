@@ -27,10 +27,9 @@ const timeAgo = (isoDateString: string): string => {
 };
 
 const RatingStars: React.FC<{ rating?: number, reviewCount?: number, showReviewCountLink?: boolean }> = ({ rating, reviewCount, showReviewCountLink = true }) => {
-  if (rating === undefined || rating < 0 || rating > 5) {
-    return <div className="h-5 mb-2"></div>;
-  }
-  const fullStars = Math.floor(rating);
+  // Si no hay rating, mostrar 0 estrellas
+  const safeRating = typeof rating === 'number' && rating >= 0 && rating <= 5 ? rating : 0;
+  const fullStars = Math.floor(safeRating);
   const emptyStars = 5 - fullStars;
   return (
     <div className="flex items-center text-yellow-500 mb-2">
@@ -44,7 +43,7 @@ const RatingStars: React.FC<{ rating?: number, reviewCount?: number, showReviewC
 };
 
 const ProductDetailPage: React.FC = () => {
-  const { productId } = useParams<{ productId: string }>();
+  const { id } = useParams<{ id: string }>(); // Cambiado de productId a id
   const {
     selectedProduct,
     isLoadingProduct,
@@ -61,19 +60,19 @@ const ProductDetailPage: React.FC = () => {
   const [isWritingReview, setIsWritingReview] = useState(false);
 
   useEffect(() => {
-    if (productId) {
-      console.log(`[Page] Obteniendo producto con ID: ${productId}`);
-      fetchProductById(productId);
+    if (id) {
+      console.log(`[Page] Obteniendo producto con ID: ${id}`);
+      fetchProductById(id);
       setCurrentImageIndex(0);
       setQuantity(1);
     } else {
-      console.error("[Page] No se encontró productId en la URL.");
+      console.error("[Page] No se encontró id en la URL.");
     }
     return () => {
       console.log("[Page] Limpiando producto seleccionado y reviews.");
       clearSelectedProduct();
     };
-  }, [productId, fetchProductById, clearSelectedProduct]);
+  }, [id, fetchProductById, clearSelectedProduct]);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -131,14 +130,14 @@ const ProductDetailPage: React.FC = () => {
     );
   }
 
-  if (!selectedProduct && productId) {
+  if (!selectedProduct && id) {
      return (
       <div className="flex flex-col min-h-screen" style={{ backgroundColor: colors.ultraLightGray }}>
         <Navbar />
         <main className="flex-grow container mx-auto px-4 py-8">
            <div className="text-center py-10 bg-white p-6 rounded-lg shadow-md border" style={{ borderColor: colors.lightGray }}>
              <h2 className="text-xl font-semibold mb-2" style={{ color: colors.darkGray }}>Producto no encontrado</h2>
-             <p style={{ color: colors.mediumGray }}>No pudimos encontrar un producto con el ID "{productId}".</p>
+             <p style={{ color: colors.mediumGray }}>No pudimos encontrar un producto con el ID "{id}".</p>
            </div>
         </main>
         <Footer />
