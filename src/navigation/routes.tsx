@@ -93,7 +93,7 @@ export const publicRoutes = [
     element: <SearchResultsPage />
   },
   {
-    path: '/producto/:productId', 
+    path: '/producto/:id', 
     element: <ProductDetailPage />
   },
   {

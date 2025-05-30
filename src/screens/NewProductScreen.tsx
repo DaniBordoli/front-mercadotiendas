@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -41,6 +41,7 @@ const NewProductScreen: React.FC = () => {
 
   // Estado para imágenes
   const [productImages, setProductImages] = React.useState<(File | string)[]>([]);
+  const variantsRef = useRef<{ getVariants: () => { color?: string[], talle?: string[] } }>(null);
 
   const handleBasicInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
@@ -57,21 +58,34 @@ const NewProductScreen: React.FC = () => {
 
   const handlePublish = async () => {
     try {
+      const variants = variantsRef.current?.getVariants() || {};
     
+      const colorArr = Array.isArray(variants.color) ? variants.color : [];
+      const talleArr = Array.isArray(variants.talle) ? variants.talle : [];
       let formData: FormData | null = null;
       if (productImages.length > 0) {
         formData = new FormData();
         Object.entries(basicInfo).forEach(([key, value]) => {
           formData!.append(key, value);
         });
+       
+        formData!.append('color', JSON.stringify(colorArr));
+        formData!.append('talle', JSON.stringify(talleArr));
         productImages.forEach((img) => {
           if (img instanceof File) {
             formData!.append('productImages', img);
           }
         });
       }
-     
-      const result = await createProduct(formData ? (formData as any) : basicInfo);
+      
+      const dataToSend = formData
+        ? (formData as any)
+        : {
+            ...basicInfo,
+            color: colorArr,
+            talle: talleArr,
+          };
+      const result = await createProduct(dataToSend);
       setCreatedProduct({
         nombre: result.data?.nombre || basicInfo.nombre,
         sku: result.data?.sku || basicInfo.sku,
@@ -179,7 +193,9 @@ const NewProductScreen: React.FC = () => {
             setProductImages={setProductImages}
           />
         )}
-        {step === 3 && <VariantsStep />}
+        {step === 3 && (
+          <VariantsStep ref={variantsRef} />
+        )}
 
         {showModal && createdProduct && (
           <ProductSuccessModal

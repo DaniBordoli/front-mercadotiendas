@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useAuthStore } from './slices/authSlice';
 
 // --- Tipos Compartidos ---
 // Idealmente, estos tipos vendrían de un paquete compartido con el backend
@@ -229,6 +230,34 @@ const calculateAvailableFilters = (products: Product[]): AvailableFilters => {
     };
 };
 
+// --- Helper para mapear productos del backend al formato Product ---
+function mapBackendProductToProduct(backendProduct: any): Product {
+  return {
+    id: backendProduct._id || backendProduct.id || backendProduct.sku || Math.random().toString(),
+    name: backendProduct.nombre,
+    price: Number(backendProduct.precio) || 0,
+    imageUrls: Array.isArray(backendProduct.productImages) ? backendProduct.productImages : [],
+    rating: backendProduct.rating ?? undefined, // Si el backend lo provee
+    storeName: backendProduct.storeName ?? undefined, // Si el backend lo provee
+    brand: backendProduct.brand ?? undefined, // Si el backend lo provee
+    condition: backendProduct.estado === 'used' ? 'used' : 'new', // Mapear 'estado' a 'condition'
+    hasFreeShipping: backendProduct.hasFreeShipping ?? undefined,
+    isFeatured: backendProduct.isFeatured ?? undefined,
+  };
+}
+
+// --- Helper para combinar productos del backend y mocks sin duplicados ---
+function mergeProductsWithMocks(backendProducts: any[]): Product[] {
+  const mappedBackend = backendProducts.map(mapBackendProductToProduct);
+  const all = [...mappedBackend];
+  // Agregar los mocks solo si no existe un producto con el mismo id
+  for (const mock of mockProducts) {
+    if (!all.some(p => p.id === mock.id)) {
+      all.push(mock);
+    }
+  }
+  return all;
+}
 
 // --- Estado del Store ---
 
@@ -371,60 +400,84 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   },
 
   // Ahora síncrono y usa mocks
-  fetchSearchResults: (options = {}) => {
-    const { 
-        term = get().searchTerm, 
-        page = 1,             
-        keepFilters = false   
+  fetchSearchResults: async (options = {}) => {
+    const {
+      term = get().searchTerm,
+      page = 1,
+      keepFilters = false
     } = options;
 
     if (!term.trim()) {
-      set({ 
-        searchTerm: '', baseSearchResults: [], searchResults: [], totalResults: 0, 
+      set({
+        searchTerm: '', baseSearchResults: [], searchResults: [], totalResults: 0,
         currentPage: 1, totalPages: 1, availableFilters: null,
         selectedBrands: [], selectedCondition: null, priceRange: { min: null, max: null },
-        isLoadingResults: false 
+        isLoadingResults: false
       });
       return;
     }
 
-    set({ isLoadingResults: true, searchTerm: term }); // Actualizar término
-    
-    // Simular demora de búsqueda
-    setTimeout(() => {
-      // 1. Filtrar mocks por término
-      const termFilteredResults = mockProducts.filter(p => 
-          p.name.toLowerCase().includes(term.toLowerCase())
-      );
+    set({ isLoadingResults: true, searchTerm: term });
 
+    try {
+      // --- Obtener productos reales del backend y combinarlos con los mocks ---
+      const productsFromBackend = await useAuthStore.getState().fetchProducts();
+      const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
+      // 1. Filtrar por término
+      const termFilteredResults = allProducts.filter(p =>
+        p.name.toLowerCase().includes(term.toLowerCase())
+      );
       // 2. Calcular metadatos
       const totalResults = termFilteredResults.length;
       const availableFilters = calculateAvailableFilters(termFilteredResults);
-
       // 3. Resetear filtros seleccionados si es nueva búsqueda
       let newStatePartial: Partial<SearchState> = {
+        baseSearchResults: termFilteredResults,
+        totalResults: totalResults,
+        availableFilters: availableFilters,
+        currentPage: page,
+        isLoadingResults: false,
+      };
+      if (!keepFilters) {
+        newStatePartial = {
+          ...newStatePartial,
+          selectedBrands: [],
+          selectedCondition: null,
+          priceRange: { min: null, max: null },
+          sortOrder: 'relevance'
+        };
+      }
+      set(newStatePartial);
+      get()._updateDisplayedResults();
+    } catch (error) {
+      // Si falla el fetch, usar mocks como fallback
+      console.error('Fallo al obtener productos reales, usando mocks:', error);
+      setTimeout(() => {
+        const termFilteredResults = mockProducts.filter(p =>
+          p.name.toLowerCase().includes(term.toLowerCase())
+        );
+        const totalResults = termFilteredResults.length;
+        const availableFilters = calculateAvailableFilters(termFilteredResults);
+        let newStatePartial: Partial<SearchState> = {
           baseSearchResults: termFilteredResults,
           totalResults: totalResults,
           availableFilters: availableFilters,
-          currentPage: page, // Establecer página solicitada
+          currentPage: page,
           isLoadingResults: false,
-      };
-      if (!keepFilters) {
+        };
+        if (!keepFilters) {
           newStatePartial = {
-              ...newStatePartial,
-              selectedBrands: [],
-              selectedCondition: null,
-              priceRange: { min: null, max: null },
-              sortOrder: 'relevance' // Resetear orden también? Sí.
+            ...newStatePartial,
+            selectedBrands: [],
+            selectedCondition: null,
+            priceRange: { min: null, max: null },
+            sortOrder: 'relevance'
           };
-      }
-      
-      set(newStatePartial);
-
-      // 4. Calcular y mostrar resultados (filtrados, ordenados, paginados)
-      get()._updateDisplayedResults(); 
-
-    }, 300); // Simular delay
+        }
+        set(newStatePartial);
+        get()._updateDisplayedResults();
+      }, 300);
+    }
   },
 
   goToPage: (pageNumber) => {
@@ -474,31 +527,40 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   // --- Acciones para Producto Individual ---
   
   // Ahora síncrono y usa mocks
-  fetchProductById: (productId) => {
+  fetchProductById: async (productId) => {
     if (!productId) {
       console.error("fetchProductById: productId es requerido.");
-      // Limpiar producto y reviews si no hay ID
-      set({ selectedProduct: null, isLoadingProduct: false, productReviews: [], isLoadingReviews: false }); 
+      set({ selectedProduct: null, isLoadingProduct: false, productReviews: [], isLoadingReviews: false });
       return;
     }
-    // Iniciar carga y limpiar anterior producto y reviews
-    set({ isLoadingProduct: true, selectedProduct: null, productReviews: [], isLoadingReviews: false }); 
-
-    // Simular demora de búsqueda individual
-    setTimeout(() => {
-      // Usar mockProducts que ya está definido en el archivo
-      const foundProduct = mockProducts.find(p => p.id === productId);
-
+    set({ isLoadingProduct: true, selectedProduct: null, productReviews: [], isLoadingReviews: false });
+    try {
+      // Buscar primero en el backend y mocks combinados
+      const productsFromBackend = await useAuthStore.getState().fetchProducts();
+      const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
+      const foundProduct = allProducts.find(p => p.id === productId);
       if (foundProduct) {
-        console.log(`[Store] Producto encontrado por ID ${productId}:`, foundProduct);
-        set({ selectedProduct: { ...foundProduct }, isLoadingProduct: false }); // Guardar una copia
-        // Ahora llamar a fetchReviewsByProductId después de encontrar el producto
+        console.log(`[Store] Producto encontrado por ID ${productId} (backend+mock):`, foundProduct);
+        set({ selectedProduct: { ...foundProduct }, isLoadingProduct: false });
         get().fetchReviewsByProductId(productId);
-      } else {
-        console.warn(`[Store] Producto con ID ${productId} no encontrado.`);
-        set({ selectedProduct: null, isLoadingProduct: false }); // isLoadingReviews ya está en false
+        return;
       }
-    }, 200); // Simular delay más corto para carga individual
+      // Si no se encuentra, mostrar null
+      console.warn(`[Store] Producto con ID ${productId} no encontrado.`);
+      set({ selectedProduct: null, isLoadingProduct: false });
+    } catch (error) {
+      // Si falla el fetch, usar mocks como fallback
+      console.error('Fallo al obtener productos reales, usando mocks:', error);
+      setTimeout(() => {
+        const foundMock = mockProducts.find(p => p.id === productId);
+        if (foundMock) {
+          set({ selectedProduct: { ...foundMock }, isLoadingProduct: false });
+          get().fetchReviewsByProductId(productId);
+        } else {
+          set({ selectedProduct: null, isLoadingProduct: false });
+        }
+      }, 200);
+    }
   },
 
   clearSelectedProduct: () => {
