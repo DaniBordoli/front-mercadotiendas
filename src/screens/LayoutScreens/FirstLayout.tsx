@@ -8,6 +8,7 @@ import NewsletterSection from '../../components/FirstLayoutComponents/Newsletter
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { AIChat } from '../../components/organisms/AIChat/AIChat';
+import { useAuthStore } from '../../stores';
 
 const LOCAL_STORAGE_KEY = 'firstLayoutEditableVariables';
 
@@ -60,7 +61,25 @@ const FirstLayout: React.FC = () => {
     return saved ? JSON.parse(saved) : defaultEditableVariables;
   });
 
-  
+  const fetchProducts = useAuthStore(state => state.fetchProducts);
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoadingProducts(true);
+        const prods = await fetchProducts();
+        setFeaturedProducts(prods);
+      } catch (err) {
+        setFeaturedProducts([]);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+    loadProducts();
+  }, [fetchProducts]);
+
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(editableVariables));
   }, [editableVariables]);
@@ -110,6 +129,7 @@ const FirstLayout: React.FC = () => {
         cardButtonColor={editableVariables.featuredProductsCardButtonColor}
         cardButtonTextColor={editableVariables.featuredProductsCardButtonTextColor}
         titleColor={editableVariables.textColor}
+        products={!loadingProducts && featuredProducts.length > 0 ? featuredProducts : []}
       />
       <PurpleSection
         titleColor={editableVariables.textColor}
