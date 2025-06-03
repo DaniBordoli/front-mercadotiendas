@@ -43,7 +43,7 @@ const RatingStars: React.FC<{ rating?: number, reviewCount?: number, showReviewC
 };
 
 const ProductDetailPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>(); // Cambiado de productId a id
+  const { id } = useParams<{ id: string }>(); 
   const {
     selectedProduct,
     isLoadingProduct,
@@ -58,6 +58,7 @@ const ProductDetailPage: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWritingReview, setIsWritingReview] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -256,10 +257,28 @@ const ProductDetailPage: React.FC = () => {
 
             <div className="mb-6">
                 <label className="block text-sm font-medium mb-2" style={{ color: colors.darkGray }}>Color:</label>
-                <div className="flex space-x-2">
-                    <button className="w-8 h-8 rounded-full bg-black border-2 border-sky-500 ring-1 ring-offset-1 ring-sky-500 focus:outline-none" aria-label="Color Negro"></button>
-                    <button className="w-8 h-8 rounded-full bg-gray-300 border-2 border-transparent hover:border-gray-400 focus:outline-none focus:border-gray-500" aria-label="Color Gris"></button>
-                </div>
+                <select
+                  className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+                  value={selectedColor || ''}
+                  onChange={e => setSelectedColor(e.target.value)}
+                >
+                  <option value="">Seleccionar color</option>
+                  {(() => {
+                    const colorArray =
+                      Array.isArray((selectedProduct as any).color) && (selectedProduct as any).color.length > 0
+                        ? (selectedProduct as any).color
+                        : Array.isArray((selectedProduct as any).colores) && (selectedProduct as any).colores.length > 0
+                        ? (selectedProduct as any).colores
+                        : Array.isArray((selectedProduct as any).variants?.color) && (selectedProduct as any).variants.color.length > 0
+                        ? (selectedProduct as any).variants.color
+                        : [];
+                    return colorArray.length > 0
+                      ? colorArray.map((color: string) => (
+                          <option key={color} value={color}>{color}</option>
+                        ))
+                      : <option disabled value="">No hay colores disponibles</option>;
+                  })()}
+                </select>
             </div>
 
             <div className="flex items-center gap-4 mb-6">

@@ -20,6 +20,8 @@ export interface Product {
   condition: 'new' | 'used'; 
   hasFreeShipping?: boolean; 
   isFeatured?: boolean; 
+  color?: string[];
+  talle?: string[];
 }
 
 // --- NUEVO: Tipo para Opiniones ---
@@ -243,6 +245,8 @@ function mapBackendProductToProduct(backendProduct: any): Product {
     condition: backendProduct.estado === 'used' ? 'used' : 'new', // Mapear 'estado' a 'condition'
     hasFreeShipping: backendProduct.hasFreeShipping ?? undefined,
     isFeatured: backendProduct.isFeatured ?? undefined,
+    color: Array.isArray(backendProduct.color) ? backendProduct.color : [],
+    talle: Array.isArray(backendProduct.talle) ? backendProduct.talle : [],
   };
 }
 
