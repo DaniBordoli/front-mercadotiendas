@@ -3,6 +3,7 @@ import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FaChevronRight, FaStar, FaRegStar, FaHeart, FaTruck, FaUndo } from 'react-icons/fa';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const images = [
   'https://www.houseofblanks.com/cdn/shop/files/HeavyweightTshirt_White_01_2.jpg?v=1726516822&width=1445',
@@ -18,10 +19,16 @@ const ProductDetailScreen: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [tab, setTab] = useState<'description' | 'specs' | 'reviews'>('description');
-
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div>
-      <NavBar />
+    <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
 
       <section className="bg-gray-100 py-2">
         <div className="max-w-7xl mx-auto px-12">
@@ -140,41 +147,67 @@ const ProductDetailScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="w-full bg-gray-100 mt-12 py-8">
+      <div className="w-full" style={{ backgroundColor: editableVariables.heroBackgroundColor, marginTop: '3rem', paddingTop: '2rem', paddingBottom: '2rem' }}>
         <div className="max-w-7xl mx-auto px-8">
-
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex border-b mb-6">
             <button
-              className="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600"
+              className="px-4 py-2 text-sm font-medium border-b-2"
               type="button"
+              style={{ color: tab === 'description' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'description' ? editableVariables.primaryColor : 'transparent' }}
+              onClick={() => setTab('description')}
             >
               Description
             </button>
             <button
-              className="px-4 py-2 text-sm font-medium text-gray-500"
+              className="px-4 py-2 text-sm font-medium border-b-2"
               type="button"
+              style={{ color: tab === 'specs' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'specs' ? editableVariables.primaryColor : 'transparent' }}
+              onClick={() => setTab('specs')}
             >
               Specifications
             </button>
             <button
-              className="px-4 py-2 text-sm font-medium text-gray-500"
+              className="px-4 py-2 text-sm font-medium border-b-2"
               type="button"
+              style={{ color: tab === 'reviews' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'reviews' ? editableVariables.primaryColor : 'transparent' }}
+              onClick={() => setTab('reviews')}
             >
               Reviews (24)
             </button>
           </div>
-          <div >
-            <h3 className="text-lg font-semibold mb-2">Product Description</h3>
-            <p className="text-gray-700 mb-4">
-              This classic white shirt is crafted from premium 100% cotton fabric, ensuring both comfort and durability. The regular fit design provides a timeless silhouette that suits various body types. Features include:
-            </p>
-            <div className="pl-0 text-gray-700 space-y-1">
-              <div>Premium cotton fabric</div>
-              <div>Button-down collar</div>
-              <div>Regular fit</div>
-              <div>Curved hem</div>
-              <div>Machine washable</div>
-            </div>
+          <div>
+            {tab === 'description' && (
+              <>
+                <h3 className="text-lg font-semibold mb-2" style={{ color: editableVariables.textColor }}>Product Description</h3>
+                <p className="mb-4" style={{ color: editableVariables.secondaryColor }}>
+                  This classic white shirt is crafted from premium 100% cotton fabric, ensuring both comfort and durability. The regular fit design provides a timeless silhouette that suits various body types. Features include:
+                </p>
+                <div className="pl-0 space-y-1" style={{ color: editableVariables.textColor }}>
+                  <div>Premium cotton fabric</div>
+                  <div>Button-down collar</div>
+                  <div>Regular fit</div>
+                  <div>Curved hem</div>
+                  <div>Machine washable</div>
+                </div>
+              </>
+            )}
+            {tab === 'specs' && (
+              <div style={{ color: editableVariables.textColor }}>
+                <h3 className="text-lg font-semibold mb-2">Specifications</h3>
+                <ul className="list-disc pl-6">
+                  <li>Material: 100% Cotton</li>
+                  <li>Fit: Regular</li>
+                  <li>Color: White</li>
+                  <li>Care: Machine washable</li>
+                </ul>
+              </div>
+            )}
+            {tab === 'reviews' && (
+              <div style={{ color: editableVariables.textColor }}>
+                <h3 className="text-lg font-semibold mb-2">Reviews (24)</h3>
+                <p>No reviews yet.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -209,7 +242,11 @@ const ProductDetailScreen: React.FC = () => {
           ))}
         </div>
       </div>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

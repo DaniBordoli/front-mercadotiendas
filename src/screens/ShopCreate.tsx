@@ -65,10 +65,10 @@ const ShopCreate: React.FC = () => {
 
     return (
         <>
-            <div className=''>
+            <div className='fixed top-0 left-0 w-full z-50'>
                 <Navbar />
             </div>
-            <div className="min-h-screen flex justify-center">
+            <div className="min-h-screen flex justify-center pt-20">
                 <div className="flex flex-col flex-grow p-10 max-w-7xl">
                     <h1 className="text-2xl font-space font-medium mt-20 text-gray-800 mb-6">Crea tu Tienda Online</h1>
                     <p className='text-gray-600 my-4 w-10/12'>Configura tu tienda en minutos y empieza a vender con nuestra plataforma potenciada por IA</p>

@@ -7,11 +7,19 @@ import { FiTarget } from 'react-icons/fi';
 import InfoCard from '../../components/LayoutComponents/InfoCard';
 import ValueCard from '../../components/LayoutComponents/ValueCard';
 import TeamMemberCard from '../../components/LayoutComponents/TeamMemberCard';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const AboutUsScreen: React.FC = () => {
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <NavBar />
+    <div className="min-h-screen flex flex-col bg-gray-50" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
       <main className="flex-1">
       
         <section className="bg-gray-50">
@@ -130,7 +138,11 @@ const AboutUsScreen: React.FC = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

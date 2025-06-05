@@ -4,20 +4,26 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FaMapMarkerAlt, FaPhoneAlt, FaEnvelope } from 'react-icons/fa';
 import ContactInfoCard from '../../components/LayoutComponents/ContactInfoCard';
 import FAQCard from '../../components/LayoutComponents/FAQCard';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const ContactScreen: React.FC = () => {
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <NavBar />
-      
-      <section className="bg-gray-50 py-12">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
+      <section className="py-12" style={{ backgroundColor: editableVariables.heroBackgroundColor }}>
         <div className="max-w-5xl mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-2">Contact & Support</h1>
-          <p className="text-gray-500 mb-10">We're here to help you with any questions or concerns</p>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: editableVariables.textColor }}>Contact & Support</h1>
+          <p className="mb-10" style={{ color: editableVariables.secondaryColor }}>We're here to help you with any questions or concerns</p>
         </div>
       </section>
-     
-      <section className="bg-white py-8">
+      <section className="py-8" style={{ backgroundColor: editableVariables.navbarBackgroundColor }}>
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <ContactInfoCard
             icon={<FaMapMarkerAlt className="text-blue-600 text-3xl mb-3" />}
@@ -36,10 +42,9 @@ const ContactScreen: React.FC = () => {
           />
         </div>
       </section>
-     
-      <section className="bg-gray-50 py-12">
+      <section className="py-12" style={{ backgroundColor: editableVariables.heroBackgroundColor }}>
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-semibold text-center mb-8">Send Us a Message</h2>
+          <h2 className="text-2xl font-semibold text-center mb-8" style={{ color: editableVariables.textColor }}>Send Us a Message</h2>
           <form className="space-y-6">
             <div className="flex flex-col md:flex-row gap-6">
               <div className="flex-1">
@@ -65,17 +70,17 @@ const ContactScreen: React.FC = () => {
             </div>
             <button
               type="button"
-              className="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition"
+              className="w-full py-2 rounded font-semibold transition"
+              style={{ backgroundColor: editableVariables.buttonBackgroundColor, color: editableVariables.buttonTextColor }}
             >
               Send Message
             </button>
           </form>
         </div>
       </section>
-  
-      <section className="bg-white py-16">
+      <section className="py-16" style={{ backgroundColor: editableVariables.navbarBackgroundColor }}>
         <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl font-semibold text-center mb-8">Frequently Asked Questions</h2>
+          <h2 className="text-2xl font-semibold text-center mb-8" style={{ color: editableVariables.textColor }}>Frequently Asked Questions</h2>
           <div className="space-y-6">
             <FAQCard
               question="How do I track my order?"
@@ -92,7 +97,11 @@ const ContactScreen: React.FC = () => {
           </div>
         </div>
       </section>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

@@ -144,7 +144,7 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="navbar-desktop w-full bg-white px-4 py-2 flex items-start justify-center z-50 fixed border-b border-gray-200">
+      <nav className="navbar-desktop w-full bg-white px-4 py-2 flex items-start justify-center z-50 fixed top-0 left-0 border-b border-gray-200">
         <div className="container flex w-full max-w-3xl mx-auto">
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-4 mb-1 w-full">
@@ -347,9 +347,9 @@ export const Navbar: React.FC = () => {
           <a href="#" className="hover:text-red-500 transition-colors">Ofertas</a>
         </div>
       </div>
-      <div className="hidden md:block w-full mt-4 h-px bg-gray-200" /> {/* Línea debajo de menú */}
+      <div className="hidden md:block w-full mt-4" /> 
       {/* Mobile Navbar */}
-      <nav className="navbar-mobile">
+      <nav className="navbar-mobile fixed top-0 left-0 w-full z-50">
         <div className="navbar-mobile-logo" onClick={() => navigate('/dashboard')}>
           <Logo size={28} color="skyblue" />
           <span className="text-lg font-space font-semibold">Mercado Tiendas</span>
