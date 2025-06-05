@@ -9,6 +9,7 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { AIChat } from '../../components/organisms/AIChat/AIChat';
 import { useAuthStore } from '../../stores';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const LOCAL_STORAGE_KEY = 'firstLayoutEditableVariables';
 
@@ -55,11 +56,9 @@ const defaultEditableVariables: FirstLayoutEditableVariables = {
 };
 
 const FirstLayout: React.FC = () => {
-
-  const [editableVariables, setEditableVariables] = useState<FirstLayoutEditableVariables>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return saved ? JSON.parse(saved) : defaultEditableVariables;
-  });
+  // Usar Zustand store en vez de useState local
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
@@ -80,18 +79,8 @@ const FirstLayout: React.FC = () => {
     loadProducts();
   }, [fetchProducts]);
 
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(editableVariables));
-  }, [editableVariables]);
-
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
-    setEditableVariables(prev => ({
-      ...prev,
-      ...changes,
-      filterOptions: changes.filterOptions
-        ? { ...prev.filterOptions, ...changes.filterOptions }
-        : prev.filterOptions,
-    }));
+    updateEditableVariables(changes);
   };
 
   return (

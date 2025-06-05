@@ -4,11 +4,19 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FaRegHeart, FaClipboardList} from 'react-icons/fa';
 import ProfileSidebar from '../../components/LayoutComponents/ProfileSidebar';
 import DashboardCard from '../../components/LayoutComponents/DashboardCard';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const UserProfileScreen: React.FC = () => {
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavBar />
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
       <main className="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 py-10 px-4">
         <ProfileSidebar />
         <section className="flex-1">
@@ -103,7 +111,11 @@ const UserProfileScreen: React.FC = () => {
           </div>
         </section>
       </main>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

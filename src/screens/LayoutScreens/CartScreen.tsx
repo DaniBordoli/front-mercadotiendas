@@ -3,6 +3,7 @@ import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import CartItem from '../../components/LayoutComponents/CartItem';
 import OrderSummary from '../../components/LayoutComponents/OrderSummary';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const cart = [
   {
@@ -29,9 +30,16 @@ const cart = [
 ];
 
 const CartScreen: React.FC = () => {
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div>
-      <NavBar />
+    <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
       <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">
         <div className="flex-1">
           <h2 className="text-2xl font-bold mb-6">Shopping Cart</h2>
@@ -48,7 +56,11 @@ const CartScreen: React.FC = () => {
           buttonLabel="Checkout"
         />
       </div>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

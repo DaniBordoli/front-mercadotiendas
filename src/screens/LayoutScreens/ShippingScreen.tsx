@@ -3,13 +3,20 @@ import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import OrderSummary from '../../components/LayoutComponents/OrderSummary';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const ShippingScreen: React.FC = () => {
   const navigate = useNavigate();
-
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div className="min-h-screen flex flex-col">
-      <NavBar />
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">
       
@@ -65,7 +72,11 @@ const ShippingScreen: React.FC = () => {
           />
         </div>
       </main>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };

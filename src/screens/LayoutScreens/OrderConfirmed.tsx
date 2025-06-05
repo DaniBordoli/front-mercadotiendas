@@ -3,6 +3,7 @@ import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { FaCheck } from 'react-icons/fa';
 import OrderItemCard from '../../components/LayoutComponents/OrderItemCard';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 const order = {
   number: '#ORD-2025-1234',
@@ -42,9 +43,16 @@ const order = {
 };
 
 const OrderConfirmed: React.FC = () => {
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <NavBar />
+    <div className="min-h-screen flex flex-col bg-gray-50" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      <NavBar
+        navbarLinks={editableVariables.navbarLinks}
+        title={editableVariables.title}
+        backgroundColor={editableVariables.navbarBackgroundColor}
+        textColor={editableVariables.textColor}
+        fontType={editableVariables.fontType}
+      />
       <main className="flex-1 flex flex-col items-center justify-center py-12">
         <div className="bg-white rounded-lg shadow p-8 w-full max-w-2xl">
           <div className="flex flex-col items-center mb-8">
@@ -113,7 +121,11 @@ const OrderConfirmed: React.FC = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      <Footer
+        backgroundColor={editableVariables.footerBackgroundColor}
+        textColor={editableVariables.footerTextColor}
+        footerDescription={editableVariables.footerDescription}
+      />
     </div>
   );
 };
