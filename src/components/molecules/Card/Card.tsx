@@ -2,6 +2,7 @@ import React from 'react';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton';
 import '../../../styles/responsive.css';
+import { useSearchStore } from '../../../stores';
 
 interface CardProps {
   imageSrc?: string;
@@ -66,38 +67,78 @@ const cardData = [
   { 
     imageSrc: "https://images.pexels.com/photos/447570/pexels-photo-447570.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     title: "Reloj negro elegante",
-    price: 350
+    price: 350,
+    category: "Accesorios",
+    onClick: undefined,
   },
   { 
     imageSrc: "https://images.pexels.com/photos/10274665/pexels-photo-10274665.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     title: "Chaqueta marrón de cuero",
-    price: 100
+    price: 100,
+    category: "Ropa",
+    onClick: undefined,
   },
   { 
     imageSrc: "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
     title: "Camiseta negra básica",
-    price: 60
+    price: 60,
+    category: "Ropa",
+    onClick: undefined,
   },
 ];
 
 export const CardList: React.FC = () => {
+  const fetchProducts = require('../../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const [loading, setLoading] = React.useState(false);
+  const [products, setProducts] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      try {
+        const prods = await fetchProducts();
+        setProducts(prods);
+      } catch (err) {
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, [fetchProducts]);
+
   const handleCardClick = (index: number) => {
     console.log(`Card ${index + 1} clicked`);
-   
   };
+
+  // Si hay productos reales, usarlos. Si no, usar los mock de cardData
+  const productsToShow = products && products.length > 0
+    ? products.map((prod, idx) => ({
+        imageSrc: prod.productImages?.[0] || prod.productImage || '',
+        title: prod.nombre,
+        price: prod.precio,
+        category: prod.categoria || prod.estado || 'General',
+        onClick: () => handleCardClick(idx),
+      }))
+    : cardData;
 
   return (
     <div className="text-center mt-8">
       <div className="flex justify-center flex-wrap">
-        {cardData.map((card, index) => (
-          <Card 
-            key={index} 
-            imageSrc={card.imageSrc} 
-            title={card.title}
-            price={card.price}
-            onClick={() => handleCardClick(index)}
-          />
-        ))}
+        {loading ? (
+          <div className="w-full text-center text-gray-400 py-8">Cargando productos...</div>
+        ) : (
+          productsToShow.map((card, index) => (
+            <Card 
+              key={index} 
+              imageSrc={card.imageSrc} 
+              title={card.title}
+              price={card.price}
+              category={card.category}
+              onClick={card.onClick}
+            />
+          ))
+        )}
       </div>
     </div>
   );
