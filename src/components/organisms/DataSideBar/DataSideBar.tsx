@@ -6,7 +6,7 @@ import { IoDocumentText, IoChevronDown, IoToggleSharp } from "react-icons/io5";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { colors } from '../../../design/colors';
 import { motion } from 'framer-motion';
-import { FaGear, FaScrewdriverWrench, FaCircleInfo } from "react-icons/fa6";
+import { FaGear, FaScrewdriverWrench, FaCircleInfo, FaBoxArchive  } from "react-icons/fa6";
 import { AiFillDatabase } from "react-icons/ai";
 
 import { FiLogOut } from "react-icons/fi";
@@ -26,6 +26,7 @@ const DataSideBar: React.FC = () => {
     const menuOptions = [
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
         { key: 'profile', label: 'Datos Personales', icon: <FaUser className="text-lg" />, path: '/data-profile' },
+        { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' },
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
      
         ...(hasShop ? [

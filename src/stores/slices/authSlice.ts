@@ -793,3 +793,65 @@ export const fetchCountries = async (): Promise<{ name: string; code: string }[]
     throw error;
   }
 };
+
+
+export const createCategory = async (data: {
+  name: string;
+  description?: string;
+  image?: string;
+  status?: 'Active' | 'Pending' | 'Inactive';
+  parent?: string | null;
+}) => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+ 
+  const response = await fetch(`${API_URL}/categories`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al crear la categoría');
+  }
+  return responseData.data;
+};
+
+
+export const fetchCategories = async () => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No token provided');
+  
+  const response = await fetch(`${API_URL}/categories`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message || 'Error al obtener categorías');
+  return responseData.data;
+};
+
+
+export const deleteCategory = async (id: string) => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No token provided');
+  const response = await fetch(`${API_URL}/categories/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message || 'Error al eliminar la categoría');
+  return responseData.data;
+};
