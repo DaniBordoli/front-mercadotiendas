@@ -45,6 +45,7 @@ import CartCompleted from '../screens/CartCompleted';
 import MyProductsSection from '../screens/MyProductsSection';
 import EditProductScreen from '../screens/EditProductScreen';
 import NewProductScreen from '../screens/NewProductScreen';
+import DataCatalog from '../screens/DataCatalog';
 
 
 export const publicRoutes = [
@@ -211,6 +212,10 @@ export const publicRoutes = [
   {
     path: '/new-product',
     element: <NewProductScreen />
+  },
+  {
+    path: '/data-catalog',
+    element: <DataCatalog />
   },
 ];
 
