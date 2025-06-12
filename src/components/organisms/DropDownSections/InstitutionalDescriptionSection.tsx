@@ -46,7 +46,7 @@ export const InstitutionalDescriptionSection: React.FC = () => {
                     rows={4}
                 />
             </div>
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col gap-2">
                 <DesignButton variant="neutral">Restaurar</DesignButton>
                 <DesignButton variant="primary">Guardar cambios</DesignButton>
             </div>

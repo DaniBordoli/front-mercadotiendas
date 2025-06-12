@@ -31,8 +31,17 @@ const Register = () => {
   useEffect(() => {
     if (values.country === 'Argentina') {
       fetchProvincesForArgentina()
-        .then((data) => setProvinces(data))
-        .catch((error) => console.error('Error fetching provinces:', error));
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setProvinces(data);
+          } else {
+            setProvinces(['Buenos Aires']);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching provinces:', error);
+          setProvinces(['Buenos Aires']);
+        });
     } else {
       setProvinces([]);
     }
@@ -40,8 +49,18 @@ const Register = () => {
 
   useEffect(() => {
     fetchCountries()
-      .then((data) => setCountries(data))
-      .catch((error) => console.error('Error fetching countries:', error));
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCountries(data);
+        } else {
+          // Si la API no devuelve países, usar Argentina por defecto
+          setCountries([{ name: 'Argentina', code: 'AR' }]);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching countries:', error);
+        setCountries([{ name: 'Argentina', code: 'AR' }]);
+      });
   }, []);
 
   const validateForm = (values: Record<string, string>): Record<string, string> => {

@@ -15,11 +15,11 @@ const DataShopConfig: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+            <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Configuración de Tienda</h1>
                 
             
-                <div className="p-6 bg-white rounded-md border" style={{ borderColor: colors.lightGray }}>
+                <div className="p-4 md:p-6 bg-white rounded-md border" style={{ borderColor: colors.lightGray }}>
                     <div className="relative">
                         <div className="flex gap-6 relative">
                             {tabs.map((tab, index) => (
@@ -59,7 +59,7 @@ const DataShopConfig: React.FC = () => {
                     </div>
 
                   
-                    <div className="flex gap-10 mt-6">
+                    <div className="flex flex-col md:flex-row gap-6 md:gap-10 mt-6">
                        
                         <div className="flex-1">
                             <h2 className="text-lg font-space font-medium text-gray-800 mb-4">Layout</h2>

@@ -29,7 +29,7 @@ export const OperationPoliciesSection: React.FC = () => {
                     rows={4}
                 />
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 gap-4 mb-6">
                 <div>
                     <label className="text-sm font-space mb-2 block">CUIT/RUT</label>
                     <InputDefault placeholder="Ingrese CUIT/RUT" className="w-full" />
@@ -43,7 +43,7 @@ export const OperationPoliciesSection: React.FC = () => {
                 <label className="text-sm font-space mb-2 block">Domicilio Fiscal</label>
                 <InputDefault placeholder="Ingrese domicilio fiscal" className="w-full" />
             </div>
-            <div className="flex justify-end space-x-4">
+            <div className="flex flex-col gap-2">
                 <DesignButton variant="neutral">Restaurar</DesignButton>
                 <DesignButton variant="primary">Guardar cambios</DesignButton>
             </div>
