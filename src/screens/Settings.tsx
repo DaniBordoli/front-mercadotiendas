@@ -12,8 +12,8 @@ const Settings = () => {
     return (
         <div className="min-h-screen bg-gray-100 flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px]">
-                <div className="w-4/5 mx-auto bg-white p-5 rounded-lg shadow-md mt-8">
+            <div className="flex flex-col flex-grow p-10 md:ml-[250px]">
+                <div className="bg-white p-5 rounded-lg shadow-md mt-8 md:w-4/5 md:mx-auto">
                     <h1 className="text-left text-xl font-space">Configuración</h1>
                     <DropDownSections openSection={openSection} toggleSection={toggleSection} />
                 </div>

@@ -10,7 +10,7 @@ const DataShopState: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px] gap-6">
+            <div className="flex flex-col flex-grow p-10 md:ml-[250px] gap-6">
                 
                 <div>
                     <h1 className="text-2xl font-space font-medium text-gray-800">Estado de la Tienda</h1>

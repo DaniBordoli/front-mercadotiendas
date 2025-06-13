@@ -140,10 +140,10 @@ const DataPersonalInfo: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+            <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Datos Personales</h1>
-                <div className="p-6 bg-white rounded-md border" style={{ borderColor: '#E5E7EB' }}>
-                    <div className="flex ml-[16%] items-center gap-6">
+                <div className="p-4 md:p-6 bg-white rounded-md border" style={{ borderColor: '#E5E7EB' }}>
+                    <div className="flex flex-col md:flex-row md:ml-[16%] items-center gap-4 md:gap-6">
                         <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden mb-4 relative group">
                             <img
                                 src={profileImage || "https://placehold.co/100x100"}
@@ -162,9 +162,9 @@ const DataPersonalInfo: React.FC = () => {
                                 </button>
                             )}
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col w-full md:w-auto">
                             <h2 className="text-lg font-space font-medium text-gray-800 mb-2">Foto de Perfil</h2>
-                            <div className="flex gap-4">
+                            <div className="flex flex-col md:flex-row gap-2 md:gap-4">
                                 <DesignButton variant="primary" onClick={handleEditProfileClick}>
                                     Cambiar foto
                                 </DesignButton>
@@ -184,11 +184,11 @@ const DataPersonalInfo: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="w-8/12 ml-[16%] items-center border-t border-gray-300 my-6"></div>
+                    <div className="border-t border-gray-300 my-6 md:w-8/12 md:ml-[16%] w-full"></div>
 
                     <div className="flex flex-col items-center gap-6">
-                        <div className="flex gap-4 w-full justify-center">
-                            <div className="w-4/12">
+                        <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Nombre Completo
                                 </label>
@@ -202,7 +202,7 @@ const DataPersonalInfo: React.FC = () => {
                                     <p className="text-red-500 text-xs">{validationErrors.fullName}</p>
                                 )}
                             </div>
-                            <div className="w-4/12">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Correo Electrónico
                                 </label>
@@ -219,9 +219,8 @@ const DataPersonalInfo: React.FC = () => {
                                 )}
                             </div>
                         </div>
-
-                        <div className="flex gap-4 w-full justify-center">
-                            <div className="w-4/12">
+                        <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Fecha de nacimiento
                                 </label>
@@ -232,7 +231,7 @@ const DataPersonalInfo: React.FC = () => {
                                     onChange={val => setValues(v => ({ ...v, birthDate: val }))}
                                 />
                             </div>
-                            <div className="w-4/12">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Número de teléfono
                                 </label>
@@ -244,9 +243,8 @@ const DataPersonalInfo: React.FC = () => {
                                 />
                             </div>
                         </div>
-
-                        <div className="flex gap-4 w-full justify-center">
-                            <div className="w-4/12">
+                        <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     País
                                 </label>
@@ -262,7 +260,7 @@ const DataPersonalInfo: React.FC = () => {
                                     onChange={val => setValues(v => ({ ...v, country: val }))}
                                 />
                             </div>
-                            <div className="w-4/12">
+                            <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Ciudad
                                 </label>
@@ -274,8 +272,7 @@ const DataPersonalInfo: React.FC = () => {
                                 />
                             </div>
                         </div>
-
-                        <div className="w-8/12 mt-6">
+                        <div className="w-full md:w-8/12 mt-6">
                             <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                 Dirección
                             </label>
@@ -286,15 +283,13 @@ const DataPersonalInfo: React.FC = () => {
                                 onChange={val => setValues(v => ({ ...v, address: val }))}
                             />
                         </div>
-
-                        <div className="w-8/12 border-t border-gray-300 my-2"></div>
-
+                        <div className="border-t border-gray-300 my-2 w-full md:w-8/12"></div>
                         <div className="w-full">
-                            <h2 className="text-lg font-space font-medium text-gray-800 mb-4" style={{ marginLeft: '16%' }}>
+                            <h2 className="text-lg font-space font-medium text-gray-800 mb-4 md:ml-[16%]">
                                 Cambiar contraseña
                             </h2>
-                            <div className="flex gap-4 w-full justify-center">
-                                <div className="w-4/12">
+                            <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
+                                <div className="w-full md:w-4/12">
                                     <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                         Contraseña actual
                                     </label>
@@ -304,7 +299,7 @@ const DataPersonalInfo: React.FC = () => {
                                         className="w-full"
                                     />
                                 </div>
-                                <div className="w-4/12">
+                                <div className="w-full md:w-4/12">
                                     <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                         Nueva contraseña
                                     </label>
@@ -316,8 +311,7 @@ const DataPersonalInfo: React.FC = () => {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="flex justify-end mt-6 w-full">
+                        <div className="flex flex-col items-center md:items-end mt-6 w-full">
                             <DesignButton variant="primary" onClick={handleSaveChanges}>
                                 Guardar cambios
                             </DesignButton>

@@ -14,7 +14,7 @@ const DataSubscription: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+            <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6">Mi Suscripción</h1>
                 
                 <div className="flex flex-col gap-6">
@@ -32,7 +32,7 @@ const DataSubscription: React.FC = () => {
                                 Cambiar Plan
                             </DesignButton>
                         </div>
-                        <div className="flex gap-10 justify-center">
+                        <div className="flex flex-col md:flex-row md:gap-10 md:justify-center gap-4 justify-center">
                             {[
                                 { icon: <MdDateRange />, text: "Próxima Renovación", subtext: "30 Mayo, 2025" },
                                 { icon: <FaCreditCard />, text: "Método de Pago", subtext: "Visa terminada en 4242" },
@@ -66,7 +66,7 @@ const DataSubscription: React.FC = () => {
                         style={{ borderColor: colors.lightGray }}
                     >
                         <h2 className="text-xl font-space font-medium text-gray-600 mb-4">Beneficios Incluidos</h2>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {[
                                 { icon: <FaPercent />, text: "Comisiones Reducidas", subtext: "Solo 3.5% por venta en lugar del 5% estándar" },
                                 { icon: <GoGraph />, text: "Analytics Avanzados", subtext: "Reportes detallados y métricas en tiempo real" },

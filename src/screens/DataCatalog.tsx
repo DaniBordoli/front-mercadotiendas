@@ -170,8 +170,8 @@ const DataCatalog: React.FC = () => {
   return (
     <div className="flex">
       <DataSideBar />
-      <div className="flex-1 min-h-screen pl-[250px]">
-        <div className="p-8">
+      <div className="flex-1 min-h-screen pl-0 md:pl-[250px]">
+        <div className="p-4 md:p-8">
           {/* Título y resumen fuera de la caja */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
             <h1 className="text-xl font-space">Gestión de Categorías</h1>
@@ -187,11 +187,12 @@ const DataCatalog: React.FC = () => {
             Dashboard &gt; Catálogo &gt; Gestión de Categorías
           </div>
           {/* Botón arriba a la izquierda */}
-          <div className="flex items-center justify-start mb-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-start mb-4 gap-2">
             <DesignButton
               variant="primary"
               icon={FaPlus}
               onClick={() => setShowModal(true)}
+              className="w-full sm:w-auto"
             >
               <span className="font-space">Nueva Categoría</span>
             </DesignButton>
@@ -201,7 +202,7 @@ const DataCatalog: React.FC = () => {
             <span className="font-space text-base">Árbol de Categorías</span>
           </div>
           <div className="bg-white rounded-lg shadow p-0 min-h-[300px] flex flex-col border">
-            <div className="px-8 py-6">
+            <div className="px-4 md:px-8 py-6">
               {isLoading ? (
                 <div className="text-center text-gray-400 font-space">Cargando categorías...</div>
               ) : categories.length === 0 ? (
@@ -226,8 +227,8 @@ const DataCatalog: React.FC = () => {
           </div>
           {/* Modal de agregar */}
           {showModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-              <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
+              <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-4 md:p-6 relative">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-space">
@@ -301,7 +302,7 @@ const DataCatalog: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex justify-end gap-2 mt-6">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
                     <DesignButton
                       variant="neutral"
                       onClick={() => {
@@ -313,10 +314,11 @@ const DataCatalog: React.FC = () => {
                       }}
                       type="button"
                       disabled={isCreating}
+                      className="w-full sm:w-auto"
                     >
                       <span className="font-space">Cancelar</span>
                     </DesignButton>
-                    <DesignButton variant="primary" type="submit" loading={isCreating}>
+                    <DesignButton variant="primary" type="submit" loading={isCreating} className="w-full sm:w-auto">
                       <span className="font-space">Aceptar</span>
                     </DesignButton>
                   </div>
@@ -326,8 +328,8 @@ const DataCatalog: React.FC = () => {
           )}
           {/* Modal de eliminar */}
           {showDeleteModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-              <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
+              <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-4 md:p-6 relative">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-space">Eliminar categoría</h2>
@@ -438,16 +440,18 @@ const DataCatalog: React.FC = () => {
                   </div>
                 </div>
                 {/* Botones */}
-                <div className="flex justify-end gap-2 mt-6">
+                <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
                   <DesignButton
                     variant="neutral"
                     onClick={() => setShowDeleteModal(false)}
+                    className="w-full sm:w-auto"
                   >
                     <span className="font-space">Cancelar</span>
                   </DesignButton>
                   <DesignButton
                     variant="primary"
                     onClick={handleDeleteCategory}
+                    className="w-full sm:w-auto"
                   >
                     <span className="font-space">Eliminar</span>
                   </DesignButton>
