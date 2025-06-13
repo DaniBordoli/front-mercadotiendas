@@ -24,7 +24,7 @@ const DataSalesManagement: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#F8F8F8] flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-10 ml-[250px]">
+            <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
                     Gestión de Ventas
                     <div className="flex items-center gap-4">

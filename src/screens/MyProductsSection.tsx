@@ -77,23 +77,24 @@ const MyProductsSection: React.FC = () => {
   return (
     <div className="min-h-screen flex">
       <DataSideBar />
-      <div className="flex flex-col flex-grow ml-[250px]">
-       
-        <div className="w-full flex items-center justify-between px-8 h-[80px] bg-white">
+      <div className="flex flex-col flex-grow ml-0 md:ml-[250px]">
+        {/* Barra superior */}
+        <div className="w-full flex flex-col md:flex-row items-start md:items-center justify-between px-4 md:px-8 h-auto md:h-[80px] bg-white gap-4 md:gap-0 pt-4 md:pt-0">
           <h1 className="text-2xl font-space ">Mis Productos</h1>
-          <div className="flex items-center gap-3">
-            <div className="relative">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3 w-full md:w-auto">
+            <div className="relative w-full md:w-auto">
               <input
                 type="text"
                 placeholder="Buscar productos..."
-                className="border border-gray-200 rounded-lg px-4 py-2 pl-10 w-64 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primaryRed"
+                className="border border-gray-200 rounded-lg px-4 py-2 pl-10 w-full md:w-64 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primaryRed"
               />
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
             </div>
             <DesignButton
               variant="primary"
               onClick={() => navigate('/new-product')}
-            icon={FaPlus}
+              icon={FaPlus}
+              className="w-full md:w-auto"
             >
 
               Nuevo Producto
@@ -101,32 +102,31 @@ const MyProductsSection: React.FC = () => {
           </div>
         </div>
         <hr className="border-gray-300" />
-       
-        <div className="w-full px-8 flex items-center justify-between mt-4 mb-2">
+        {/* Filtros */}
+        <div className="w-full px-4 md:px-8 flex flex-col md:flex-row items-start md:items-center justify-between mt-4 mb-2 gap-2">
           <span className="font-space text-lg">Filtros</span>
           <button className="text-sky-500 text-sm font-space hover:underline">Limpiar filtros</button>
         </div>
-        <div className="w-full px-8 py-6 pt-0">
-        
-          <div className="flex items-end gap-4 mb-2">
-            <div className="flex flex-col gap-1 w-40">
+        <div className="w-full px-4 md:px-8 py-6 pt-0">
+          <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4 mb-2">
+            <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Estado</span>
               <SelectDefault options={estadoOptions} value={''} />
             </div>
-            <div className="flex flex-col gap-1 w-40">
+            <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Categoría</span>
               <SelectDefault options={categoriaOptions} value={''} />
             </div>
-            <div className="flex flex-col gap-1 w-48">
+            <div className="flex flex-col gap-1 w-full md:w-48">
               <span className="text-xs text-gray-500 font-space">Ordenar por</span>
               <SelectDefault options={ordenarOptions} value={'recientes'} />
             </div>
-            <div className="flex flex-col gap-1 w-40">
+            <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Stock</span>
               <SelectDefault options={stockOptions} value={''} />
             </div>
           </div>
-     
+          {/* Tabla responsiva */}
           <div className="mt-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
@@ -153,7 +153,7 @@ const MyProductsSection: React.FC = () => {
                 ) : (
                   productos.map((prod, idx) => (
                     <tr key={prod._id || prod.sku || idx} className="border-t last:border-b rounded-xl hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3 flex items-center gap-3">
+                      <td className="px-4 py-3 flex items-center gap-3 min-w-[180px]">
                         {prod.productImages && prod.productImages.length > 0 ? (
                           <img
                             src={prod.productImages[0]}
@@ -173,17 +173,17 @@ const MyProductsSection: React.FC = () => {
                         )}
                         <span className="font-space text-sm text-gray-800">{prod.nombre}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 font-space">{prod.sku}</td>
-                      <td className="px-4 py-3 font-space">{prod.precio}</td>
-                      <td className="px-4 py-3 font-space">{prod.stock ?? '-'}</td>
-                      <td className="px-4 py-3 font-space">
+                      <td className="px-4 py-3 text-gray-400 font-space min-w-[100px]">{prod.sku}</td>
+                      <td className="px-4 py-3 font-space min-w-[100px]">{prod.precio}</td>
+                      <td className="px-4 py-3 font-space min-w-[80px]">{prod.stock ?? '-'}</td>
+                      <td className="px-4 py-3 font-space min-w-[100px]">
                         <span className="font-medium text-green-600">{prod.estado}</span>
                       </td>
-                      <td className="px-4 py-3 font-space">{prod.categoria}</td>
-                      <td className="px-4 py-3 font-space">
+                      <td className="px-4 py-3 font-space min-w-[120px]">{prod.categoria}</td>
+                      <td className="px-4 py-3 font-space min-w-[120px]">
                         {prod.createdAt ? new Date(prod.createdAt).toLocaleDateString() : '-'}
                       </td>
-                      <td className="px-4 py-3 flex items-center gap-3">
+                      <td className="px-4 py-3 flex items-center gap-3 min-w-[120px]">
                         <button
                           className="hover:text-primaryRed"
                           onClick={() => navigate(`/edit-products/${prod._id}`)}
