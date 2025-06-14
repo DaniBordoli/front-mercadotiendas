@@ -12,10 +12,10 @@ import { FaBell } from 'react-icons/fa';
 
 const DataPurchaseHistory: React.FC = () => {
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 ml-0 md:ml-[250px]">
-                <h1 className="text-2xl font-space mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <h1 className="text-2xl font-space mb-6 flex items-center justify-between gap-4">
                     Historial de Compras
                     <div className="flex items-center gap-4">
                         <FaBell className="text-gray-500 cursor-pointer" />

@@ -13,6 +13,20 @@ import { FaSearch } from 'react-icons/fa';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FaBell } from 'react-icons/fa';
 
+// Hook para detectar mobile
+function useIsMobile(breakpoint = 768) {
+    const [isMobile, setIsMobile] = React.useState(false);
+    React.useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= breakpoint);
+        }
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [breakpoint]);
+    return isMobile;
+}
+
 const DataSalesManagement: React.FC = () => {
     const boxes = [
         { title: 'Ingresos Totales', number: 123, trend: '+8.5%  vs mes anterior', icon: <FaDollarSign />, iconColor: `${colors.primaryRed}1A`, iconTextColor: colors.primaryRed, showTrend: true },
@@ -21,10 +35,18 @@ const DataSalesManagement: React.FC = () => {
         { title: 'Conversión', number: 101, trend: '+4% vs mes anterior', icon: <FaChartPie />, iconColor: `${colors.accentTeal}1A`, iconTextColor: colors.accentTeal, showTrend: false },
     ];
 
+    const isMobile = useIsMobile();
+
+    const rows = [
+        { id: '001', producto: 'Producto A', cliente: 'Juan Pérez', fecha: '2023-10-01', monto: '$100', estado: 'Active' as 'Active' },
+        { id: '002', producto: 'Producto B', cliente: 'Ana Gómez', fecha: '2023-10-02', monto: '$200', estado: 'Pending' as 'Pending' },
+        { id: '003', producto: 'Producto C', cliente: 'Luis Martínez', fecha: '2023-10-03', monto: '$150', estado: 'Inactive' as 'Inactive' },
+    ];
+
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
-            <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
+            <div className={`flex flex-col flex-grow ${isMobile ? 'px-2' : 'p-4 md:p-10'} md:ml-[250px]`}>
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
                     Gestión de Ventas
                     <div className="flex items-center gap-4">
@@ -61,16 +83,16 @@ const DataSalesManagement: React.FC = () => {
                     ))}
                 </div>
                 <div
-                    className="p-4 bg-white rounded-md border mt-8"
+                    className={`p-4 bg-white rounded-md border mt-8${isMobile ? ' p-2' : ''}`}
                     style={{ borderColor: colors.lightGray, width: '100%' }}
                 >
-                    <div className="flex justify-between items-center mb-4">
+                    <div className="flex justify-between items-center mb-4 flex-col gap-3 sm:flex-row sm:gap-5">
                         <h2 className="text-lg font-space font-medium text-gray-600">Últimas Ventas</h2>
-                        <div className="flex gap-5">
+                        <div className="flex flex-col gap-2 w-full sm:flex-row sm:gap-5 sm:w-auto">
                             <InputDefault
                                 placeholder="Buscar..."
                                 icon={<FaSearch className="text-gray-500" />}
-                                className="w-80"
+                                className="w-full sm:w-80"
                             />
                             <SelectDefault
                                 options={[
@@ -79,39 +101,77 @@ const DataSalesManagement: React.FC = () => {
                                     { value: '90', label: 'Últimos 90 Días' },
                                 ]}
                                 placeholder="Últimos 30 Días"
-                                className="w-44"
+                                className="w-full sm:w-44"
                             />
                         </div>
                     </div>
                     <div className="w-full">
-                        <div className="flex text-gray-500 font-space font-medium text-sm border-b pb-2">
-                            <div className="w-1/6">ID Orden</div>
-                            <div className="w-1/6">Producto</div>
-                            <div className="w-1/6">Cliente</div>
-                            <div className="w-1/6">Fecha</div>
-                            <div className="w-1/6">Monto</div>
-                            <div className="w-1/6">Estado</div>
-                            <div className="w-1/6">Acciones</div>
-                        </div>
-                        {[
-                            { id: '001', producto: 'Producto A', cliente: 'Juan Pérez', fecha: '2023-10-01', monto: '$100', estado: 'Active' as 'Active' },
-                            { id: '002', producto: 'Producto B', cliente: 'Ana Gómez', fecha: '2023-10-02', monto: '$200', estado: 'Pending' as 'Pending' },
-                            { id: '003', producto: 'Producto C', cliente: 'Luis Martínez', fecha: '2023-10-03', monto: '$150', estado: 'Inactive' as 'Inactive' },
-                        ].map((row, index) => (
-                            <div key={index} className="flex items-center text-sm font-space py-4 border-b">
-                                <div className="w-1/6">{row.id}</div>
-                                <div className="w-1/6">{row.producto}</div>
-                                <div className="w-1/6">{row.cliente}</div>
-                                <div className="w-1/6">{row.fecha}</div>
-                                <div className="w-1/6">{row.monto}</div>
-                                <div className="w-1/6">
-                                    <StatusTags status={row.estado} />
+                        {!isMobile ? (
+                            // Vista Desktop (tabla horizontal)
+                            <>
+                                <div className="flex text-gray-500 font-space font-medium text-sm border-b pb-2">
+                                    <div className="w-1/6">ID Orden</div>
+                                    <div className="w-1/6">Producto</div>
+                                    <div className="w-1/6">Cliente</div>
+                                    <div className="w-1/6">Fecha</div>
+                                    <div className="w-1/6">Monto</div>
+                                    <div className="w-1/6">Estado</div>
+                                    <div className="w-1/6">Acciones</div>
                                 </div>
-                                <div className="w-1/6">
-                                    <FaEllipsisV className="text-gray-500 cursor-pointer" />
-                                </div>
+                                {rows.map((row, index) => (
+                                    <div key={index} className="flex items-center text-sm font-space py-4 border-b">
+                                        <div className="w-1/6">{row.id}</div>
+                                        <div className="w-1/6">{row.producto}</div>
+                                        <div className="w-1/6">{row.cliente}</div>
+                                        <div className="w-1/6">{row.fecha}</div>
+                                        <div className="w-1/6">{row.monto}</div>
+                                        <div className="w-1/6">
+                                            <StatusTags status={row.estado} />
+                                        </div>
+                                        <div className="w-1/6">
+                                            <FaEllipsisV className="text-gray-500 cursor-pointer" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            // Vista Mobile (tarjetas verticales)
+                            <div className="flex flex-col gap-2">
+                                {rows.map((row, index) => (
+                                    <div key={index} className="border rounded-md p-2 flex flex-col gap-1 font-space text-xs bg-gray-50">
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">ID Orden:</span>
+                                            <span>{row.id}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Producto:</span>
+                                            <span>{row.producto}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Cliente:</span>
+                                            <span>{row.cliente}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Fecha:</span>
+                                            <span>{row.fecha}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Monto:</span>
+                                            <span>{row.monto}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-gray-700">Estado:</span>
+                                            <StatusTags status={row.estado} />
+                                        </div>
+                                        <div className="flex gap-2 mt-2">
+                                            <button className="font-medium text-gray-500">
+                                                <FaEllipsisV />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
                     <div className="flex justify-between items-center mt-4">
                         <span className="text-sm text-gray-500 font-space">

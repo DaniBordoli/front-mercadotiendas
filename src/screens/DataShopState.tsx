@@ -8,7 +8,7 @@ const DataShopState: React.FC = () => {
     const [isActive, setIsActive] = React.useState(true);
 
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-10 md:ml-[250px] gap-6">
                 

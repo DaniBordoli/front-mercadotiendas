@@ -12,7 +12,7 @@ import { FaHeadset } from "react-icons/fa";
 
 const DataSubscription: React.FC = () => {
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6">Mi Suscripción</h1>
