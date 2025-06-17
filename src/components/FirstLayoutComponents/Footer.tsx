@@ -39,7 +39,7 @@ const Footer: React.FC<FooterProps> = ({
             <li>
               <span
                 className="hover:text-white cursor-pointer"
-                onClick={() => navigate('/aboutus-layout')}
+                onClick={() => navigate('/first-layout/aboutus-layout')}
               >
                 About Us
               </span>
@@ -47,7 +47,7 @@ const Footer: React.FC<FooterProps> = ({
             <li>
               <span
                 className="hover:text-white cursor-pointer"
-                onClick={() => navigate('/contact-layout')}
+                onClick={() => navigate('/first-layout/contact-layout')}
               >
                 Contact
               </span>

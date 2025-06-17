@@ -22,6 +22,10 @@ export interface Product {
   isFeatured?: boolean; 
   color?: string[];
   talle?: string[];
+  shop?: {
+    name: string;
+    _id?: string;
+  };
 }
 
 // --- NUEVO: Tipo para Opiniones ---
@@ -247,6 +251,10 @@ function mapBackendProductToProduct(backendProduct: any): Product {
     isFeatured: backendProduct.isFeatured ?? undefined,
     color: Array.isArray(backendProduct.color) ? backendProduct.color : [],
     talle: Array.isArray(backendProduct.talle) ? backendProduct.talle : [],
+    // mapea shop si viene del backend
+    shop: backendProduct.shop && typeof backendProduct.shop === 'object' && backendProduct.shop.name
+      ? { name: backendProduct.shop.name, _id: backendProduct.shop._id }
+      : undefined,
   };
 }
 
@@ -424,8 +432,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     set({ isLoadingResults: true, searchTerm: term });
 
     try {
-      // --- Obtener productos reales del backend y combinarlos con los mocks ---
-      const productsFromBackend = await useAuthStore.getState().fetchProducts();
+      // --- Obtener productos reales del backend (todos) y combinarlos con los mocks ---
+      const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
       const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
       // 1. Filtrar por término
       const termFilteredResults = allProducts.filter(p =>
@@ -539,8 +547,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     }
     set({ isLoadingProduct: true, selectedProduct: null, productReviews: [], isLoadingReviews: false });
     try {
-      // Buscar primero en el backend y mocks combinados
-      const productsFromBackend = await useAuthStore.getState().fetchProducts();
+      // Buscar primero en el backend (todos los productos) y mocks combinados
+      const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
       const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
       const foundProduct = allProducts.find(p => p.id === productId);
       if (foundProduct) {

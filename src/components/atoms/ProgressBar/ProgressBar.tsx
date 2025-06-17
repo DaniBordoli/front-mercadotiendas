@@ -5,7 +5,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   progress = 33,
   height = "h-2.5",
   backgroundColor = "bg-gray-200",
-  progressColor = "bg-sky-500",
+  progressColor = "bg-red-500",
   className = ""
 }) => {
   return (

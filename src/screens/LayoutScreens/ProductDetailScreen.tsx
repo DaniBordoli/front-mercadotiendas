@@ -126,7 +126,7 @@ const ProductDetailScreen: React.FC = () => {
           </div>
  
           <div className="flex gap-2 mt-4">
-            <button onClick={() => {navigate('/shipping-layout')}} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition">
+            <button onClick={() => {navigate('/first-layout/shipping-layout')}} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition">
               Add to Cart
             </button>
             <button className="w-12 h-12 flex items-center justify-center border rounded bg-white text-blue-600 hover:bg-blue-50 transition">

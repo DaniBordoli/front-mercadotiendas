@@ -145,47 +145,48 @@ export const publicRoutes = [
     path: '/data-profile',
     element: <DataPersonalInfo />
   },
+  
   {
-    path: '/shop-layout',
+    path: '/first-layout/shop-layout',
     element: <ShopLayout />
   },
   {
-    path: '/detail-layout',
+    path: '/first-layout/detail-layout',
     element: <ProductDetailScreen />
   },
-   {
-    path: '/cart-layout',
+  {
+    path: '/first-layout/cart-layout',
     element: <CartScreen />
   },
-    {
-    path: '/shipping-layout',
+  {
+    path: '/first-layout/shipping-layout',
     element: <ShippingScreen />
   },
   {
-    path: '/login-layout',
+    path: '/first-layout/login-layout',
     element: <LoginScreen />
   },
   {
-    path: '/register-layout',
+    path: '/first-layout/register-layout',
     element: <RegisterScreen />
   },
   {
-    path: '/order-layout',
+    path: '/first-layout/order-layout',
     element: <OrderConfirmed />
   },
   {
-    path: '/user-layout',
+    path: '/first-layout/user-layout',
     element: <UserProfileScreen />
   },
   {
-    path: '/aboutus-layout',
+    path: '/first-layout/aboutus-layout',
     element: <AboutUsScreen />
   },
   {
-    path: '/contact-layout',
+    path: '/first-layout/contact-layout',
     element: <ContactScreen />
   },
-    {
+  {
     path: '/cart-list',
     element: <CartList />
   },

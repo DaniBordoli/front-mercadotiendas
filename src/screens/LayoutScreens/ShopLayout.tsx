@@ -108,7 +108,7 @@ const ShopLayout: React.FC = () => {
               <div
                 key={idx}
                 className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
-                onClick={() => navigate('/detail-layout')}
+                onClick={() => navigate('/first-layout/detail-layout')}
                 style={{ backgroundColor: editableVariables.heroBackgroundColor }}
               >
                 <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
