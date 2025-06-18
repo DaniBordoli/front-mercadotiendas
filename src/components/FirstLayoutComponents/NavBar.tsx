@@ -13,8 +13,8 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({
   navbarLinks = [
     { label: 'Home', href: '/first-layout' },
-    { label: 'Shop', href: '/shop-layout' },
-    { label: 'Contact', href: '/contact-layout' },
+    { label: 'Shop', href: '/first-layout/shop-layout' },
+    { label: 'Contact', href: '/first-layout/contact-layout' },
   ],
   title = 'ShopSmart',
   backgroundColor = '#FFFFFF',
@@ -39,7 +39,7 @@ const NavBar: React.FC<NavBarProps> = ({
               key={idx}
               className="hover:text-blue-500 cursor-pointer"
               style={{ color: textColor, fontFamily: fontType }}
-              onClick={() => link.href.startsWith('/') ? navigate(link.href) : undefined}
+              onClick={() => link.href.startsWith('/') ? navigate(link.href.startsWith('/first-layout') ? link.href : `/first-layout${link.href}`) : undefined}
               href={link.href.startsWith('/') ? undefined : link.href}
             >
               {link.label}
@@ -47,8 +47,8 @@ const NavBar: React.FC<NavBarProps> = ({
           ))}
         </div>
         <div className="flex gap-4">
-          <FaUser onClick={() => navigate('/user-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
-          <FaShoppingCart onClick={() => navigate('/cart-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
+          <FaUser onClick={() => navigate('/first-layout/user-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
+          <FaShoppingCart onClick={() => navigate('/first-layout/cart-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
         </div>
       </div>
     </nav>

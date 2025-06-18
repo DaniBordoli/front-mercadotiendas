@@ -620,6 +620,30 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   /**
+   * Obtiene todos los productos de todas las tiendas (para búsqueda global).
+   */
+  fetchAllProducts: async (): Promise<any[]> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/all`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchAllProducts:', responseData);
+      throw new Error(responseData.message || 'Error al obtener todos los productos');
+    }
+    return responseData.data || [];
+  },
+
+  /**
    * Elimina un producto por su ID.
    */
   deleteProduct: async (id: string): Promise<void> => {

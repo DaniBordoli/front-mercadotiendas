@@ -68,7 +68,7 @@ const ShippingScreen: React.FC = () => {
             tax={34.80}
             total={624.75}
             buttonLabel="Proceed to Payment"
-            onButtonClick={() => navigate('/order-layout')}
+            onButtonClick={() => navigate('/first-layout/order-layout')}
           />
         </div>
       </main>

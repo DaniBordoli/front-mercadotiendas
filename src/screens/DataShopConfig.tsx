@@ -13,7 +13,7 @@ const DataShopConfig: React.FC = () => {
     const tabs = ['Diseño', 'Productos', 'Envíos', 'Pagos'];
 
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Configuración de Tienda</h1>

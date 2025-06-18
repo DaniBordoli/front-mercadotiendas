@@ -4,17 +4,18 @@ import { SelectDefault } from '../../atoms/SelectDefault/SelectDefault';
 
 const categoriaOptions = [
   { value: '', label: 'Seleccionar categoría' },
-  { value: 'accesorios', label: 'Accesorios' },
-  { value: 'calzado', label: 'Calzado' },
+  { value: 'Accesorios', label: 'Accesorios' },
+  { value: 'Calzado', label: 'Calzado' },
+   { value: 'Indumentaria', label: 'Indumentaria' },
 ];
 const subcategoriaOptions = [
   { value: '', label: 'Seleccionar subcategoría' },
-  { value: 'relojes', label: 'Relojes' },
-  { value: 'zapatillas', label: 'Zapatillas' },
+  { value: 'Relojes', label: 'Relojes' },
+  { value: 'Zapatillas', label: 'Zapatillas' },
 ];
 const estadoOptions = [
-  { value: 'activo', label: 'Activo' },
-  { value: 'inactivo', label: 'Inactivo' },
+  { value: 'Activo', label: 'Activo' },
+  { value: 'Inactivo', label: 'Inactivo' },
 ];
 
 interface StepBasicInfoProps {

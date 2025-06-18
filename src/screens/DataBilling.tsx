@@ -13,9 +13,31 @@ import { FaFilePdf } from 'react-icons/fa';
 import { FaCcVisa, FaCcMastercard } from "react-icons/fa";
 import { FaCcAmex, FaEye, FaDownload as FaDownload6 } from "react-icons/fa6";
 
+// Hook para detectar mobile
+function useIsMobile(breakpoint = 768) {
+    const [isMobile, setIsMobile] = React.useState(false);
+    React.useEffect(() => {
+        function handleResize() {
+            setIsMobile(window.innerWidth <= breakpoint);
+        }
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [breakpoint]);
+    return isMobile;
+}
+
 const DataBilling: React.FC = () => {
+    const isMobile = useIsMobile();
+
+    const rows = [
+        { id: '101', producto: 'Producto X', tienda: 'Tienda A', fecha: '2023-10-05', monto: '$300', medioPago: 'visa', tarjeta: '4242', estado: 'Active' as 'Active' },
+        { id: '102', producto: 'Producto Y', tienda: 'Tienda B', fecha: '2023-10-06', monto: '$400', medioPago: 'mastercard', tarjeta: '5555', estado: 'Pending' as 'Pending' },
+        { id: '103', producto: 'Producto Z', tienda: 'Tienda C', fecha: '2023-10-07', monto: '$250', medioPago: 'amex', tarjeta: '8888', estado: 'Inactive' as 'Inactive' },
+    ];
+
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
@@ -77,54 +99,110 @@ const DataBilling: React.FC = () => {
                     style={{ borderColor: colors.lightGray, width: '100%' }}
                 >
                     <div className="w-full">
-                        <div className="flex text-gray-500 font-space font-medium text-xs md:text-sm border-b pb-2">
-                            <div className="w-1/6">ID Factura</div>
-                            <div className="w-1/6">Producto</div>
-                            <div className="w-1/6">Tienda</div>
-                            <div className="w-1/6">Fecha</div>
-                            <div className="w-1/6">Monto</div>
-                            <div className="w-1/6">Medio de Pago</div>
-                            <div className="w-1/6">Estado</div>
-                            <div className="w-1/6">Acciones</div>
-                        </div>
-                        {[
-                            { id: '101', producto: 'Producto X', tienda: 'Tienda A', fecha: '2023-10-05', monto: '$300', medioPago: 'visa', tarjeta: '4242', estado: 'Active' as 'Active' },
-                            { id: '102', producto: 'Producto Y', tienda: 'Tienda B', fecha: '2023-10-06', monto: '$400', medioPago: 'mastercard', tarjeta: '5555', estado: 'Pending' as 'Pending' },
-                            { id: '103', producto: 'Producto Z', tienda: 'Tienda C', fecha: '2023-10-07', monto: '$250', medioPago: 'amex', tarjeta: '8888', estado: 'Inactive' as 'Inactive' },
-                        ].map((row, index) => (
-                            <div key={index} className="flex items-center font-space py-4 border-b text-xs md:text-sm">
-                                <div className="w-1/6">{row.id}</div>
-                                <div className="w-1/6 flex items-center gap-2">
-                                    {row.producto}
+                        {!isMobile ? (
+                            // Vista Desktop (tabla horizontal)
+                            <>
+                                <div className="flex text-gray-500 font-space font-medium text-xs md:text-sm border-b pb-2">
+                                    <div className="w-1/6">ID Factura</div>
+                                    <div className="w-1/6">Producto</div>
+                                    <div className="w-1/6">Tienda</div>
+                                    <div className="w-1/6">Fecha</div>
+                                    <div className="w-1/6">Monto</div>
+                                    <div className="w-1/6">Medio de Pago</div>
+                                    <div className="w-1/6">Estado</div>
+                                    <div className="w-1/6">Acciones</div>
                                 </div>
-                                <div className="w-1/6">{row.tienda}</div>
-                                <div className="w-1/6">{row.fecha}</div>
-                                <div className="w-1/6">{row.monto}</div>
-                                <div className="w-1/6 flex items-center gap-2">
-                                    {row.medioPago === 'visa' && <FaCcVisa />}
-                                    {row.medioPago === 'mastercard' && <FaCcMastercard />}
-                                    {row.medioPago === 'amex' && <FaCcAmex />}
-                                    <span>•••• {row.tarjeta}</span>
-                                </div>
-                                <div className="w-1/6">
-                                    <StatusTags status={row.estado} />
-                                </div>
-                                <div className="w-1/6 flex gap-2">
-                                    <button
-                                        className="font-medium"
-                                        style={{ color: colors.primaryRed }}
-                                    >
-                                        <FaEye />
-                                    </button>
-                                    <button
-                                        className="font-medium"
-                                        style={{ color: colors.primaryRed }}
-                                    >
-                                        <FaDownload6 />
-                                    </button>
-                                </div>
+                                {rows.map((row, index) => (
+                                    <div key={index} className="flex items-center font-space py-4 border-b text-xs md:text-sm">
+                                        <div className="w-1/6">{row.id}</div>
+                                        <div className="w-1/6 flex items-center gap-2">
+                                            {row.producto}
+                                        </div>
+                                        <div className="w-1/6">{row.tienda}</div>
+                                        <div className="w-1/6">{row.fecha}</div>
+                                        <div className="w-1/6">{row.monto}</div>
+                                        <div className="w-1/6 flex items-center gap-2">
+                                            {row.medioPago === 'visa' && <FaCcVisa />}
+                                            {row.medioPago === 'mastercard' && <FaCcMastercard />}
+                                            {row.medioPago === 'amex' && <FaCcAmex />}
+                                            <span>•••• {row.tarjeta}</span>
+                                        </div>
+                                        <div className="w-1/6">
+                                            <StatusTags status={row.estado} />
+                                        </div>
+                                        <div className="w-1/6 flex gap-2">
+                                            <button
+                                                className="font-medium"
+                                                style={{ color: colors.primaryRed }}
+                                            >
+                                                <FaEye />
+                                            </button>
+                                            <button
+                                                className="font-medium"
+                                                style={{ color: colors.primaryRed }}
+                                            >
+                                                <FaDownload6 />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            // Vista Mobile (tarjetas verticales)
+                            <div className="flex flex-col gap-4">
+                                {rows.map((row, index) => (
+                                    <div key={index} className="border rounded-md p-3 flex flex-col gap-2 font-space text-xs bg-gray-50">
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">ID Factura:</span>
+                                            <span>{row.id}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Producto:</span>
+                                            <span>{row.producto}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Tienda:</span>
+                                            <span>{row.tienda}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Fecha:</span>
+                                            <span>{row.fecha}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="font-semibold text-gray-700">Monto:</span>
+                                            <span>{row.monto}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-gray-700">Medio de Pago:</span>
+                                            <span className="flex items-center gap-1">
+                                                {row.medioPago === 'visa' && <FaCcVisa />}
+                                                {row.medioPago === 'mastercard' && <FaCcMastercard />}
+                                                {row.medioPago === 'amex' && <FaCcAmex />}
+                                                <span>•••• {row.tarjeta}</span>
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-gray-700">Estado:</span>
+                                            <StatusTags status={row.estado} />
+                                        </div>
+                                        <div className="flex gap-2 mt-2">
+                                            <button
+                                                className="font-medium"
+                                                style={{ color: colors.primaryRed }}
+                                            >
+                                                <FaEye />
+                                            </button>
+                                            <button
+                                                className="font-medium"
+                                                style={{ color: colors.primaryRed }}
+                                            >
+                                                <FaDownload6 />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
                     <div className="flex justify-between items-center mt-4">
                         <span className="text-sm text-gray-500 font-space">

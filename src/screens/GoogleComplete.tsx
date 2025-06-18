@@ -33,15 +33,21 @@ const GoogleComplete = () => {
 
     useEffect(() => {
         fetchCountries()
-            .then((data) => setCountries(data))
-            .catch((error) => console.error('Error fetching countries:', error));
+            .then((data) => setCountries(data.length > 0 ? data : [{ name: 'Argentina', code: 'AR' }]))
+            .catch((error) => {
+                console.error('Error fetching countries:', error);
+                setCountries([{ name: 'Argentina', code: 'AR' }]);
+            });
     }, []);
 
     useEffect(() => {
         if (values.country === 'Argentina') {
             fetchProvincesForArgentina()
-                .then((data) => setProvinces(data))
-                .catch((error) => console.error('Error fetching provinces:', error));
+                .then((data) => setProvinces(data.length > 0 ? data : ['Buenos Aires']))
+                .catch((error) => {
+                    console.error('Error fetching provinces:', error);
+                    setProvinces(['Buenos Aires']);
+                });
         } else {
             setProvinces([]);
         }

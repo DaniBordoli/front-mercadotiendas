@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchStore } from '../stores';
 import { useCartStore } from '../stores/cartStore';
+import { useShopStore } from '../stores/slices/shopStore';
+import { useAuthStore } from '../stores';
 import { Navbar } from '../components/organisms/Navbar';
 import { Footer } from '../components/organisms/Footer';
 import { FaStar, FaRegStar, FaChevronLeft, FaChevronRight, FaMinus, FaPlus, FaTruck, FaShieldAlt, FaCreditCard, FaHeart, FaSpinner } from 'react-icons/fa';
@@ -54,11 +56,15 @@ const ProductDetailPage: React.FC = () => {
     addReview,
   } = useSearchStore();
   const addToCart = useCartStore(state => state.addToCart);
+  const { getShop, shop } = useShopStore();
+  const user = useAuthStore(state => state.user);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWritingReview, setIsWritingReview] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  // Mostrar el nombre de la tienda del producto, no del usuario logueado
+  const shopName = selectedProduct?.shop?.name || null;
 
   useEffect(() => {
     if (id) {
@@ -233,9 +239,13 @@ const ProductDetailPage: React.FC = () => {
             <h1 className="text-2xl lg:text-3xl font-bold font-space mb-1.5" style={{ color: colors.darkGray }}>{selectedProduct.name}</h1>
             
             <div className="flex items-center text-xs mb-2 font-medium" style={{color: colors.mediumGray}}>
-                <span>SKU: {selectedProduct.id.toUpperCase().substring(0,8)}</span> 
-                {selectedProduct.storeName && <span className='mx-2'>|</span>} 
-                {selectedProduct.storeName && <span>Vendido por: <a href="#" className="text-sky-600 hover:underline">{selectedProduct.storeName}</a></span>}
+                {shopName ? (
+                  <span>Tienda: {shopName}</span>
+                ) : (
+                  <span>SKU: {selectedProduct.id.toUpperCase().substring(0,8)}</span>
+                )}
+                {shopName && <span className='mx-2'>|</span>}
+                {shopName && <span>Vendido por: <a href="#" className="text-sky-600 hover:underline">{shopName}</a></span>}
             </div>
 
             <RatingStars rating={averageRating} reviewCount={totalReviews} showReviewCountLink={true} />

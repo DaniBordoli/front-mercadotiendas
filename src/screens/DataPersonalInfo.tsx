@@ -138,7 +138,7 @@ const DataPersonalInfo: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F8F8F8] flex">
+        <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Datos Personales</h1>

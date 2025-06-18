@@ -116,8 +116,8 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({ product, onCli
         <RatingStars rating={product.rating} />
 
         {/* Nombre de la tienda */}
-        {product.storeName && (
-          <p className="text-xs text-gray-500 mt-1" style={{ color: '#666666' }}>Vendido por {product.storeName}</p>
+        {product.shop?.name && (
+          <p className="text-xs text-gray-500 mt-1" style={{ color: '#666666' }}>Vendido por {product.shop.name}</p>
         )}
 
         {/* Precio H4 */}
