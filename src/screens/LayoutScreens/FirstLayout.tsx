@@ -10,6 +10,7 @@ import { FirstLayoutEditableVariables } from '../../components/organisms/Customi
 import { AIChat } from '../../components/organisms/AIChat/AIChat';
 import { useAuthStore } from '../../stores';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
+import { useShopStore } from '../../stores/slices/shopStore';
 
 const LOCAL_STORAGE_KEY = 'firstLayoutEditableVariables';
 
@@ -61,8 +62,10 @@ const FirstLayout: React.FC = () => {
   const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
+  const createShop = useShopStore(state => state.createShop);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [aiChatInitialVars, setAiChatInitialVars] = useState({});
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -82,6 +85,24 @@ const FirstLayout: React.FC = () => {
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);
   };
+
+ 
+  const handleChatComplete = async (shopData: any) => {
+    try {
+      await createShop(shopData);
+   
+    } catch (error) {
+  
+    }
+  };
+
+ 
+  const shop = useShopStore(state => state.shop);
+  useEffect(() => {
+    if (!shop) {
+      setAiChatInitialVars({}); 
+    }
+  }, [shop]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
@@ -137,8 +158,8 @@ const FirstLayout: React.FC = () => {
       />
       <AIChat
         onApplyTemplateChanges={handleTemplateChanges}
-        initialVariables={editableVariables}
-        onChatComplete={() => {}}
+        initialVariables={aiChatInitialVars}
+        onChatComplete={handleChatComplete}
       />
     </div>
   );
