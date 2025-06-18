@@ -3,6 +3,7 @@ import { FaPaperPlane, FaRobot } from 'react-icons/fa';
 import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
+import { useShopStore } from '../../../stores/slices/shopStore';
 
 // Chat message type
 interface Message {
@@ -16,7 +17,7 @@ interface Message {
 interface AIChatProps {
   onApplyTemplateChanges: (changes: any) => void;
   initialVariables: any;
-  onChatComplete: () => void;
+  onChatComplete: (shopData: any) => void; 
 }
 
 // Common questions asked by the AI to guide the user
@@ -46,9 +47,13 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   ]);
   const [input, setInput] = useState('');
   const [isAIThinking, setIsAIThinking] = useState(false);
-  
+  const [currentTemplate, setCurrentTemplate] = useState<any>(initialVariables || {});
+  const [pendingShopData, setPendingShopData] = useState<any>(null);
+  const pendingShopDataRef = useRef<any>(null); 
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const createShop = useShopStore(state => state.createShop);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -64,6 +69,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     }
   }, [isOpen]);
 
+ 
+  useEffect(() => {
+    setCurrentTemplate(initialVariables || {});
+    setMessages([
+      {
+        id: 'initial-question-0',
+        text: TEMPLATE_QUESTIONS[0],
+        sender: 'ai',
+        timestamp: new Date(),
+      },
+    ]);
+    setCurrentQuestionIndex(0);
+    setPendingShopData(null);
+    pendingShopDataRef.current = null;
+    setInput('');
+  }, [initialVariables]);
+
   // Toggle chat open/closed
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -71,7 +93,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
   // Handle sending a message
   const handleSendMessage = async () => {
-    if (input.trim() === '' || isAIThinking) return; // Prevent sending while AI is thinking
+    if (input.trim() === '' || isAIThinking) return;
 
     const newUserMessage: Message = {
       id: Date.now().toString(),
@@ -80,17 +102,69 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       timestamp: new Date(),
     };
 
+    // Detectar la última pregunta de la IA
+    const lastAIMessage = [...messages].reverse().find(m => m.sender === 'ai');
+    let updatedTemplate = { ...currentTemplate };
+    if (lastAIMessage) {
+      const q = lastAIMessage.text.toLowerCase();
+      console.log('[AIChat] Última pregunta IA:', q);
+      console.log('[AIChat] Estado pendingShopData:', pendingShopData, 'Ref:', pendingShopDataRef.current);
+      if (q.includes('¿cómo se llamará tu tienda?') || q.includes('como se llamara tu tienda')) {
+        updatedTemplate.shopName = input;
+      } else if (q.includes('¿qué diseño o plantilla prefieres') || q.includes('que diseño o plantilla prefieres')) {
+        updatedTemplate.layoutDesign = input;
+      } else if (q.includes('¿cuál es el correo de contacto') || q.includes('cual es el correo de contacto')) {
+        updatedTemplate.contactEmail = input;
+      } else if (q.includes('¿cuál es el teléfono de tu tienda') || q.includes('cual es el telefono de tu tienda')) {
+        updatedTemplate.shopPhone = input;
+      } else if (q.includes('¿qué subdominio quieres') || q.includes('que subdominio quieres')) {
+        updatedTemplate.subdomain = input;
+      }
+     
+      if (
+        (q.includes('¿quieres que la cree ahora?') || q.includes('quieres que la cree ahora')) &&
+        (pendingShopDataRef.current || pendingShopData) &&
+        ['si', 'sí', 'crea', 'ok', 'dale', 'hazlo', 'yes', 'create'].some(word => input.trim().toLowerCase().startsWith(word))
+      ) {
+        console.log('[AIChat] Confirmación detectada. Llamando a createShop con:', pendingShopDataRef.current || pendingShopData);
+        // ...existing code...
+      } else if ((q.includes('¿quieres que la cree ahora?') || q.includes('quieres que la cree ahora'))) {
+        console.log('[AIChat] Pregunta de confirmación detectada, pero no se cumplen condiciones para crear la tienda. input:', input, 'pendingShopData:', pendingShopDataRef.current || pendingShopData);
+     
+        console.log('[AIChat] Mensaje completo de la IA:', lastAIMessage);
+      }
+    }
+    setCurrentTemplate(updatedTemplate);
+
     // Add user message immediately
     const updatedMessages = [...messages, newUserMessage];
     setMessages(updatedMessages);
-    const currentInput = input; // Capture input before clearing
     setInput('');
-    setIsAIThinking(true); // Start loading indicator
+    setIsAIThinking(true);
 
     try {
-      // Send the updated message history and current template state
-      const aiResponse: { reply: string; templateUpdates: any | null; isFinalStep?: boolean } = await sendChatMessageToAI(updatedMessages, initialVariables);
-
+      
+      const aiResponse: { reply: string; templateUpdates: any | null; isFinalStep?: boolean; shopData?: any; shouldCreateShop?: boolean } = await sendChatMessageToAI(updatedMessages, updatedTemplate);
+     
+      console.log('[AIChat] Respuesta completa del backend:', aiResponse);
+      if (aiResponse.isFinalStep && aiResponse.shopData) {
+        setPendingShopData(aiResponse.shopData);
+        pendingShopDataRef.current = aiResponse.shopData; // 
+        console.log('[AIChat] Guardando shopData recibido:', aiResponse.shopData);
+      }
+     
+      if (aiResponse.shouldCreateShop && aiResponse.shopData) {
+        console.log('[AIChat] Backend indica crear tienda, llamando a createShop con:', aiResponse.shopData);
+        try {
+          await createShop(aiResponse.shopData);
+          if (onChatComplete) onChatComplete({ success: true });
+        } catch (e) {
+          console.error('[AIChat] Error al crear tienda:', e);
+          if (onChatComplete) onChatComplete({ success: false, error: e });
+        }
+        setPendingShopData(null);
+        pendingShopDataRef.current = null;
+      }
       // Add AI's conversational reply
       const newAiMessage: Message = {
         id: Date.now().toString() + '-ai-reply', // Distinct ID for reply
@@ -98,22 +172,18 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         sender: 'ai',
         timestamp: new Date(),
       };
-      // Use a temporary variable to build the messages for the next state update
       let messagesToAddAfterReply: Message[] = [newAiMessage];
 
-      // Apply template updates if received
+     
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
-        console.log('[AIChat] Received templateUpdates:', JSON.stringify(aiResponse.templateUpdates, null, 2));
         onApplyTemplateChanges(aiResponse.templateUpdates);
       }
 
-      // Check if the chat is complete BEFORE deciding to ask next question
-      if (aiResponse.isFinalStep) {
-        console.log('[AIChat] Chat sequence complete. Triggering onChatComplete.');
-        onChatComplete(); // Call the new prop function
-        // Potentially add a concluding message if not already handled by the AI's final reply
-        // Example: Add a final message only if the AI didn't already say something conclusive
-        if (!aiResponse.reply.includes('Hemos configurado')) { // Example condition
+    
+      if (aiResponse.isFinalStep && aiResponse.shopData) {
+        onChatComplete(aiResponse.shopData);
+       
+        if (!aiResponse.reply.includes('Hemos configurado')) {
           const concludingMessage: Message = {
             id: Date.now().toString() + '-ai-final',
             text: '¡Genial! Hemos configurado los aspectos básicos. Revisa el resumen para confirmar.',

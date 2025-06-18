@@ -35,6 +35,8 @@ interface AiChatResponse {
   reply: string;
   templateUpdates: any | null;
   isFinalStep?: boolean;
+  shouldCreateShop?: boolean;
+  shopData?: any;
 }
 
 export const sendChatMessageToAI = async (messages: AiChatMessage[], currentTemplate: any): Promise<AiChatResponse> => {
@@ -63,7 +65,9 @@ export const sendChatMessageToAI = async (messages: AiChatMessage[], currentTemp
           return {
               reply: data.data.reply,
               templateUpdates: data.data.templateUpdates !== undefined ? data.data.templateUpdates : null,
-              isFinalStep: data.data.isFinalStep
+              isFinalStep: data.data.isFinalStep,
+              shouldCreateShop: data.data.shouldCreateShop,
+              shopData: data.data.shopData
           };
       } else {
           console.error("Invalid response structure received from AI backend. Response data:", data);
