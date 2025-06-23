@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { SelectDefault } from '../../components/atoms/SelectDefault/SelectDefault';
@@ -14,6 +14,25 @@ const ShopLayout: React.FC = () => {
 
   // Obtener variables globales de estilo
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+
+  const fetchProducts = require('../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      try {
+        const prods = await fetchProducts();
+        setProducts(prods);
+      } catch (err) {
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, [fetchProducts]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
@@ -93,7 +112,7 @@ const ShopLayout: React.FC = () => {
         <main className="flex-1 ml-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
             <span className="text-sm text-gray-700 font-medium text-left">
-              Showing 1-12 of 48 results
+              {products.length > 0 ? `Mostrando 1-${products.length} de ${products.length} resultados` : 'No hay productos'}
             </span>
             <div className="w-full md:w-48">
               <SelectDefault
@@ -104,33 +123,43 @@ const ShopLayout: React.FC = () => {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, idx) => (
-              <div
-                key={idx}
-                className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
-                onClick={() => navigate('/first-layout/detail-layout')}
-                style={{ backgroundColor: editableVariables.heroBackgroundColor }}
-              >
-                <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
-                  <span className="text-2xl" style={{ color: editableVariables.secondaryColor }}>Image</span>
-                </div>
-                <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
-                  <h3 className="text-lg font-semibold text-left mb-1" style={{ color: editableVariables.textColor }}>Product {idx + 1}</h3>
-                  <span className="font-bold text-lg mb-2 text-left block" style={{ color: editableVariables.primaryColor }}>$99.99</span>
-                  <div className="flex justify-center">
-                    <button
-                      className="px-4 w-full py-2 rounded hover:bg-blue-600 transition text-sm"
-                      style={{
-                        backgroundColor: editableVariables.featuredProductsCardButtonColor,
-                        color: editableVariables.featuredProductsCardButtonTextColor,
-                      }}
-                    >
-                      {editableVariables.featuredProductsCardButtonText}
-                    </button>
+            {loading ? (
+              <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
+            ) : (
+              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
+                <div
+                  key={prod?.id || idx}
+                  className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
+                  onClick={() => navigate('/first-layout/detail-layout')}
+                  style={{ backgroundColor: editableVariables.heroBackgroundColor }}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
+                    {prod && prod.productImages ? (
+                      <img src={prod.productImages[0]} alt={prod.nombre} className="object-cover w-full h-full" />
+                    ) : (
+                      <span className="text-2xl" style={{ color: editableVariables.secondaryColor }}>Image</span>
+                    )}
+                  </div>
+                  <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
+                    <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.nombre || `Product ${idx + 1}`}</h3>
+                    <span className="font-bold text-lg mb-2 text-left block" style={{ color: editableVariables.primaryColor }}>
+                      {prod?.precio ? `$${prod.precio}` : '$99.99'}
+                    </span>
+                    <div className="flex justify-center">
+                      <button
+                        className="px-4 w-full py-2 rounded hover:bg-blue-600 transition text-sm"
+                        style={{
+                          backgroundColor: editableVariables.featuredProductsCardButtonColor,
+                          color: editableVariables.featuredProductsCardButtonTextColor,
+                        }}
+                      >
+                        {editableVariables.featuredProductsCardButtonText}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
           <div className="flex justify-center mt-10 mb-16">
             <nav className="inline-flex items-center space-x-2">
