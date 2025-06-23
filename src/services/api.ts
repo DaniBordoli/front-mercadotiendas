@@ -79,3 +79,30 @@ export const sendChatMessageToAI = async (messages: AiChatMessage[], currentTemp
       throw error; // Re-throw to be caught by the calling component
   }
 };
+
+export const updateShopTemplate = async (templateUpdate: any) => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No authentication token found');
+  const response = await fetch(`${API_URL}/shop/template`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify({ templateUpdate }),
+  });
+  return handleResponse(response);
+};
+
+export const fetchShopTemplate = async () => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No authentication token found');
+  const response = await fetch(`${API_URL}/shop/template`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  return handleResponse(response);
+};

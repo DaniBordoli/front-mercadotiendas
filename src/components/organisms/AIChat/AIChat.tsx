@@ -4,6 +4,8 @@ import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
 import { useShopStore } from '../../../stores/slices/shopStore';
+import { Modal } from '../../molecules/Modal/Modal';
+import { updateShopTemplate } from '../../../services/api';
 
 // Chat message type
 interface Message {
@@ -49,6 +51,10 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState<any>(initialVariables || {});
   const [pendingShopData, setPendingShopData] = useState<any>(null);
+  const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<any>(null);
+  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [templateSaveError, setTemplateSaveError] = useState<string | null>(null);
   const pendingShopDataRef = useRef<any>(null); 
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -176,7 +182,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
      
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
-        onApplyTemplateChanges(aiResponse.templateUpdates);
+        setPendingTemplateUpdate(aiResponse.templateUpdates);
+        setShowTemplateModal(true);
       }
 
     
@@ -232,6 +239,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  // Confirmar y guardar cambios de template
+  const handleConfirmTemplateUpdate = async () => {
+    if (!pendingTemplateUpdate) return;
+    setSavingTemplate(true);
+    setTemplateSaveError(null);
+    try {
+      await updateShopTemplate(pendingTemplateUpdate);
+      onApplyTemplateChanges(pendingTemplateUpdate);
+      setShowTemplateModal(false);
+      setPendingTemplateUpdate(null);
+    } catch (err: any) {
+      setTemplateSaveError('Error al guardar los cambios.');
+    } finally {
+      setSavingTemplate(false);
     }
   };
 
@@ -297,6 +321,31 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
           </div>
         </div>
       </div>
+
+      {/* Modal de confirmación de cambios de template */}
+      <Modal
+        isOpen={showTemplateModal}
+        onClose={() => setShowTemplateModal(false)}
+        title="Confirmar cambios de diseño"
+      >
+        <div className="mb-4">
+          <p>¿Quieres aplicar y guardar estos cambios de diseño en tu tienda?</p>
+         
+        </div>
+        {templateSaveError && <div className="text-red-500 mb-2">{templateSaveError}</div>}
+        <div className="flex justify-end gap-2">
+          <button
+            className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+            onClick={() => setShowTemplateModal(false)}
+            disabled={savingTemplate}
+          >Cancelar</button>
+          <button
+            className="px-4 py-2 rounded bg-[#FF4F41] text-white hover:bg-[#E04437]"
+            onClick={handleConfirmTemplateUpdate}
+            disabled={savingTemplate}
+          >{savingTemplate ? 'Guardando...' : 'Confirmar'}</button>
+        </div>
+      </Modal>
     </>
   );
 };
