@@ -6,6 +6,7 @@ import { Navbar } from '../components/organisms/Navbar/Navbar';
 
 const PrivateRoute: React.FC<{ element: React.ReactElement }> = ({ element }) => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  console.log('isAuthenticated', isAuthenticated)
   return isAuthenticated ? element : <Navigate to="/login" replace />;
 };
 

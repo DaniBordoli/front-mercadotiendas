@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore, UserWithLoading } from '../../types/auth';
 import { 
   signInWithPopup, 
   signInWithEmailAndPassword, 
@@ -87,27 +87,45 @@ export const resetPassword = async (token: string, password: string): Promise<vo
 
 export const fetchUserProfile = async () => {
   const apiUrl = `${API_URL}/users/profile`;
-  const token = getStorageItem('token'); // Retrieve the token from storage
+  console.log('[Auth] Obteniendo perfil de usuario desde:', apiUrl);
+  
+  const token = getStorageItem('token');
 
   if (!token) {
-    console.error('No token provided');
+    console.error('[Auth] No se proporcionó token para obtener el perfil');
     throw new Error('No token provided');
   }
 
-  const response = await fetch(apiUrl, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`, // Include the token in the Authorization header
-    },
-  });
+  try {
 
-  const responseData = await response.json();
-  if (!response.ok) {
-    throw new Error(responseData.message || 'Error fetching user profile');
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const responseData = await response.json();
+
+    
+    if (!response.ok) {
+
+      // Incluir el código de estado en el mensaje de error para poder identificar errores 401
+      throw new Error(`${response.status}: ${responseData.message || 'Error fetching user profile'}`);
+    }
+
+    if (!responseData.data || !responseData.data.user) {
+
+      throw new Error('Invalid response structure');
+    }
+
+
+    return responseData.data.user;
+  } catch (error) {
+
+    throw error;
   }
-
-  return responseData.data.user; // Return the user data
 };
 
 export const updateUserProfile = async (profileData: Record<string, string>): Promise<void> => {
@@ -241,27 +259,45 @@ export const deleteProductImage = async (productId: string, imageUrl: string): P
 
 const checkInitialAuthState = () => {
   const token = getStorageItem('token');
-  const userStr = getStorageItem('user'); // Keep reading user for potential initial display
-  let user = null;
+  const userStr = getStorageItem('user');
+  let user: UserWithLoading | null = null;
 
-  // Try to parse user if it exists, but don't rely on it for isAuthenticated
   if (userStr) {
     try {
       user = JSON.parse(userStr);
+      if (!user || !user.email) {
+        // Datos incompletos
+      }
     } catch (e) {
-      console.error('Error al parsear usuario almacenado:', e);
-      // If user data is corrupted, remove it, but token might still be valid
       removeStorageItem('user');
     }
   }
 
-  // If a token exists, assume the user is authenticated initially.
-  // loadProfile will verify the token and fetch actual user data/status.
   if (token) {
-    return { token, isAuthenticated: true, user }; // Set isAuthenticated based on token presence
+    if (!user) {
+      user = { 
+        loading: true,
+        _id: 'loading',
+        email: 'cargando@usuario.com',
+        name: 'Cargando...',
+        role: 'user',
+        isActivated: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        birthDate: '',
+        city: '',
+        province: '',
+        country: ''
+      };
+    }
+    
+    return { 
+      token, 
+      isAuthenticated: true, 
+      user
+    };
   }
 
-  // No token means not authenticated
   return { token: null, isAuthenticated: false, user: null };
 };
 
@@ -294,15 +330,58 @@ export const clearAutoLogoutTimer = () => {
 export const useAuthStore = create<AuthStore>((set, get) => ({
   loadProfile: async () => {
     const token = get().token;
-    if (!token) return;
+    console.log('[Auth] loadProfile - token disponible:', !!token);
+    
+    if (!token) {
+      console.log('[Auth] No hay token disponible, no se puede cargar el perfil');
+      return;
+    }
 
     try {
+      console.log('[Auth] Intentando cargar perfil desde el servidor...');
+      
+      // Indicar que el perfil está cargando para evitar problemas de UI
+      const currentUser = get().user;
+      if (currentUser) {
+        set({ 
+          user: { 
+            ...currentUser, 
+            loading: true 
+          } 
+        });
+      }
+      
+      // Obtener el perfil del usuario desde el servidor
       const user = await fetchUserProfile();
+
+      
+      // Verificar que el usuario tenga la estructura correcta
+      if (!user || !user.email) {
+
+        throw new Error('Datos de usuario incompletos');
+      }
+      
+      // Guardar usuario en localStorage con el prefijo correcto
       setStorageItem('user', JSON.stringify(user));
-      set({ user });
+      
+      // Actualizar el estado global con los datos completos
+      set({ 
+        user, 
+        isAuthenticated: true 
+      });
+      
+
+      return user; // Devolver el usuario para que pueda ser utilizado por el componente que llamó a loadProfile
     } catch (error) {
-      console.error('Error loading profile:', error);
-      get().logout();
+
+      // Solo cerrar sesión si es un error de autenticación (401)
+      if (error instanceof Error && error.message.includes('401')) {
+
+        get().logout();
+      } else {
+        // Error no relacionado con autenticación, mantener sesión
+      }
+      return null;
     }
   },
 

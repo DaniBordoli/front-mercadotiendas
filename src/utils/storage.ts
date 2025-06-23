@@ -2,12 +2,14 @@ import { StateStorage } from 'zustand/middleware';
 
 const storagePrefix = 'mercadotiendas_';
 
+
+
 export const storage: StateStorage = {
   getItem: (name: string): string | null => {
     try {
       return window.localStorage.getItem(`${storagePrefix}${name}`);
     } catch (error) {
-      console.error('Error accessing localStorage:', error);
+
       return null;
     }
   },
@@ -15,26 +17,42 @@ export const storage: StateStorage = {
     try {
       window.localStorage.setItem(`${storagePrefix}${name}`, value);
     } catch (error) {
-      console.error('Error setting localStorage:', error);
+
     }
   },
   removeItem: (name: string): void => {
     try {
       window.localStorage.removeItem(`${storagePrefix}${name}`);
     } catch (error) {
-      console.error('Error removing from localStorage:', error);
+
     }
   },
 };
 
+
 export const getStorageItem = (key: string): string | null => {
-  return localStorage.getItem(key);
+
+  let value = localStorage.getItem(`${storagePrefix}${key}`);
+  
+
+  if (value === null) {
+    value = localStorage.getItem(key);
+
+    if (value !== null) {
+      setStorageItem(key, value);
+      localStorage.removeItem(key);
+
+    }
+  }
+  
+  return value;
 };
 
 export const setStorageItem = (key: string, value: string): void => {
-  localStorage.setItem(key, value);
+  localStorage.setItem(`${storagePrefix}${key}`, value);
 };
 
 export const removeStorageItem = (key: string): void => {
+  localStorage.removeItem(`${storagePrefix}${key}`);
   localStorage.removeItem(key);
 };
