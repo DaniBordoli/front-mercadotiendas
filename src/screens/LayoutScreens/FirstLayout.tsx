@@ -6,60 +6,18 @@ import FeaturedProducts from '../../components/FirstLayoutComponents/FeaturedPro
 import PurpleSection from '../../components/FirstLayoutComponents/PurpleSection';
 import NewsletterSection from '../../components/FirstLayoutComponents/NewsletterSection';
 import Footer from '../../components/FirstLayoutComponents/Footer';
-import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { AIChat } from '../../components/organisms/AIChat/AIChat';
 import { useAuthStore } from '../../stores';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
-
-const LOCAL_STORAGE_KEY = 'firstLayoutEditableVariables';
-
-const defaultEditableVariables: FirstLayoutEditableVariables = {
-  navbarLinks: [
-    { label: 'Home', href: '/' },
-    { label: 'Shop', href: '/shop-layout' },
-    { label: 'Contact', href: '/contact-layout' },
-  ],
-  title: 'ShopSmart',
-  fontType: 'Arial',
-  placeholderHeroImage: 'https://images.unsplash.com/photo-1529810313688-44ea1c2d81d3?q=80&w=2141&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  placeholderCardImage: 'https://placehold.co/300x400',
-  textColor: '#000000',
-  navbarBackgroundColor: '#FFFFFF',
-  mainBackgroundColor: '#F8F9FA',
-  filterOptions: {
-    categories: [],
-    prices: [],
-    sorting: [],
-  },
-  footerBackgroundColor: '#0B1120',
-  footerTextColor: '#FFFFFF',
-  footerSections: [],
-  footerDescription: 'Your one-stop destination for fashion and accessories.',
-  searchTitle: 'Discover Your Style',
-  buttonBackgroundColor: '#007BFF',
-  buttonTextColor: '#FFFFFF',
-  buttonBorderColor: '#0056b3',
-  buttonText: 'Shop Now',
-  button2Text: 'Learn More',
-  button2BackgroundColor: '#FFFFFF',
-  button2TextColor: '#1F2937',
-  heroBackgroundColor: '#F9FAFB',
-  featuredProductsTitle: 'Featured Products',
-  categorySectionTitle: 'Shop by Category',
-  primaryColor: '#007BFF',
-  secondaryColor: '#93C5FD',
-  footerElements: [],
-  heroDescription: 'Shop the latest trends in fashion, accessories, and lifestyle products.',
-  featuredProductsCardButtonText: 'Add to Cart',
-  featuredProductsCardButtonColor: '#3B82F6',
-  featuredProductsCardButtonTextColor: '#FFFFFF',
-};
+import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
+import { fetchShopTemplate } from '../../services/api';
 
 const FirstLayout: React.FC = () => {
-  // Usar Zustand store en vez de useState local
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
+  const shop = useShopStore(state => state.shop);
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
   const createShop = useShopStore(state => state.createShop);
@@ -82,27 +40,30 @@ const FirstLayout: React.FC = () => {
     loadProducts();
   }, [fetchProducts]);
 
+  useEffect(() => {
+    const getTemplate = async () => {
+      try {
+        const data = await fetchShopTemplate();
+        if (data && data.templateUpdate) {
+          setEditableVariables(data.templateUpdate);
+        }
+      } catch (err) {
+       
+      }
+    };
+    getTemplate();
+  }, [setEditableVariables]);
+
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);
   };
 
- 
   const handleChatComplete = async (shopData: any) => {
     try {
       await createShop(shopData);
-   
     } catch (error) {
-  
     }
   };
-
- 
-  const shop = useShopStore(state => state.shop);
-  useEffect(() => {
-    if (!shop) {
-      setAiChatInitialVars({}); 
-    }
-  }, [shop]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
