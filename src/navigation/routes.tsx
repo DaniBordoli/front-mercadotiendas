@@ -46,6 +46,7 @@ import MyProductsSection from '../screens/MyProductsSection';
 import EditProductScreen from '../screens/EditProductScreen';
 import NewProductScreen from '../screens/NewProductScreen';
 import DataCatalog from '../screens/DataCatalog';
+import PaymentReturn from '../screens/PaymentReturn';
 
 
 export const publicRoutes = [
@@ -216,6 +217,10 @@ export const publicRoutes = [
   {
     path: '/data-catalog',
     element: <DataCatalog />
+  },
+  {
+    path: '/payment/return',
+    element: <PaymentReturn />
   },
 ];
 

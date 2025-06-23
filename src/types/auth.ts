@@ -49,20 +49,24 @@ export interface Shop {
 export interface User {
   _id: string;
   email: string;
-  name: string;
+  name?: string;
   birthDate?: string;
   city?: string;
   province?: string;
   country?: string;
   shop?: Shop;
-  role: 'user' | 'admin';
-  isActivated: boolean;
-  createdAt: string;
-  updatedAt: string;
+  role?: 'user' | 'admin';
+  isActivated?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface UserWithLoading extends User {
+  loading?: boolean;
 }
 
 export interface AuthState {
-  user: User | null;
+  user: UserWithLoading | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -70,7 +74,7 @@ export interface AuthState {
 }
 
 export type AuthStore = AuthState & {
-  loadProfile: () => Promise<void>;
+  loadProfile: () => Promise<User | null>;
   login: (credentials: LoginCredentials) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   register: (data: RegisterData) => Promise<void>;

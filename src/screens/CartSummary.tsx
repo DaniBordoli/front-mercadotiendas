@@ -8,12 +8,17 @@ import { FaCcVisa } from "react-icons/fa6";
 import { DesignButton } from '../components/atoms/DesignButton';
 import { FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from '../stores/cartStore';
+import { usePaymentStore } from '../stores/paymentStore';
+import { PaymentData } from '../stores/paymentStore';
 
 export default function CartSummary() {
     const navigate = useNavigate();
     const cartItems = useCartStore(state => state.items);
-
+    const clearCart = useCartStore(state => state.clearCart);
     
+    // Payment store
+    const { createCheckout, isLoading, error, clearPayment } = usePaymentStore();
+
     const groupedByStore = React.useMemo(() => {
         const groups: Record<string, typeof cartItems> = {};
         cartItems.forEach(item => {
@@ -30,6 +35,75 @@ export default function CartSummary() {
         0
     );
     const total = subtotal + shipping;
+
+    const handleConfirmPurchase = async () => {
+        if (cartItems.length === 0) {
+            alert('No hay productos en el carrito');
+            return;
+        }
+
+        try {
+            // Limpiar errores previos
+            clearPayment();
+
+            console.log('=== FRONTEND: Iniciando proceso de pago ===');
+            console.log('Items del carrito:', cartItems);
+            console.log('Subtotal:', subtotal);
+            console.log('Envío:', shipping);
+            console.log('Total:', total);
+
+            // Preparar datos del pago
+            const paymentData: PaymentData = {
+                orderData: {
+                    total: total,
+                    description: `Compra en MercadoTiendas - ${cartItems.length} producto(s)`,
+                    reference: `order_${Date.now()}`
+                },
+                customerData: {
+                    email: 'usuario@email.com', // TODO: Obtener del usuario autenticado
+                    name: 'Usuario de Prueba', // TODO: Obtener del usuario autenticado
+                    identification: '12345678' // TODO: Obtener del usuario autenticado
+                },
+                items: cartItems.map(item => ({
+                    name: item.product.name,
+                    description: `${item.product.name} - ${item.product.brand || 'MercadoTiendas'}`,
+                    quantity: item.quantity,
+                    price: item.product.price,
+                    image: item.product.imageUrls?.[0] || 'https://via.placeholder.com/150'
+                }))
+            };
+
+            console.log('=== FRONTEND: Datos preparados para enviar al backend ===');
+            console.log('PaymentData completo:', JSON.stringify(paymentData, null, 2));
+
+            // Crear checkout con Mobbex
+            console.log('=== FRONTEND: Enviando request al backend ===');
+            const checkoutResponse = await createCheckout(paymentData);
+            
+            console.log('=== FRONTEND: Respuesta recibida del backend ===');
+            console.log('CheckoutResponse:', JSON.stringify(checkoutResponse, null, 2));
+            
+            if (checkoutResponse.success && checkoutResponse.data.url) {
+                console.log('=== FRONTEND: Checkout exitoso, limpiando carrito y redirigiendo ===');
+                console.log('URL de redirección:', checkoutResponse.data.url);
+                
+                // Limpiar carrito antes de redirigir
+                clearCart();
+                
+                // Redirigir a Mobbex para completar el pago
+                window.location.href = checkoutResponse.data.url;
+            } else {
+                console.error('=== FRONTEND: Error en la respuesta del checkout ===');
+                console.error('Respuesta:', checkoutResponse);
+                throw new Error('Error al crear el checkout de pago');
+            }
+        } catch (error) {
+            console.error('=== FRONTEND: Error en handleConfirmPurchase ===');
+            console.error('Error completo:', error);
+            console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+            alert(`Error al procesar el pago: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+        }
+    };
 
     return (
         <>
@@ -147,10 +221,16 @@ export default function CartSummary() {
                                     variant="primary"
                                     className="w-full"
                                     style={{ backgroundColor: '#FF4F41', color: '#fff' }}
-                                    onClick={() => navigate('/cart-completed')}
+                                    onClick={handleConfirmPurchase}
+                                    disabled={isLoading || cartItems.length === 0}
                                 >
-                                    Confirmar compra
+                                    {isLoading ? 'Procesando...' : 'Confirmar compra'}
                                 </DesignButton>
+                                {error && (
+                                    <div className="mt-2 text-red-600 text-sm text-center">
+                                        {error}
+                                    </div>
+                                )}
                             </div>
                          
                             <div className="w-full md:w-72 bg-gray-100 rounded-lg p-6">

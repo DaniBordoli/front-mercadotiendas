@@ -21,7 +21,13 @@ export const Navbar: React.FC = () => {
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { logout, isAuthenticated, user } = useAuthStore();
+  
+
+  const logout = useAuthStore(state => state.logout);
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const user = useAuthStore(state => state.user);
+  const token = useAuthStore(state => state.token);
+  const loadProfile = useAuthStore(state => state.loadProfile);
   const {
     searchTerm,
     suggestions,
@@ -65,7 +71,6 @@ export const Navbar: React.FC = () => {
   };
 
   const handleSuggestionClick = (suggestion: { id: string; name: string }) => {
-    console.log('[Navbar] Sugerencia clickeada:', suggestion);
     const searchTermToSend = suggestion.name;
     setSearchTerm(searchTermToSend);
     clearSuggestions();
@@ -86,7 +91,6 @@ export const Navbar: React.FC = () => {
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (searchTerm.trim() !== '') {
-      console.log('[Navbar] Búsqueda enviada:', searchTerm);
       clearSuggestions();
       setShowSuggestions(false);
       fetchSearchResults({ term: searchTerm });
@@ -116,7 +120,7 @@ export const Navbar: React.FC = () => {
       setShowSuggestions(false);
     }
   }, [suggestions, searchTerm]);
-
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (!(event.target instanceof Element) || !event.target.closest('.search-container')) {
@@ -140,6 +144,43 @@ export const Navbar: React.FC = () => {
       }
     };
   }, []);
+
+
+  
+
+  useEffect(() => {
+
+    let isMounted = true;
+    
+    const loadUserProfile = async () => {
+
+      if (token && (!user || user.loading) && isMounted) {
+
+        
+        try {
+          const loadedUser = await loadProfile();
+          // Solo mostrar errores en consola
+        } catch (error) {
+          // Error silencioso
+        }
+      }
+    };
+    
+    loadUserProfile();
+    
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  
+
+  const isUserReady = user && !user.loading;
+  
+
+  const [forceUpdate, setForceUpdate] = useState(0);
+  
+
 
   return (
     <>
@@ -197,10 +238,10 @@ export const Navbar: React.FC = () => {
                 className={`flex items-center cursor-pointer transition-color'
                 }`}
                 onClick={() => toggleModal()}
-                style={user?.shop ? { pointerEvents: 'auto' } : {}}
+                style={isUserReady && user.shop ? { pointerEvents: 'auto' } : {}}
               >
                 <RiRobot2Line className="text-xl mr-2" />
-                <span>{user?.shop ? 'Editar tienda' : 'Crear tienda'}</span>
+                <span>{isUserReady && user.shop ? 'Editar tienda' : 'Crear tienda'}</span>
               </div>
               <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
                 <BsShop className="text-xl mr-2" />
@@ -264,12 +305,12 @@ export const Navbar: React.FC = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg p-6 w-[90%] md:w-[50%] lg:w-[30%] shadow-lg">
               <h3 className="text-lg font-bold mb-4 font-space text-center">
-                {user?.shop
+                {isUserReady && user.shop
                   ? '¿Quieres editar tu tienda vía IA?'
                   : '¿Quieres ir por la creación manual o vía IA?'}
               </h3>
               <div className="flex flex-col gap-4">
-                {user?.shop ? (
+                {isUserReady && user.shop ? (
                   <DesignButton
                     variant="secondary"
                     onClick={() => {
