@@ -242,27 +242,34 @@ export const Navbar: React.FC = () => {
               >
                 <RiRobot2Line className="text-xl mr-2" />
                 <span>{isUserReady && user.shop ? 'Editar tienda' : 'Crear tienda'}</span>
-              </div>
-              <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
+              </div>              <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
                 <BsShop className="text-xl mr-2" />
                 <span
-                onClick={() => navigate('/first-layout')}>Ver mi tienda</span>
+                onClick={() => navigate('/first-layout?view=true')}>Ver mi tienda</span>
               </div>
               <div className={`relative flex items-center cursor-pointer transition-colors ${isDropdownOpen ? 'text-red-500' : 'hover:text-red-500'}`} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                 <FaRegUserCircle className="text-xl mr-2" />
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>
-                    <ul className="py-2">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
                         Mi cuenta
                       </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
                         Mi carrito
                       </li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal} >
-                        Crear mi Tienda
-                      </li>
+                      {/* Solo mostrar la opción de Crear Tienda si el usuario no tiene una tienda */}
+                      {(!isUserReady || !user.shop) && (
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal}>
+                          Crear mi Tienda
+                        </li>
+                      )}
+                      {/* Si el usuario tiene tienda, mostrar la opción para editarla */}
+                      {isUserReady && user.shop && (
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal}>
+                          Editar mi Tienda
+                        </li>
+                      )}
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={handleLogout}>
                         Cerrar Sesión
                       </li>

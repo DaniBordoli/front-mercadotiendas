@@ -150,9 +150,12 @@ export const publicRoutes = [
   {
     path: '/first-layout/shop-layout',
     element: <ShopLayout />
+  },  {
+    path: '/first-layout/detail-layout',
+    element: <ProductDetailScreen />
   },
   {
-    path: '/first-layout/detail-layout',
+    path: '/first-layout/detail-layout/:id',
     element: <ProductDetailScreen />
   },
   {

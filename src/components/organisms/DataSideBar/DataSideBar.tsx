@@ -16,7 +16,7 @@ import { FaBars } from 'react-icons/fa';
 const DataSideBar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuthStore();
+    const { user, logout } = useAuthStore();
     const hasShop = !!(user && user.shop && user.shop._id);
  
     const [shopDropdownOpen, setShopDropdownOpen] = React.useState(false);
@@ -33,6 +33,11 @@ const DataSideBar: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/dashboard');
+    };
 
     const menuOptions = [
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
@@ -197,6 +202,7 @@ const DataSideBar: React.FC = () => {
                         <button
                             className="relative flex items-center gap-3 p-3 w-full text-left hover:text-red-600 transition-colors"
                             type="button"
+                            onClick={handleLogout}
                         >
                             <FiLogOut className="text-lg" />
                             <span className='font-space'>Cerrar sesión</span>

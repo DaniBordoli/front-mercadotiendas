@@ -5,6 +5,7 @@ import { SelectDefault } from '../../components/atoms/SelectDefault/SelectDefaul
 import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
+import { useSearchStore } from '../../stores/searchStore';
 
 const ShopLayout: React.FC = () => {
   const [price, setPrice] = useState(500);
@@ -14,10 +15,12 @@ const ShopLayout: React.FC = () => {
 
   // Obtener variables globales de estilo
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
-
   const fetchProducts = require('../../stores').useAuthStore((state: any) => state.fetchProducts);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
+  
+  // Utilizar la store de búsqueda para los productos de respaldo
+  const { baseSearchResults } = useSearchStore();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -26,13 +29,14 @@ const ShopLayout: React.FC = () => {
         const prods = await fetchProducts();
         setProducts(prods);
       } catch (err) {
-        setProducts([]);
+        // Si falla la carga de productos, usar los productos simulados del searchStore
+        setProducts(baseSearchResults.length > 0 ? baseSearchResults : []);
       } finally {
         setLoading(false);
       }
     };
     loadProducts();
-  }, [fetchProducts]);
+  }, [fetchProducts, baseSearchResults]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
@@ -125,25 +129,29 @@ const ShopLayout: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
               <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
-            ) : (
-              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
-                <div
-                  key={prod?.id || idx}
+            ) : (              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (                <div                  key={prod?.id || prod?._id || idx}
                   className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
-                  onClick={() => navigate('/first-layout/detail-layout')}
+                  onClick={() => {
+                    // Usar cualquier ID disponible (del backend o store)
+                    const productId = prod?.id || prod?._id;
+                    navigate(productId ? `/first-layout/detail-layout/${productId}` : '/first-layout/detail-layout');
+                  }}
                   style={{ backgroundColor: editableVariables.heroBackgroundColor }}
-                >
-                  <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
-                    {prod && prod.productImages ? (
-                      <img src={prod.productImages[0]} alt={prod.nombre} className="object-cover w-full h-full" />
+                >                  <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
+                    {prod ? (
+                      <img 
+                        src={prod.imageUrls?.[0] || prod.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"} 
+                        alt={prod.name || prod.nombre || "Producto"} 
+                        className="object-cover w-full h-full" 
+                      />
                     ) : (
                       <span className="text-2xl" style={{ color: editableVariables.secondaryColor }}>Image</span>
                     )}
                   </div>
                   <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
-                    <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.nombre || `Product ${idx + 1}`}</h3>
+                    <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.name || prod?.nombre || `Product ${idx + 1}`}</h3>
                     <span className="font-bold text-lg mb-2 text-left block" style={{ color: editableVariables.primaryColor }}>
-                      {prod?.precio ? `$${prod.precio}` : '$99.99'}
+                      {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
                     </span>
                     <div className="flex justify-center">
                       <button
