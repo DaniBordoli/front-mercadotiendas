@@ -53,7 +53,8 @@ const DataSideBar: React.FC = () => {
         ...(hasShop ? [
             { key: 'shopState', label: 'Estado de la Tienda', icon: <IoToggleSharp className="text-lg" />, path: '/data-shop-state' },
             { key: 'shopConfig', label: 'Configuración de Tienda', icon: <FaGear className="text-lg" />, path: '/data-shop-config' },
-            { key: 'domainConfig', label: 'Configuración de Dominio', icon: <FaScrewdriverWrench className="text-lg" />, path: '/domain-config' },
+            { key: 'layout', label: 'Layouts', icon: <FaCircleInfo className="text-lg" />, path: '/layout-select' },
+        
             { key: 'seo', label: 'SEO y Metadata', icon: <AiFillDatabase className="text-lg" />, path: '/seo-metadata' },
             { key: 'general', label: 'Información general', icon: <FaCircleInfo className="text-lg" />, path: '/settings' }
         ] : []),

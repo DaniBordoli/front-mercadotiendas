@@ -10,7 +10,7 @@ import { DesignButton } from '../components/atoms/DesignButton';
 const DataShopConfig: React.FC = () => {
     const [selectedTab, setSelectedTab] = React.useState('Diseño');
 
-    const tabs = ['Diseño', 'Productos', 'Envíos', 'Pagos'];
+    const tabs = ['Diseño'];
 
     return (
         <div className="min-h-screen flex">

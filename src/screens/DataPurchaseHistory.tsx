@@ -17,14 +17,6 @@ const DataPurchaseHistory: React.FC = () => {
             <div className="flex flex-col flex-grow p-4 md:p-10 ml-0 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between gap-4">
                     Historial de Compras
-                    <div className="flex items-center gap-4">
-                        <FaBell className="text-gray-500 cursor-pointer" />
-                        <img
-                            src="https://placehold.co/40"
-                            alt="User"
-                            className="w-10 h-10 rounded-full"
-                        />
-                    </div>
                 </h1>
                 
                 <div

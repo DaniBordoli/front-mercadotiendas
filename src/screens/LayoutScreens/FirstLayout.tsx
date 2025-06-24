@@ -25,6 +25,9 @@ const FirstLayout: React.FC = () => {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [aiChatInitialVars, setAiChatInitialVars] = useState({});
 
+  // Detectar si está en un iframe (previsualización)
+  const isPreview = typeof window !== 'undefined' && window.self !== window.top;
+
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -117,11 +120,14 @@ const FirstLayout: React.FC = () => {
         textColor={editableVariables.footerTextColor}
         footerDescription={editableVariables.footerDescription}
       />
-      <AIChat
-        onApplyTemplateChanges={handleTemplateChanges}
-        initialVariables={aiChatInitialVars}
-        onChatComplete={handleChatComplete}
-      />
+      {/* Solo mostrar AIChat si no es previsualización */}
+      {!isPreview && (
+        <AIChat
+          onApplyTemplateChanges={handleTemplateChanges}
+          initialVariables={aiChatInitialVars}
+          onChatComplete={handleChatComplete}
+        />
+      )}
     </div>
   );
 };

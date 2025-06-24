@@ -38,6 +38,13 @@ const MyProductsSection: React.FC = () => {
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [productToDelete, setProductToDelete] = React.useState<any | null>(null);
 
+  // Estados para filtros
+  const [estadoFiltro, setEstadoFiltro] = React.useState('');
+  const [categoriaFiltro, setCategoriaFiltro] = React.useState('');
+  const [ordenarFiltro, setOrdenarFiltro] = React.useState('recientes');
+  const [stockFiltro, setStockFiltro] = React.useState('');
+  const [busqueda, setBusqueda] = React.useState('');
+
   React.useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -52,6 +59,27 @@ const MyProductsSection: React.FC = () => {
     };
     loadProducts();
   }, [fetchProducts]);
+
+  // Filtrado de productos
+  const productosFiltrados = React.useMemo(() => {
+    let filtered = [...productos];
+    if (estadoFiltro) filtered = filtered.filter(p => (p.estado || '').toLowerCase() === estadoFiltro);
+    if (categoriaFiltro) filtered = filtered.filter(p => (p.categoria || '').toLowerCase() === categoriaFiltro);
+    if (stockFiltro === 'conStock') filtered = filtered.filter(p => Number(p.stock) > 0);
+    if (stockFiltro === 'sinStock') filtered = filtered.filter(p => !p.stock || Number(p.stock) <= 0);
+    if (busqueda.trim()) filtered = filtered.filter(p => (p.nombre || '').toLowerCase().includes(busqueda.trim().toLowerCase()));
+    if (ordenarFiltro === 'recientes') filtered = filtered.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA;
+    });
+    if (ordenarFiltro === 'antiguos') filtered = filtered.sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateA - dateB;
+    });
+    return filtered;
+  }, [productos, estadoFiltro, categoriaFiltro, stockFiltro, busqueda, ordenarFiltro]);
 
   const openDeleteModal = (product: any) => {
     setProductToDelete(product);
@@ -87,6 +115,8 @@ const MyProductsSection: React.FC = () => {
                 type="text"
                 placeholder="Buscar productos..."
                 className="border border-gray-200 rounded-lg px-4 py-2 pl-10 w-full md:w-64 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primaryRed"
+                value={busqueda}
+                onChange={e => setBusqueda(e.target.value)}
               />
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
             </div>
@@ -105,25 +135,31 @@ const MyProductsSection: React.FC = () => {
         {/* Filtros */}
         <div className="w-full px-4 md:px-8 flex flex-col md:flex-row items-start md:items-center justify-between mt-4 mb-2 gap-2">
           <span className="font-space text-lg">Filtros</span>
-          <button className="text-sky-500 text-sm font-space hover:underline">Limpiar filtros</button>
+          <button className="text-sky-500 text-sm font-space hover:underline" onClick={() => {
+            setEstadoFiltro('');
+            setCategoriaFiltro('');
+            setOrdenarFiltro('recientes');
+            setStockFiltro('');
+            setBusqueda('');
+          }}>Limpiar filtros</button>
         </div>
         <div className="w-full px-4 md:px-8 py-6 pt-0">
           <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4 mb-2">
             <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Estado</span>
-              <SelectDefault options={estadoOptions} value={''} />
+              <SelectDefault options={estadoOptions} value={estadoFiltro} onChange={val => setEstadoFiltro(val)} />
             </div>
             <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Categoría</span>
-              <SelectDefault options={categoriaOptions} value={''} />
+              <SelectDefault options={categoriaOptions} value={categoriaFiltro} onChange={val => setCategoriaFiltro(val)} />
             </div>
             <div className="flex flex-col gap-1 w-full md:w-48">
               <span className="text-xs text-gray-500 font-space">Ordenar por</span>
-              <SelectDefault options={ordenarOptions} value={'recientes'} />
+              <SelectDefault options={ordenarOptions} value={ordenarFiltro} onChange={val => setOrdenarFiltro(val)} />
             </div>
             <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Stock</span>
-              <SelectDefault options={stockOptions} value={''} />
+              <SelectDefault options={stockOptions} value={stockFiltro} onChange={val => setStockFiltro(val)} />
             </div>
           </div>
           {/* Tabla responsiva */}
@@ -151,7 +187,7 @@ const MyProductsSection: React.FC = () => {
                     <td colSpan={8} className="text-center py-6 text-gray-400">No hay productos.</td>
                   </tr>
                 ) : (
-                  productos.map((prod, idx) => (
+                  productosFiltrados.map((prod, idx) => (
                     <tr key={prod._id || prod.sku || idx} className="border-t last:border-b rounded-xl hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 flex items-center gap-3 min-w-[180px]">
                         {prod.productImages && prod.productImages.length > 0 ? (
@@ -190,9 +226,7 @@ const MyProductsSection: React.FC = () => {
                         >
                           <TbEdit className="text-lg text-gray-500" />
                         </button>
-                        <button className="hover:text-primaryRed">
-                          <FaEyeSlash className="text-lg text-gray-500" />
-                        </button>
+                       
                         <button
                           className="text-red-500 hover:text-red-700"
                           onClick={() => openDeleteModal(prod)}

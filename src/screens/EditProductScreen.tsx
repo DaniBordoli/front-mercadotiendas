@@ -368,11 +368,22 @@ const EditProductScreen: React.FC = () => {
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Estado *</label>
-                    <SelectDefault
-                      options={estadoOptions}
-                      value={product.estado}
-                      onChange={val => handleSelectChange('estado', val)}
-                    />
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-space font-semibold ${product.estado === 'activo' ? 'text-green-600' : 'text-red-500'}`}>{product.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>
+                      <button
+                        type="button"
+                        className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${product.estado === 'activo' ? 'bg-green-500' : 'bg-gray-300'}`}
+                        onClick={() => setProduct((prev: any) => ({ ...prev, estado: prev.estado === 'activo' ? 'inactivo' : 'activo' }))}
+                        aria-pressed={product.estado === 'activo'}
+                        aria-label="Cambiar estado"
+                      >
+                        <motion.span
+                          className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow"
+                          animate={{ x: product.estado === 'activo' ? 20 : 0 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mb-4">

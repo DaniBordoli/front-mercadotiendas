@@ -42,14 +42,7 @@ const DataBilling: React.FC = () => {
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
                     Facturación
-                    <div className="flex items-center gap-4">
-                        <FaBell className="text-gray-500 cursor-pointer" />
-                        <img
-                            src="https://placehold.co/40"
-                            alt="User"
-                            className="w-10 h-10 rounded-full"
-                        />
-                    </div>
+                   
                 </h1>
                 <div
                     className="p-4 bg-white rounded-md border mb-6 flex flex-col md:flex-row md:items-center md:gap-4 gap-4"

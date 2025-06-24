@@ -7,38 +7,61 @@ import { colors } from '../design/colors';
 const DataShopState: React.FC = () => {
     const [isActive, setIsActive] = React.useState(true);
 
+ 
+    const gray800 = '#1F2937';
+    const gray600 = '#4B5563';
+    const gray500 = '#6B7280'; 
+
+
+    const shopStateItems = isActive
+        ? [
+            { icon: <FaCheckCircle />, text: 'Tienda Visible', subtext: 'Tu tienda aparece en los resultados de búsqueda' },
+            { icon: <FaShoppingCart />, text: 'Compras Habilitadas', subtext: 'Los clientes pueden realizar pedidos normalmente' },
+            { icon: <FaBell />, text: 'Notificaciones Activas', subtext: 'Recibirás alertas de nuevos pedidos y mensajes' },
+        ]
+        : [
+            { icon: <FaCheckCircle />, text: 'Tienda Oculta', subtext: 'Tu tienda no aparece en los resultados de búsqueda' },
+            { icon: <FaShoppingCart />, text: 'Compras Deshabilitadas', subtext: 'Los clientes no pueden realizar pedidos' },
+            { icon: <FaBell />, text: 'Notificaciones Inactivas', subtext: 'No recibirás alertas de nuevos pedidos ni mensajes' },
+        ];
+
     return (
         <div className="min-h-screen flex">
             <DataSideBar />
             <div className="flex flex-col flex-grow p-10 md:ml-[250px] gap-6">
-                
                 <div>
-                    <h1 className="text-2xl font-space font-medium text-gray-800">Estado de la Tienda</h1>
-                    <p className="text-sm font-space text-gray-500">Administra la visibilidad de tu tienda para los compradores</p>
+                    <h1 className="text-2xl font-space font-medium" style={{ color: isActive ? gray800 : colors.primaryRed }}>
+                        Estado de la Tienda
+                    </h1>
+                    <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>
+                        {isActive ? 'Administra la visibilidad de tu tienda para los compradores' : 'Tu tienda no está visible para los compradores'}
+                    </p>
                 </div>
-
-             
                 <div
                     className="p-6 bg-white rounded-md flex items-center justify-between border"
-                    style={{ borderColor: colors.lightGray }}
+                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
                     <div className="flex items-center">
                         <div
                             className="w-12 h-12 rounded-md flex items-center justify-center mr-4"
-                            style={{ backgroundColor: `${colors.accentTeal}1A` }}
+                            style={{ backgroundColor: isActive ? `${colors.accentTeal}1A` : `${colors.primaryRed}1A` }}
                         >
-                            <FaStore style={{ color: colors.accentTeal }} />
+                            <FaStore style={{ color: isActive ? colors.accentTeal : colors.primaryRed }} />
                         </div>
                         <div>
-                            <p className="text-lg font-space font-medium text-gray-600">Tu tienda está activa</p>
-                            <p className="text-sm font-space text-gray-500">Los compradores pueden ver y comprar tus productos</p>
+                            <p className="text-lg font-space font-medium" style={{ color: isActive ? gray600 : colors.primaryRed }}>
+                                {isActive ? 'Tu tienda está activa' : 'Tu tienda no está activa'}
+                            </p>
+                            <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>
+                                {isActive ? 'Los compradores pueden ver y comprar tus productos' : 'Los compradores no pueden ver ni comprar tus productos'}
+                            </p>
                         </div>
                     </div>
                     <motion.div
-                        className="w-14 h-8 flex items-center bg-gray-300 rounded-full p-1 cursor-pointer"
+                        className="w-14 h-8 flex items-center rounded-full p-1 cursor-pointer"
                         onClick={() => setIsActive(!isActive)}
                         style={{
-                            backgroundColor: isActive ? colors.accentTeal : colors.lightGray,
+                            backgroundColor: isActive ? colors.accentTeal : colors.primaryRed,
                         }}
                     >
                         <motion.div
@@ -51,31 +74,25 @@ const DataShopState: React.FC = () => {
                         />
                     </motion.div>
                 </div>
-
-               
                 <div
                     className="p-6 bg-white rounded-md border"
-                    style={{ borderColor: colors.lightGray }}
+                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
-                    {[
-                        { icon: <FaCheckCircle />, text: "Tienda Visible", subtext: "Tu tienda aparece en los resultados de búsqueda" },
-                        { icon: <FaShoppingCart />, text: "Compras Habilitadas", subtext: "Los clientes pueden realizar pedidos normalmente" },
-                        { icon: <FaBell />, text: "Notificaciones Activas", subtext: "Recibirás alertas de nuevos pedidos y mensajes" },
-                    ].map((item, index) => (
+                    {shopStateItems.map((item, index) => (
                         <React.Fragment key={index}>
                             <div className="flex items-center py-4">
                                 <div
                                     className="w-12 h-12 rounded-md flex items-center justify-center mr-4"
-                                  
+                                    style={{ color: isActive ? colors.accentTeal : colors.primaryRed }}
                                 >
-                                    <div style={{ color: colors.accentTeal }}>{item.icon}</div>
+                                    {item.icon}
                                 </div>
                                 <div>
-                                    <p className="text-lg font-space font-medium text-gray-600">{item.text}</p>
-                                    <p className="text-sm font-space text-gray-500">{item.subtext}</p>
+                                    <p className="text-lg font-space font-medium" style={{ color: isActive ? gray600 : colors.primaryRed }}>{item.text}</p>
+                                    <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>{item.subtext}</p>
                                 </div>
                             </div>
-                            {index < 2 && <hr className="border-gray-300" />}
+                            {index < 2 && <hr className={isActive ? 'border-gray-300' : 'border-red-300'} />}
                         </React.Fragment>
                     ))}
                 </div>

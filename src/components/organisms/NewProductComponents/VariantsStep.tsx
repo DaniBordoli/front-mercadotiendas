@@ -42,6 +42,8 @@ const VariantsStep = forwardRef((props, ref) => {
 
   const handleAddValue = (variant: string, value: string) => {
     if (!value.trim()) return;
+    // Evitar duplicados
+    if (variantValues[variant]?.includes(value.trim())) return;
     setVariantValues((prev) => ({
       ...prev,
       [variant]: prev[variant] ? [...prev[variant], value.trim()] : [value.trim()],
