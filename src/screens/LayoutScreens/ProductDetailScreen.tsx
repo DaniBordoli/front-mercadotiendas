@@ -63,6 +63,7 @@ const ProductDetailScreen: React.FC = () => {
           backgroundColor={editableVariables.navbarBackgroundColor}
           textColor={editableVariables.textColor}
           fontType={editableVariables.fontType}
+          logoUrl={editableVariables.logoUrl}
         />
         <div className="max-w-7xl mx-auto p-8 flex justify-center items-center min-h-[60vh]">
           <div className="text-lg">Cargando producto...</div>
@@ -91,6 +92,7 @@ const ProductDetailScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />      <section className="bg-gray-100 py-2">
         <div className="max-w-7xl mx-auto px-12">
           <div className="flex items-center space-x-2 text-gray-500 text-sm">

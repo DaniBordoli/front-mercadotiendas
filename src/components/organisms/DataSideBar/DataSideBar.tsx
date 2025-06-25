@@ -43,10 +43,14 @@ const DataSideBar: React.FC = () => {
         navigate('/dashboard');
     };
 
+    const isAdmin = user?.role === 'admin';
+
     const menuOptions = [
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
         { key: 'profile', label: 'Datos Personales', icon: <FaUser className="text-lg" />, path: '/data-profile' },
-        { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' },
+        ...(isAdmin ? [
+            { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' }
+        ] : []),
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
      
         ...(hasShop ? [

@@ -155,7 +155,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
             }
 
             const result = await response.json();
-            set({ shop: result.shop, loading: false });
+            set({ shop: result.data?.shop, loading: false });
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
             throw error;

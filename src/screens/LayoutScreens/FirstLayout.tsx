@@ -83,6 +83,7 @@ const FirstLayout: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <HeroSection
         title={editableVariables.searchTitle}

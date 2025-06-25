@@ -16,6 +16,7 @@ const ContactScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <section className="py-12" style={{ backgroundColor: editableVariables.heroBackgroundColor }}>
         <div className="max-w-5xl mx-auto text-center">

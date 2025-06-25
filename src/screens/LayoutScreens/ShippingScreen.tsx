@@ -16,6 +16,7 @@ const ShippingScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">

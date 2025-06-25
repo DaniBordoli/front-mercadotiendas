@@ -46,6 +46,7 @@ const ShopLayout: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <section className="py-8" style={{ backgroundColor: editableVariables.heroBackgroundColor }}>
         <div className="max-w-7xl mx-auto">
