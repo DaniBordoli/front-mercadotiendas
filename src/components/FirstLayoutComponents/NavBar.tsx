@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../stores/cartStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { useAuthStore } from '../../stores';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 interface NavBarProps {
   navbarLinks?: { label: string; href: string }[];
@@ -32,6 +33,10 @@ const NavBar: React.FC<NavBarProps> = ({
   
   const { shop, getShop, setShop } = useShopStore();
   const { isAuthenticated, user } = useAuthStore();
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+
+  // Usar el logo del store si está disponible, sino usar el prop logoUrl
+  const currentLogoUrl = editableVariables.logoUrl || logoUrl;
 
   useEffect(() => {
     if (user?.shop && !shop) {
@@ -58,7 +63,7 @@ const NavBar: React.FC<NavBarProps> = ({
           onClick={() => navigate('/first-layout')}
         >
           <img 
-            src={logoUrl} 
+            src={currentLogoUrl} 
             alt="Logo" 
             className="h-8 w-8 object-contain"
             onError={(e) => {

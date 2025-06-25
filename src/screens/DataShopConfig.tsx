@@ -6,9 +6,12 @@ import { InputDefault } from '../components/atoms/InputDefault';
 import { FaCloudUploadAlt } from "react-icons/fa";
 import { FaImage } from "react-icons/fa6";
 import { DesignButton } from '../components/atoms/DesignButton';
+import LogoUploader from '../components/CreateShopComponents/LogoUploader';
+import { useFirstLayoutStore } from '../stores/firstLayoutStore';
 
 const DataShopConfig: React.FC = () => {
     const [selectedTab, setSelectedTab] = React.useState('Diseño');
+    const editableVariables = useFirstLayoutStore(state => state.editableVariables);
 
     const tabs = ['Diseño'];
 
@@ -158,14 +161,9 @@ const DataShopConfig: React.FC = () => {
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Logo de Tienda
                                 </label>
-                                <div
-                                    className="h-40 border-dashed border-2 border-gray-300 rounded-md flex flex-col items-center justify-center"
-                                >
-                                    <FaCloudUploadAlt className="text-4xl text-gray-600" />
-                                    <p className="text-sm text-gray-600 mt-2">Arrastra tu logo aquí</p>
-                                    <p className="text-sm text-gray-600"
-                                    style={{color: colors.primaryRed}}>o selecciona un archivo</p>
-                                </div>
+                                <LogoUploader 
+                                    currentLogoUrl={editableVariables.logoUrl || '/logo.png'} 
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
