@@ -11,6 +11,7 @@ import VariantsStep from '../components/organisms/NewProductComponents/VariantsS
 import ProductSuccessModal from '../components/organisms/NewProductComponents/ProductSuccessModal';
 import { useAuthStore } from '../stores/slices/authSlice';
 import Toast from '../components/atoms/Toast';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const steps = [
   { label: 'Información Básica' },
@@ -28,6 +29,7 @@ const NewProductScreen: React.FC = () => {
     message: '',
     type: 'error' as 'success' | 'error' | 'info',
   });
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const [basicInfo, setBasicInfo] = React.useState({
     nombre: '',
@@ -41,7 +43,7 @@ const NewProductScreen: React.FC = () => {
 
   // Estado para imágenes
   const [productImages, setProductImages] = React.useState<(File | string)[]>([]);
-  const variantsRef = useRef<{ getVariants: () => { color?: string[], talle?: string[] } }>(null);
+  const variantsRef = useRef<{ getVariants: () => { tipo: string; valores: string[] }[] }>(null);
 
   const handleBasicInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
@@ -57,20 +59,17 @@ const NewProductScreen: React.FC = () => {
   const createProduct = useAuthStore(state => state.createProduct);
 
   const handlePublish = async () => {
+    setIsLoading(true);
     try {
-      const variants = variantsRef.current?.getVariants() || {};
-    
-      const colorArr = Array.isArray(variants.color) ? variants.color : [];
-      const talleArr = Array.isArray(variants.talle) ? variants.talle : [];
+      const variants = variantsRef.current?.getVariants() || [];
+      
       let formData: FormData | null = null;
       if (productImages.length > 0) {
         formData = new FormData();
         Object.entries(basicInfo).forEach(([key, value]) => {
           formData!.append(key, value);
         });
-       
-        formData!.append('color', JSON.stringify(colorArr));
-        formData!.append('talle', JSON.stringify(talleArr));
+        formData!.append('variantes', JSON.stringify(variants));
         productImages.forEach((img) => {
           if (img instanceof File) {
             formData!.append('productImages', img);
@@ -82,9 +81,9 @@ const NewProductScreen: React.FC = () => {
         ? (formData as any)
         : {
             ...basicInfo,
-            color: colorArr,
-            talle: talleArr,
+            variantes: variants,
           };
+      
       const result = await createProduct(dataToSend);
       setCreatedProduct({
         nombre: result.data?.nombre || basicInfo.nombre,
@@ -100,11 +99,14 @@ const NewProductScreen: React.FC = () => {
         message: 'Error al crear el producto',
         type: 'error',
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex relative">
+      {isLoading && <FullScreenLoader />}
       <DataSideBar />
       <div className="flex flex-col flex-grow ml-[250px]">
         <div className="w-full flex items-center justify-between px-8 h-[80px] bg-white border-b border-gray-200">

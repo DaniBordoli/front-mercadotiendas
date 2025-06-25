@@ -1,88 +1,76 @@
 import React, { useImperativeHandle, forwardRef } from 'react';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
-import { SelectDefault } from '../../atoms/SelectDefault/SelectDefault';
 import { motion } from 'framer-motion';
 
-const colorOptions = [
-  'Negro', 'Marrón', 'Plata', 'Rojo', 'Azul', 'Verde'
-];
+interface Variant {
+  tipo: string;
+  valores: string[];
+}
 
-const variant1Options = [
-  { value: '', label: 'Seleccionar... (talle, etc)' },
-  { value: 'color', label: 'Color' },
-  { value: 'talle', label: 'Talle' },
-];
-const variant2Options = [
-  { value: '', label: 'Seleccionar... (talle, etc)' },
-  { value: 'talle', label: 'Talle' },
-  { value: 'color', label: 'Color' },
-];
+interface VariantsStepProps {}
 
-const colorMap: Record<string, string> = {
-  Negro: 'bg-black',
-  Marrón: '', // custom color below
-  Plata: 'bg-gray-300',
-};
+interface VariantsStepRef {
+  getVariants: () => Variant[];
+}
 
-const customColorStyle: Record<string, React.CSSProperties> = {
-  Marrón: { background: '#8B5C2A' },
-};
-
-const talleOptions = [
-  'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'
-];
-
-const VariantsStep = forwardRef((props, ref) => {
+const VariantsStep = forwardRef<VariantsStepRef, VariantsStepProps>((props, ref) => {
   const [hasVariants, setHasVariants] = React.useState(true);
-  const [variant1, setVariant1] = React.useState('');
-  const [variant2, setVariant2] = React.useState('');
-  const [variantValues, setVariantValues] = React.useState<Record<string, string[]>>({});
-  const [newValue1, setNewValue1] = React.useState('');
-  const [newValue2, setNewValue2] = React.useState('');
+  const [variants, setVariants] = React.useState<Variant[]>([]);
+  const [newVariantType, setNewVariantType] = React.useState('');
+  const [newVariantValues, setNewVariantValues] = React.useState<Record<number, string>>({});
 
-  const handleAddValue = (variant: string, value: string) => {
-    if (!value.trim()) return;
-    // Evitar duplicados
-    if (variantValues[variant]?.includes(value.trim())) return;
-    setVariantValues((prev) => ({
-      ...prev,
-      [variant]: prev[variant] ? [...prev[variant], value.trim()] : [value.trim()],
-    }));
-    if (variant === variant1) setNewValue1('');
-    if (variant === variant2) setNewValue2('');
+  const handleAddVariant = () => {
+    if (!newVariantType.trim()) return;
+    const newVariant: Variant = {
+      tipo: newVariantType.trim(),
+      valores: []
+    };
+    setVariants(prev => [...prev, newVariant]);
+    setNewVariantType('');
   };
 
-  const handleRemoveValue = (variant: string, value: string) => {
-    setVariantValues((prev) => ({
-      ...prev,
-      [variant]: prev[variant].filter((v) => v !== value),
-    }));
+  const handleRemoveVariant = (index: number) => {
+    setVariants(prev => prev.filter((_, i) => i !== index));
+    setNewVariantValues(prev => {
+      const newValues = { ...prev };
+      delete newValues[index];
+      return newValues;
+    });
   };
 
-  const handleVariantChange = (variant: 'variant1' | 'variant2', value: any) => {
-    const val = typeof value === 'object' && value !== null
-      ? value.value
-      : value;
-    if (variant === 'variant1') {
-      setVariant1(val);
-      if (val && !variantValues[val]) {
-        setVariantValues((prev) => ({ ...prev, [val]: [] }));
+  const handleAddValue = (variantIndex: number) => {
+    const value = newVariantValues[variantIndex];
+    if (!value?.trim()) return;
+    
+    setVariants(prev => prev.map((variant, index) => {
+      if (index === variantIndex) {
+        // Evitar duplicados
+        if (variant.valores.includes(value.trim())) return variant;
+        return {
+          ...variant,
+          valores: [...variant.valores, value.trim()]
+        };
       }
-      setNewValue1('');
-    } else {
-      setVariant2(val);
-      if (val && !variantValues[val]) {
-        setVariantValues((prev) => ({ ...prev, [val]: [] }));
+      return variant;
+    }));
+
+    setNewVariantValues(prev => ({ ...prev, [variantIndex]: '' }));
+  };
+
+  const handleRemoveValue = (variantIndex: number, valueIndex: number) => {
+    setVariants(prev => prev.map((variant, index) => {
+      if (index === variantIndex) {
+        return {
+          ...variant,
+          valores: variant.valores.filter((_, i) => i !== valueIndex)
+        };
       }
-      setNewValue2('');
-    }
+      return variant;
+    }));
   };
 
   useImperativeHandle(ref, () => ({
-    getVariants: () => ({
-      color: Array.isArray(variantValues['color']) ? variantValues['color'] : [],
-      talle: Array.isArray(variantValues['talle']) ? variantValues['talle'] : [],
-    }),
+    getVariants: () => hasVariants ? variants.filter(v => v.tipo && v.valores.length > 0) : [],
   }));
 
   return (
@@ -90,18 +78,9 @@ const VariantsStep = forwardRef((props, ref) => {
       <div className="w-full bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <span className="font-space font-semibold text-lg mb-1 block">Variantes del Producto</span>
         <span className="block text-sm text-gray-400 mb-4">
-          Sube al menos una variante para tu producto.
+          Define las variantes de tu producto como color, talla, material, etc.
         </span>
-        <div className="flex items-center justify-between mb-4">
-          <span className="font-space text-base font-medium">
-            Variantes del producto: Reloj de Cuero Clásico
-          </span>
-          <div className="flex items-center gap-4">
-            <span className="text-xs font-space text-green-600 font-semibold">Activo</span>
-            <span className="text-xs font-space text-gray-400">SKU base: RL-001</span>
-          </div>
-        </div>
-   
+        
         <div className="flex items-center gap-4 mb-6">
           <button
             type="button"
@@ -118,211 +97,106 @@ const VariantsStep = forwardRef((props, ref) => {
           <div>
             <span className="font-space font-medium text-sm text-gray-700">Este producto tiene variantes</span>
             <div className="text-xs text-gray-400 font-space">
-              Activa esta opción para gestionar variantes como color, talle, etc.
+              Activa esta opción para gestionar variantes como color, talle, material, etc.
             </div>
           </div>
         </div>
-  
+
         {hasVariants && (
           <>
-            <div className="mb-6">
-              <span className="font-space text-sm font-semibold block mb-2">Tipos de variantes</span>
-              <span className="block text-xs text-gray-400 mb-4">
-                Selecciona o crea los tipos de variantes para este producto
-              </span>
-              <div className="flex flex-col gap-4 mb-4">
-                <div>
-                  <label className="block text-xs font-space text-gray-500 mb-1">Variante 1</label>
-                  <SelectDefault
-                    options={variant1Options}
-                    value={variant1}
-                    onChange={(e: any) => handleVariantChange('variant1', e?.target?.value ?? e?.value ?? e)}
+            {/* Agregar nueva variante */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+              <span className="font-space text-sm font-semibold block mb-2">Agregar nueva variante</span>
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <label className="block text-xs font-space text-gray-500 mb-1">Tipo de variante</label>
+                  <input
+                    className="w-full px-3 py-2 border rounded-lg text-sm font-space focus:outline-sky-400"
+                    type="text"
+                    placeholder="Ej: Color, Talla, Material, Madera..."
+                    value={newVariantType}
+                    onChange={(e) => setNewVariantType(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddVariant();
+                    }}
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-space text-gray-500 mb-1">Variante 2 (opcional)</label>
-                  <SelectDefault
-                    options={variant2Options}
-                    value={variant2}
-                    onChange={(e: any) => handleVariantChange('variant2', e?.target?.value ?? e?.value ?? e)}
-                  />
-                </div>
+                <DesignButton
+                  variant="primary"
+                  onClick={handleAddVariant}
+                  disabled={!newVariantType.trim()}
+                  className="px-4 py-2 text-sm"
+                >
+                  Agregar
+                </DesignButton>
               </div>
             </div>
 
-            {variant1 && variant1 !== '' && (
-              <div className="mb-2">
-                <span className="block text-xs font-space text-gray-500 mb-2">Valores para {variant1.charAt(0).toUpperCase() + variant1.slice(1)}</span>
-                <div className="flex gap-2 flex-wrap mb-2">
-                  {variantValues[variant1]?.map((value) => (
-                    <span key={value} className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-sm font-space">
-                      {value}
-                      <button
-                        className="ml-1 text-gray-400 hover:text-gray-600 text-xs"
-                        onClick={() => handleRemoveValue(variant1, value)}
-                        type="button"
-                        aria-label={`Eliminar ${value}`}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
+            {/* Lista de variantes */}
+            {variants.map((variant, variantIndex) => (
+              <div key={variantIndex} className="mb-6 p-4 bg-white border rounded-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-space font-medium text-sm text-gray-700 capitalize">
+                    {variant.tipo}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveVariant(variantIndex)}
+                    className="text-red-500 hover:text-red-700 text-sm font-space"
+                  >
+                    Eliminar variante
+                  </button>
                 </div>
-                <div className="flex gap-2 items-center mt-2">
-                  {variant1 === 'talle' ? (
-                    <>
-                      <select
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        value={newValue1}
-                        onChange={(e) => setNewValue1(e.target.value)}
+
+                {/* Valores de la variante */}
+                <div className="mb-3">
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {variant.valores.map((valor, valueIndex) => (
+                      <span
+                        key={valueIndex}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-sky-100 text-sky-700 rounded text-xs font-space"
                       >
-                        <option value="">Seleccionar talle...</option>
-                        {talleOptions.map((talle) => (
-                          <option key={talle} value={talle}>{talle}</option>
-                        ))}
-                      </select>
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => {
-                          if (newValue1) handleAddValue(variant1, newValue1);
-                        }}
-                      >
-                        + Agregar talle
-                      </button>
-                    </>
-                  ) : variant1 === 'color' ? (
-                    <>
-                      <select
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        value={newValue1}
-                        onChange={(e) => setNewValue1(e.target.value)}
-                      >
-                        <option value="">Seleccionar color...</option>
-                        {colorOptions.map((color) => (
-                          <option key={color} value={color}>{color}</option>
-                        ))}
-                      </select>
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => {
-                          if (newValue1) handleAddValue(variant1, newValue1);
-                        }}
-                      >
-                        + Agregar color
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <input
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        type="text"
-                        placeholder={`Agregar valor...`}
-                        value={newValue1}
-                        onChange={(e) => setNewValue1(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleAddValue(variant1, newValue1);
-                        }}
-                      />
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => handleAddValue(variant1, newValue1)}
-                      >
-                        + Agregar valor
-                      </button>
-                    </>
-                  )}
+                        {valor}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveValue(variantIndex, valueIndex)}
+                          className="text-sky-500 hover:text-sky-700 ml-1"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Agregar nuevo valor */}
+                <div className="flex gap-2">
+                  <input
+                    className="flex-1 px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
+                    type="text"
+                    placeholder={`Agregar ${variant.tipo.toLowerCase()}...`}
+                    value={newVariantValues[variantIndex] || ''}
+                    onChange={(e) => setNewVariantValues(prev => ({ ...prev, [variantIndex]: e.target.value }))}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddValue(variantIndex);
+                    }}
+                  />
+                  <button
+                    className="text-sky-600 text-xs font-space hover:underline px-2"
+                    type="button"
+                    onClick={() => handleAddValue(variantIndex)}
+                  >
+                    Agregar
+                  </button>
                 </div>
               </div>
-            )}
+            ))}
 
-            {variant2 && variant2 !== '' && (
-              <div className="mb-2">
-                <span className="block text-xs font-space text-gray-500 mb-2">Valores para {variant2.charAt(0).toUpperCase() + variant2.slice(1)}</span>
-                <div className="flex gap-2 flex-wrap mb-2">
-                  {variantValues[variant2]?.map((value) => (
-                    <span key={value} className="flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 border border-gray-200 text-sm font-space">
-                      {value}
-                      <button
-                        className="ml-1 text-gray-400 hover:text-gray-600 text-xs"
-                        onClick={() => handleRemoveValue(variant2, value)}
-                        type="button"
-                        aria-label={`Eliminar ${value}`}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2 items-center mt-2">
-                  {variant2 === 'talle' ? (
-                    <>
-                      <select
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        value={newValue2}
-                        onChange={(e) => setNewValue2(e.target.value)}
-                      >
-                        <option value="">Seleccionar talle...</option>
-                        {talleOptions.map((talle) => (
-                          <option key={talle} value={talle}>{talle}</option>
-                        ))}
-                      </select>
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => {
-                          if (newValue2) handleAddValue(variant2, newValue2);
-                        }}
-                      >
-                        + Agregar talle
-                      </button>
-                    </>
-                  ) : variant2 === 'color' ? (
-                    <>
-                      <select
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        value={newValue2}
-                        onChange={(e) => setNewValue2(e.target.value)}
-                      >
-                        <option value="">Seleccionar color...</option>
-                        {colorOptions.map((color) => (
-                          <option key={color} value={color}>{color}</option>
-                        ))}
-                      </select>
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => {
-                          if (newValue2) handleAddValue(variant2, newValue2);
-                        }}
-                      >
-                        + Agregar color
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <input
-                        className="px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
-                        type="text"
-                        placeholder={`Agregar valor...`}
-                        value={newValue2}
-                        onChange={(e) => setNewValue2(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') handleAddValue(variant2, newValue2);
-                        }}
-                      />
-                      <button
-                        className="text-sky-600 text-xs font-space hover:underline"
-                        type="button"
-                        onClick={() => handleAddValue(variant2, newValue2)}
-                      >
-                        + Agregar valor
-                      </button>
-                    </>
-                  )}
-                </div>
+            {variants.length === 0 && (
+              <div className="text-center py-8 text-gray-400">
+                <span className="text-sm font-space">
+                  No hay variantes definidas. Agrega una nueva variante arriba.
+                </span>
               </div>
             )}
           </>
@@ -331,5 +205,7 @@ const VariantsStep = forwardRef((props, ref) => {
     </div>
   );
 });
+
+VariantsStep.displayName = 'VariantsStep';
 
 export default VariantsStep;

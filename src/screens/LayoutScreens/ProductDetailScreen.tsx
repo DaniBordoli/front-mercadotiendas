@@ -21,7 +21,7 @@ const ProductDetailScreen: React.FC = () => {
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<'description' | 'specs' | 'reviews'>('description');
   const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
@@ -150,26 +150,41 @@ const ProductDetailScreen: React.FC = () => {
           </p>
 
           <div className="mb-4">
-            <div className="text-sm font-semibold mb-2">Talle</div>
-            <div className="flex gap-2">
-              {(selectedProduct?.talle || ['S', 'M', 'L', 'XL']).map(size => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`px-3 py-1 rounded border text-xs font-medium ${
-                    selectedSize === size
-                      ? 'text-white'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                  }`}
-                  style={selectedSize === size ? { 
-                    backgroundColor: editableVariables.primaryColor,
-                    borderColor: editableVariables.primaryColor
-                  } : {}}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
+            {selectedProduct?.variantes && selectedProduct.variantes.length > 0 ? (
+              <div className="space-y-4">
+                {selectedProduct.variantes.map((variante, index) => (
+                  <div key={index}>
+                    <div className="text-sm font-semibold mb-2">{variante.tipo}</div>
+                    <div className="flex gap-2 flex-wrap">
+                      {variante.valores.map((valor: string) => (
+                        <button
+                          key={valor}
+                          onClick={() => setSelectedVariants(prev => ({ 
+                            ...prev, 
+                            [variante.tipo]: valor 
+                          }))}
+                          className={`px-3 py-1 rounded border text-xs font-medium ${
+                            selectedVariants[variante.tipo] === valor
+                              ? 'text-white'
+                              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                          }`}
+                          style={selectedVariants[variante.tipo] === valor ? { 
+                            backgroundColor: editableVariables.primaryColor,
+                            borderColor: editableVariables.primaryColor
+                          } : {}}
+                        >
+                          {valor}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">
+                Este producto no tiene variantes disponibles.
+              </div>
+            )}
           </div>
   
           <div className="mb-4">
@@ -281,11 +296,14 @@ const ProductDetailScreen: React.FC = () => {
                 <ul className="list-disc pl-6">
                   <li>Marca: {selectedProduct?.brand || 'No especificada'}</li>
                   <li>Estado: {selectedProduct?.condition === 'new' ? 'Nuevo' : 'Usado'}</li>
-                  {selectedProduct?.color && selectedProduct.color.length > 0 && (
-                    <li>Colores disponibles: {selectedProduct.color.join(', ')}</li>
-                  )}
-                  {selectedProduct?.talle && selectedProduct.talle.length > 0 && (
-                    <li>Tallas disponibles: {selectedProduct.talle.join(', ')}</li>
+                  {selectedProduct?.variantes && selectedProduct.variantes.length > 0 && (
+                    <>
+                      {selectedProduct.variantes.map((variante, index) => (
+                        <li key={index}>
+                          {variante.tipo}: {variante.valores.join(', ')}
+                        </li>
+                      ))}
+                    </>
                   )}
                   {selectedProduct?.shop?.name && (
                     <li>Vendedor: {selectedProduct.shop.name}</li>

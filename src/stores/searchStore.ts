@@ -20,8 +20,7 @@ export interface Product {
   condition: 'new' | 'used'; 
   hasFreeShipping?: boolean; 
   isFeatured?: boolean; 
-  color?: string[];
-  talle?: string[];
+  variantes?: { tipo: string; valores: string[] }[];
   shop?: {
     name: string;
     _id?: string;
@@ -86,6 +85,10 @@ const mockProducts: Product[] = [
     condition: 'new',
     hasFreeShipping: true,
     isFeatured: true,
+    variantes: [
+      { tipo: 'Color', valores: ['Negro', 'Plata', 'Azul'] },
+      { tipo: 'Memoria RAM', valores: ['16GB', '32GB', '64GB'] }
+    ],
   },
   {
     id: 'prod2',
@@ -104,6 +107,10 @@ const mockProducts: Product[] = [
     condition: 'used',
     hasFreeShipping: true,
     isFeatured: false,
+    variantes: [
+      { tipo: 'Color', valores: ['Gris', 'Negro'] },
+      { tipo: 'Almacenamiento', valores: ['256GB SSD', '512GB SSD', '1TB SSD'] }
+    ],
   },
   {
     id: 'prod3',
@@ -122,6 +129,10 @@ const mockProducts: Product[] = [
     condition: 'new',
     hasFreeShipping: false,
     isFeatured: false,
+    variantes: [
+      { tipo: 'Switch', valores: ['Cherry MX Red', 'Cherry MX Blue', 'Cherry MX Brown'] },
+      { tipo: 'Layout', valores: ['Español', 'Inglés'] }
+    ],
   },
    {
     id: 'prod4',
@@ -140,6 +151,10 @@ const mockProducts: Product[] = [
     condition: 'new',
     hasFreeShipping: true,
     isFeatured: true,
+    variantes: [
+      { tipo: 'Color', valores: ['Negro', 'Blanco'] },
+      { tipo: 'Resolución', valores: ['3440x1440', '2560x1080'] }
+    ],
   },
   // Añadir más productos mock para probar paginación y filtros
   {
@@ -153,6 +168,10 @@ const mockProducts: Product[] = [
     condition: 'new',
     hasFreeShipping: false,
     isFeatured: false,
+    variantes: [
+      { tipo: 'Color', valores: ['Negro', 'Blanco', 'Azul'] },
+      { tipo: 'DPI', valores: ['1600 DPI', '3200 DPI', '6400 DPI'] }
+    ],
   },
     {
     id: 'prod6',
@@ -165,6 +184,10 @@ const mockProducts: Product[] = [
     condition: 'used',
     hasFreeShipping: true,
     isFeatured: false,
+    variantes: [
+      { tipo: 'Layout', valores: ['Español', 'Inglés'] },
+      { tipo: 'Color', valores: ['Blanco', 'Negro'] }
+    ],
   },
 ];
 
@@ -249,8 +272,7 @@ function mapBackendProductToProduct(backendProduct: any): Product {
     condition: backendProduct.estado === 'used' ? 'used' : 'new', // Mapear 'estado' a 'condition'
     hasFreeShipping: backendProduct.hasFreeShipping ?? undefined,
     isFeatured: backendProduct.isFeatured ?? undefined,
-    color: Array.isArray(backendProduct.color) ? backendProduct.color : [],
-    talle: Array.isArray(backendProduct.talle) ? backendProduct.talle : [],
+    variantes: Array.isArray(backendProduct.variantes) ? backendProduct.variantes : [],
     // mapea shop si viene del backend
     shop: backendProduct.shop && typeof backendProduct.shop === 'object' && backendProduct.shop.name
       ? { name: backendProduct.shop.name, _id: backendProduct.shop._id }

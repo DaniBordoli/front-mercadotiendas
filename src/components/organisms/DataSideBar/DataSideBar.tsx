@@ -8,6 +8,7 @@ import { colors } from '../../../design/colors';
 import { motion } from 'framer-motion';
 import { FaGear, FaScrewdriverWrench, FaCircleInfo, FaBoxArchive  } from "react-icons/fa6";
 import { AiFillDatabase } from "react-icons/ai";
+import { RiRobot2Line } from "react-icons/ri";
 
 import { FiLogOut } from "react-icons/fi";
 import { useAuthStore } from '../../../stores';
@@ -59,6 +60,7 @@ const DataSideBar: React.FC = () => {
     const shopOptions = [
     
         ...(hasShop ? [
+            { key: 'editShop', label: 'Editar Tienda', icon: <RiRobot2Line className="text-lg" />, path: '/layout-select' },
             { key: 'shopState', label: 'Estado de la Tienda', icon: <IoToggleSharp className="text-lg" />, path: '/data-shop-state' },
             { key: 'shopConfig', label: 'Configuración de Tienda', icon: <FaGear className="text-lg" />, path: '/data-shop-config' },
             { key: 'layout', label: 'Layouts', icon: <FaCircleInfo className="text-lg" />, path: '/layout-select' },

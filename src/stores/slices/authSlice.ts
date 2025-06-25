@@ -12,6 +12,11 @@ import { FirebaseError } from 'firebase/app';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
 
+// Función auxiliar para determinar si un usuario se logueó con Google
+export const isGoogleUser = (user: User | UserWithLoading | null): boolean => {
+  return user?.authMethod === 'google';
+};
+
 export const forgotPassword = async (email: string): Promise<void> => {
   const apiUrl = `${API_URL}/auth/forgot-password`;
   const response = await fetch(apiUrl, {
@@ -287,7 +292,8 @@ const checkInitialAuthState = () => {
         birthDate: '',
         city: '',
         province: '',
-        country: ''
+        country: '',
+        authMethod: 'email'
       };
     }
     
@@ -361,17 +367,23 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('Datos de usuario incompletos');
       }
       
+      // Preservar el método de autenticación del usuario actual si existe
+      const userWithAuthMethod = {
+        ...user,
+        authMethod: currentUser?.authMethod || user.authMethod || 'email'
+      };
+      
       // Guardar usuario en localStorage con el prefijo correcto
-      setStorageItem('user', JSON.stringify(user));
+      setStorageItem('user', JSON.stringify(userWithAuthMethod));
       
       // Actualizar el estado global con los datos completos
       set({ 
-        user, 
+        user: userWithAuthMethod, 
         isAuthenticated: true 
       });
       
 
-      return user; // Devolver el usuario para que pueda ser utilizado por el componente que llamó a loadProfile
+      return userWithAuthMethod; // Devolver el usuario para que pueda ser utilizado por el componente que llamó a loadProfile
     } catch (error) {
 
       // Solo cerrar sesión si es un error de autenticación (401)
@@ -426,13 +438,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const needsProfileCompletion = isActivated && 
         (!user.country || !user.city || !user.birthDate || !user.province);
+
+      // Marcar que el usuario se logueó con Google
+      const userWithAuthMethod = {
+        ...user,
+        authMethod: 'google'
+      };
   
       setStorageItem('token', token); 
-      setStorageItem('user', JSON.stringify(user));
+      setStorageItem('user', JSON.stringify(userWithAuthMethod));
       set({
         isAuthenticated: true,
         token,
-        user,
+        user: userWithAuthMethod,
         isLoading: false,
       });
 
@@ -503,12 +521,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         // Cargar el perfil actualizado incluyendo la tienda
         await get().loadProfile();
       } else {
+        const userWithAuthMethod = {
+          ...user,
+          authMethod: 'email'
+        };
         setStorageItem('token', token);
-        setStorageItem('user', JSON.stringify(user));
+        setStorageItem('user', JSON.stringify(userWithAuthMethod));
         set({
           isAuthenticated: false,
           token,
-          user,
+          user: userWithAuthMethod,
           isLoading: false,
 
         });
@@ -563,7 +585,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const userWithActivation = {
         ...user,
-        isActivated: user.isActivated !== undefined ? user.isActivated : false
+        isActivated: user.isActivated !== undefined ? user.isActivated : false,
+        authMethod: 'email'
       };
       
       setStorageItem('token', token);
@@ -756,6 +779,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       stock?: string;
       categoria?: string;
       estado?: string;
+      variantes?: { tipo: string; valores: string[] }[];
     }
   ): Promise<any> => {
     const token = getStorageItem('token');
