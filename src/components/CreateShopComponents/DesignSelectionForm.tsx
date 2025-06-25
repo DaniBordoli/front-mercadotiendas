@@ -60,9 +60,6 @@ const DesignSelectionForm: React.FC<DesignSelectionFormProps> = ({ onApply, onAp
         <div className="w-full">
             <div className="flex gap-8 border-b pb-4 mb-8">
                 <span className="text-primary font-semibold border-b-2 border-primary pb-2">Layout</span>
-                <span className="text-gray-500">Paleta de colores</span>
-                <span className="text-gray-500">Tipografía</span>
-                <span className="text-gray-500">Vista previa</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {layouts.map((layout, index) => (

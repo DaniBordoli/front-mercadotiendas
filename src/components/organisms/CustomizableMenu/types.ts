@@ -35,6 +35,7 @@ export interface EditableVariables {
     primaryColor?: string;
     secondaryColor?: string;
     footerElements?: { title: string; content: string }[];
+    logoUrl?: string;
 }
 
 // Variables específicas para FirstLayout

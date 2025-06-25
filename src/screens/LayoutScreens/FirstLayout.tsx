@@ -12,18 +12,28 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { fetchShopTemplate } from '../../services/api';
+import { useLocation } from 'react-router-dom';
 
 const FirstLayout: React.FC = () => {
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
   const shop = useShopStore(state => state.shop);
+  const location = useLocation();
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
   const createShop = useShopStore(state => state.createShop);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [aiChatInitialVars, setAiChatInitialVars] = useState({});
+
+  // Detectar si está en un iframe (previsualización) o en modo visualización (view=true en la URL)
+  const isPreview = typeof window !== 'undefined' && window.self !== window.top;
+  const urlParams = new URLSearchParams(location.search);
+  const isViewMode = urlParams.get('view') === 'true';
+
+  // No mostrar el chat AI si estamos en preview o en modo visualización
+  const shouldShowChat = !isPreview && !isViewMode;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -73,6 +83,7 @@ const FirstLayout: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <HeroSection
         title={editableVariables.searchTitle}
@@ -117,11 +128,14 @@ const FirstLayout: React.FC = () => {
         textColor={editableVariables.footerTextColor}
         footerDescription={editableVariables.footerDescription}
       />
-      <AIChat
-        onApplyTemplateChanges={handleTemplateChanges}
-        initialVariables={aiChatInitialVars}
-        onChatComplete={handleChatComplete}
-      />
+      {/* Solo mostrar AIChat si no es previsualización */}
+      {shouldShowChat && (
+        <AIChat
+          onApplyTemplateChanges={handleTemplateChanges}
+          initialVariables={aiChatInitialVars}
+          onChatComplete={handleChatComplete}
+        />
+      )}
     </div>
   );
 };

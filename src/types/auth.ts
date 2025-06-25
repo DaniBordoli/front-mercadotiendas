@@ -59,6 +59,7 @@ export interface User {
   isActivated?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  authMethod?: 'email' | 'google';
 }
 
 export interface UserWithLoading extends User {
@@ -92,7 +93,8 @@ export type AuthStore = AuthState & {
       precio: string;
       categoria: string;
       subcategoria: string;
-    }
+      variantes?: { tipo: string; valores: string[] }[];
+    } | FormData
   ) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
   /**
@@ -108,6 +110,7 @@ export type AuthStore = AuthState & {
     stock?: string;
     categoria?: string;
     estado?: string;
+    variantes?: { tipo: string; valores: string[] }[];
     
   }) => Promise<any>;
   fetchProductById: (id: string) => Promise<any>;

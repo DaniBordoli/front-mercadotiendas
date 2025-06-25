@@ -19,6 +19,7 @@ const AboutUsScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <main className="flex-1">
       

@@ -49,14 +49,7 @@ const DataSalesManagement: React.FC = () => {
             <div className={`flex flex-col flex-grow ${isMobile ? 'px-2' : 'p-4 md:p-10'} md:ml-[250px]`}>
                 <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
                     Gestión de Ventas
-                    <div className="flex items-center gap-4">
-                        <FaBell className="text-gray-500 cursor-pointer" />
-                        <img
-                            src="https://placehold.co/40"
-                            alt="User"
-                            className="w-10 h-10 rounded-full"
-                        />
-                    </div>
+              
                 </h1>
                 <div className="flex flex-wrap gap-4 justify-center">
                     {boxes.map((box, index) => (

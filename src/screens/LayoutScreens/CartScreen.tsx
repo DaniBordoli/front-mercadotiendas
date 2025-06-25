@@ -39,6 +39,7 @@ const CartScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <div className="max-w-7xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-8">
         <div className="flex-1">

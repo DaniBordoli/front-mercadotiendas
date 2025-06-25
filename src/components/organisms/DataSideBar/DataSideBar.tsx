@@ -8,6 +8,7 @@ import { colors } from '../../../design/colors';
 import { motion } from 'framer-motion';
 import { FaGear, FaScrewdriverWrench, FaCircleInfo, FaBoxArchive  } from "react-icons/fa6";
 import { AiFillDatabase } from "react-icons/ai";
+import { RiRobot2Line } from "react-icons/ri";
 
 import { FiLogOut } from "react-icons/fi";
 import { useAuthStore } from '../../../stores';
@@ -16,8 +17,11 @@ import { FaBars } from 'react-icons/fa';
 const DataSideBar: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuthStore();
+    const { user, logout } = useAuthStore();
     const hasShop = !!(user && user.shop && user.shop._id);
+    
+    // Agregar console.log para inspeccionar el objeto user completo
+    console.log('User object in DataSideBar:', user);
  
     const [shopDropdownOpen, setShopDropdownOpen] = React.useState(false);
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -34,10 +38,19 @@ const DataSideBar: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    const handleLogout = () => {
+        logout();
+        navigate('/dashboard');
+    };
+
+    const isAdmin = user?.role === 'admin';
+
     const menuOptions = [
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
         { key: 'profile', label: 'Datos Personales', icon: <FaUser className="text-lg" />, path: '/data-profile' },
-        { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' },
+        ...(isAdmin ? [
+            { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' }
+        ] : []),
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
      
         ...(hasShop ? [
@@ -51,9 +64,11 @@ const DataSideBar: React.FC = () => {
     const shopOptions = [
     
         ...(hasShop ? [
+            { key: 'editShop', label: 'Editar Tienda', icon: <RiRobot2Line className="text-lg" />, path: '/layout-select' },
             { key: 'shopState', label: 'Estado de la Tienda', icon: <IoToggleSharp className="text-lg" />, path: '/data-shop-state' },
             { key: 'shopConfig', label: 'Configuración de Tienda', icon: <FaGear className="text-lg" />, path: '/data-shop-config' },
-            { key: 'domainConfig', label: 'Configuración de Dominio', icon: <FaScrewdriverWrench className="text-lg" />, path: '/domain-config' },
+            { key: 'layout', label: 'Layouts', icon: <FaCircleInfo className="text-lg" />, path: '/layout-select' },
+        
             { key: 'seo', label: 'SEO y Metadata', icon: <AiFillDatabase className="text-lg" />, path: '/seo-metadata' },
             { key: 'general', label: 'Información general', icon: <FaCircleInfo className="text-lg" />, path: '/settings' }
         ] : []),
@@ -196,6 +211,7 @@ const DataSideBar: React.FC = () => {
                         <button
                             className="relative flex items-center gap-3 p-3 w-full text-left hover:text-red-600 transition-colors"
                             type="button"
+                            onClick={handleLogout}
                         >
                             <FiLogOut className="text-lg" />
                             <span className='font-space'>Cerrar sesión</span>

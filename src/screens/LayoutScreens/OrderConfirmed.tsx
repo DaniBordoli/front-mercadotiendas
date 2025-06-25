@@ -52,6 +52,7 @@ const OrderConfirmed: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <main className="flex-1 flex flex-col items-center justify-center py-12">
         <div className="bg-white rounded-lg shadow p-8 w-full max-w-2xl">

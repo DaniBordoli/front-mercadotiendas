@@ -4,6 +4,7 @@ import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
 import { useShopStore } from '../../../stores/slices/shopStore';
+import { useAuthStore } from '../../../stores';
 import { Modal } from '../../molecules/Modal/Modal';
 import { updateShopTemplate } from '../../../services/api';
 
@@ -241,14 +242,47 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       handleSendMessage();
     }
   };
-
   // Confirmar y guardar cambios de template
   const handleConfirmTemplateUpdate = async () => {
     if (!pendingTemplateUpdate) return;
     setSavingTemplate(true);
     setTemplateSaveError(null);
+    
     try {
+      // Primero guardar el template
       await updateShopTemplate(pendingTemplateUpdate);
+      
+      // Actualizar la tienda principal si hay cambios en propiedades clave
+      const user = useAuthStore.getState().user;
+      const updateShopInfo = useShopStore.getState().updateShopInfo;
+      
+      if (user?.shop?._id && pendingTemplateUpdate) {
+        // Extraer propiedades que deben sincronizarse con el modelo Shop
+        const shopUpdates: any = {};
+        
+        // Mapear propiedades del template a campos del Shop
+        if (pendingTemplateUpdate.title) {
+          shopUpdates.name = pendingTemplateUpdate.title;
+          shopUpdates.brandName = pendingTemplateUpdate.title;
+        }
+        
+        if (pendingTemplateUpdate.shopName) {
+          shopUpdates.name = pendingTemplateUpdate.shopName;
+          shopUpdates.brandName = pendingTemplateUpdate.shopName;
+        }
+        
+        // Si hay cambios para la tienda principal, actualizarla
+        if (Object.keys(shopUpdates).length > 0) {
+          try {
+            await updateShopInfo(user.shop._id, shopUpdates);
+            console.log('[AIChat] Sincronizado template con datos de tienda principal:', shopUpdates);
+          } catch (shopError) {
+            console.error('[AIChat] Error al sincronizar template con tienda principal:', shopError);
+            // No fallar todo el proceso si esto falla, ya que el template ya se guardó
+          }
+        }
+      }
+      
       onApplyTemplateChanges(pendingTemplateUpdate);
       setShowTemplateModal(false);
       setPendingTemplateUpdate(null);

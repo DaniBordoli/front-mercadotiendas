@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
-import { StatusTags } from '../components/atoms/StatusTags/StatusTags';
 import { FaPlus, FaRegImage, FaBox, FaPenToSquare, FaTrash, FaChevronDown, FaChevronRight, FaTriangleExclamation } from 'react-icons/fa6';
 import { createCategory, fetchCategories, deleteCategory } from '../stores/slices/authSlice';
 import { getStorageItem } from '../utils/storage';
+
+// Máximo de categorías principales y subcategorías
+const MAX_CATEGORIES = 4;
 
 function buildCategoryTree(categories: any[]) {
   const map: Record<string, any> = {};
@@ -31,6 +33,7 @@ const CollapsibleCategory: React.FC<{
 }> = ({ cat, onDelete, onAddSubcategory }) => {
   const [open, setOpen] = useState(true);
   const hasChildren = cat.children && cat.children.length > 0;
+  const maxSubcats = cat.children && cat.children.length >= MAX_CATEGORIES;
   return (
     <div>
       <div className={`flex items-center py-2`}>
@@ -49,16 +52,12 @@ const CollapsibleCategory: React.FC<{
         </button>
         <cat.icon className="text-[#FF4D4F] mr-2" />
         <span className="font-space mr-2">{cat.name}</span>
-        <StatusTags
-          status={cat.status === 'Active' ? 'Active' : cat.status === 'Pending' ? 'Pending' : 'Inactive'}
-          text={cat.status === 'Active' ? 'Activa' : cat.status === 'Pending' ? 'Pendiente' : 'Inactiva'}
-          className="ml-2"
-        />
         <div className="ml-auto flex gap-2">
           <button
-            className="text-gray-400 hover:text-[#2563eb]"
+            className={`text-gray-400 hover:text-[#2563eb] ${maxSubcats ? 'opacity-50 cursor-not-allowed' : ''}`}
             title="Agregar subcategoría"
-            onClick={() => onAddSubcategory(cat)}
+            onClick={() => !maxSubcats && onAddSubcategory(cat)}
+            disabled={maxSubcats}
           >
             <FaPlus size={16} />
           </button>
@@ -109,6 +108,9 @@ const DataCatalog: React.FC = () => {
 
   // Opciones de categorías destino 
   const categoryOptions = categories.map(cat => ({ id: cat.id, name: cat.name }));
+
+  // Contar cuántas subcategorías tiene el parent actual
+  const parentSubcategoryCount = parentCategory ? (parentCategory.children?.length || 0) : 0;
 
   // Fetch categories on mount
   useEffect(() => {
@@ -193,9 +195,13 @@ const DataCatalog: React.FC = () => {
               icon={FaPlus}
               onClick={() => setShowModal(true)}
               className="w-full sm:w-auto"
+              disabled={categories.length >= MAX_CATEGORIES}
             >
               <span className="font-space">Nueva Categoría</span>
             </DesignButton>
+            {categories.length >= MAX_CATEGORIES && (
+              <span className="text-xs text-red-500 font-space ml-2">Máximo 4 categorías principales</span>
+            )}
           </div>
           {/* Sección principal con título */}
           <div className='my-8'>
@@ -258,7 +264,11 @@ const DataCatalog: React.FC = () => {
                       placeholder={`Ingresa el nombre de la ${parentCategory ? 'subcategoría' : 'categoría'}`}
                       value={newCategoryName}
                       onChange={e => setNewCategoryName(e.target.value)}
+                      disabled={parentCategory ? parentSubcategoryCount >= MAX_CATEGORIES : false}
                     />
+                    {parentCategory && parentSubcategoryCount >= MAX_CATEGORIES && (
+                      <span className="text-xs text-red-500 font-space">Máximo 4 subcategorías por categoría</span>
+                    )}
                   </div>
                   <div className="mb-4">
                     <label className="block text-sm mb-1 font-space">
@@ -271,36 +281,7 @@ const DataCatalog: React.FC = () => {
                       value={newCategoryDesc}
                       onChange={e => setNewCategoryDesc(e.target.value)}
                     />
-                  </div>
-                  <div className="mb-6">
-                    <label className="block text-sm mb-1 font-space">
-                      Imagen representativa (opcional)
-                    </label>
-                    <div className="border border-dashed border-gray-200 rounded-lg p-4 flex flex-col items-center text-center">
-                      <FaRegImage className="text-3xl text-gray-300 mb-2" />
-                      <span className="text-xs text-gray-400 mb-2 font-space">
-                        Arrastra y suelta una imagen aquí o
-                      </span>
-                      <label className="inline-block">
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept="image/png, image/jpeg"
-                          onChange={e => setNewCategoryImage(e.target.files?.[0] || null)}
-                        />
-                        <DesignButton variant="neutral" size="small">
-                          <span className="font-space">Seleccionar archivo</span>
-                        </DesignButton>
-                      </label>
-                      <span className="text-[10px] text-gray-300 mt-2 font-space">
-                        PNG, JPG hasta 2MB
-                      </span>
-                      {newCategoryImage && (
-                        <span className="text-xs text-gray-500 mt-2 font-space">
-                          {newCategoryImage.name}
-                        </span>
-                      )}
-                    </div>
+             
                   </div>
                   <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
                     <DesignButton
@@ -318,7 +299,7 @@ const DataCatalog: React.FC = () => {
                     >
                       <span className="font-space">Cancelar</span>
                     </DesignButton>
-                    <DesignButton variant="primary" type="submit" loading={isCreating} className="w-full sm:w-auto">
+                    <DesignButton variant="primary" type="submit" loading={isCreating} className="w-full sm:w-auto" disabled={parentCategory ? parentSubcategoryCount >= MAX_CATEGORIES : false}>
                       <span className="font-space">Aceptar</span>
                     </DesignButton>
                   </div>

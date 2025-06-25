@@ -7,6 +7,7 @@ import { InstitutionalDescriptionSection } from './DropDownSections/Institutiona
 import { SeoMetadataSection } from './DropDownSections/SeoMetadataSection';
 import { SocialMediaSection } from './DropDownSections/SocialMediaSection';
 import { OperationPoliciesSection } from './DropDownSections/OperationPoliciesSection';
+import ShopDesignSection from './DropDownSections/ShopDesignSection';
 
 interface DropDownSectionsProps {
     openSection: string | null;
@@ -84,26 +85,6 @@ export const DropDownSections: React.FC<DropDownSectionsProps> = ({ openSection,
                 </motion.div>
             </div>
             
-            {/* Dropdown for SEO Metadata */}
-            <div className="mt-6">
-                <button
-                    onClick={() => toggleSection('seoMetadataSection')}
-                    className={`w-full text-left text-lg font-space flex justify-between items-center border border-gray-300 p-3 rounded-t-md ${
-                        openSection === 'seoMetadataSection' ? '' : 'rounded-md'
-                    }`}
-                >
-                    SEO y Metadata
-                    <FaChevronDown className="text-gray-500" />
-                </button>
-                <motion.div
-                    initial="hidden"
-                    animate={openSection === 'seoMetadataSection' ? 'visible' : 'hidden'}
-                    variants={sectionVariants}
-                    className="overflow-hidden"
-                >
-                    <SeoMetadataSection />
-                </motion.div>
-            </div>
 
             {/* Dropdown for Social Media */}
             <div className="mt-6">
@@ -144,6 +125,27 @@ export const DropDownSections: React.FC<DropDownSectionsProps> = ({ openSection,
                     className="overflow-hidden"
                 >
                     <OperationPoliciesSection />
+                </motion.div>
+            </div>
+
+            {/* Dropdown for Shop Design */}
+            <div className="mt-6">
+                <button
+                    onClick={() => toggleSection('shopDesign')}
+                    className={`w-full text-left text-lg font-space flex justify-between items-center border border-gray-300 p-3 rounded-t-md ${
+                        openSection === 'shopDesign' ? '' : 'rounded-md'
+                    }`}
+                >
+                    Diseño de Tienda
+                    <FaChevronDown className="text-gray-500" />
+                </button>
+                <motion.div
+                    initial="hidden"
+                    animate={openSection === 'shopDesign' ? 'visible' : 'hidden'}
+                    variants={sectionVariants}
+                    className="overflow-hidden"
+                >
+                    <ShopDesignSection />
                 </motion.div>
             </div>
         </>

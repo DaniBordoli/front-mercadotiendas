@@ -22,23 +22,6 @@ const estadoOptions = [
   { value: 'inactivo', label: 'Inactivo' },
 ];
 
-const variantes = [
-  {
-    variante: 'Azul / M',
-    sku: 'RB-001-AZM',
-    stock: 11,
-    precio: '$2.990',
-    imagen: 'https://images.unsplash.com/photo-1519125323398-675f0ddb6308',
-  },
-  {
-    variante: 'Negro / S',
-    sku: 'RB-001-NES',
-    stock: 10,
-    precio: '$2.990',
-    imagen: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d',
-  },
-];
-
 const EditProductScreen: React.FC = () => {
   const [hasVariants, setHasVariants] = React.useState(true);
   const navigate = useNavigate();
@@ -56,6 +39,9 @@ const EditProductScreen: React.FC = () => {
   const [productImages, setProductImages] = React.useState<string[]>([]);
   const [newImageFiles, setNewImageFiles] = React.useState<File[]>([]);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
+  const [variants, setVariants] = React.useState<{ tipo: string; valores: string[] }[]>([]);
+  const [newVariantType, setNewVariantType] = React.useState('');
+  const [newVariantValues, setNewVariantValues] = React.useState<Record<number, string>>({});
   const [toast, setToast] = React.useState({
     show: false,
     message: '',
@@ -78,7 +64,26 @@ const EditProductScreen: React.FC = () => {
             categoria: found.categoria || '',
             estado: found.estado || 'activo',
           });
+          
+          // Cargar variantes del producto
+          if (found.variantes && Array.isArray(found.variantes)) {
+            setVariants(found.variantes);
+            setHasVariants(found.variantes.length > 0);
+          } else {
+            setVariants([]);
+            setHasVariants(false);
+          }
+          
+          // Cargar imágenes del producto
+          if (found.productImages && Array.isArray(found.productImages)) {
+            setProductImages(found.productImages);
+          }
           setProductImages(found.productImages || (found.productImage ? [found.productImage] : []));
+          // Cargar variantes existentes
+          if (found.variantes && Array.isArray(found.variantes)) {
+            setVariants(found.variantes);
+            setHasVariants(found.variantes.length > 0);
+          }
         }
       } finally {
         setLoading(false);
@@ -94,6 +99,56 @@ const EditProductScreen: React.FC = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setProduct((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddVariant = () => {
+    if (!newVariantType.trim()) return;
+    const newVariant = {
+      tipo: newVariantType.trim(),
+      valores: []
+    };
+    setVariants(prev => [...prev, newVariant]);
+    setNewVariantType('');
+  };
+
+  const handleRemoveVariant = (index: number) => {
+    setVariants(prev => prev.filter((_, i) => i !== index));
+    setNewVariantValues(prev => {
+      const newValues = { ...prev };
+      delete newValues[index];
+      return newValues;
+    });
+  };
+
+  const handleAddValue = (variantIndex: number) => {
+    const value = newVariantValues[variantIndex];
+    if (!value?.trim()) return;
+    
+    setVariants(prev => prev.map((variant, index) => {
+      if (index === variantIndex) {
+        // Evitar duplicados
+        if (variant.valores.includes(value.trim())) return variant;
+        return {
+          ...variant,
+          valores: [...variant.valores, value.trim()]
+        };
+      }
+      return variant;
+    }));
+
+    setNewVariantValues(prev => ({ ...prev, [variantIndex]: '' }));
+  };
+
+  const handleRemoveValue = (variantIndex: number, valueIndex: number) => {
+    setVariants(prev => prev.map((variant, index) => {
+      if (index === variantIndex) {
+        return {
+          ...variant,
+          valores: variant.valores.filter((_, i) => i !== valueIndex)
+        };
+      }
+      return variant;
+    }));
   };
 
   const handleProductImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -163,6 +218,12 @@ const EditProductScreen: React.FC = () => {
         setNewImageFiles([]);
         setProductImages(updatedImages);
       }
+
+      // Preparar las variantes para enviar
+      const validVariants = hasVariants 
+        ? variants.filter(v => v.tipo && v.valores.length > 0)
+        : [];
+
       await updateProduct(product._id, {
         nombre: product.nombre,
         sku: product.sku,
@@ -171,6 +232,7 @@ const EditProductScreen: React.FC = () => {
         stock: product.stock,
         categoria: product.categoria,
         estado: product.estado,
+        variantes: validVariants,
       });
       setToast({
         show: true,
@@ -368,11 +430,22 @@ const EditProductScreen: React.FC = () => {
                 <div className="grid grid-cols-2 gap-6 mb-4">
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Estado *</label>
-                    <SelectDefault
-                      options={estadoOptions}
-                      value={product.estado}
-                      onChange={val => handleSelectChange('estado', val)}
-                    />
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs font-space font-semibold ${product.estado === 'activo' ? 'text-green-600' : 'text-red-500'}`}>{product.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>
+                      <button
+                        type="button"
+                        className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${product.estado === 'activo' ? 'bg-green-500' : 'bg-gray-300'}`}
+                        onClick={() => setProduct((prev: any) => ({ ...prev, estado: prev.estado === 'activo' ? 'inactivo' : 'activo' }))}
+                        aria-pressed={product.estado === 'activo'}
+                        aria-label="Cambiar estado"
+                      >
+                        <motion.span
+                          className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow"
+                          animate={{ x: product.estado === 'activo' ? 20 : 0 }}
+                          transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mb-4">
@@ -393,43 +466,101 @@ const EditProductScreen: React.FC = () => {
            
                 {hasVariants && (
                   <div className="mt-2">
-                    <table className="min-w-full text-sm border border-gray-200 rounded-xl overflow-hidden">
-                      <thead>
-                        <tr className="bg-gray-50 text-gray-500 font-space text-xs">
-                          <th className="px-4 py-3 font-normal text-left">Variante</th>
-                          <th className="px-4 py-3 font-normal text-left">SKU</th>
-                          <th className="px-4 py-3 font-normal text-left">Stock</th>
-                          <th className="px-4 py-3 font-normal text-left">Precio</th>
-                          <th className="px-4 py-3 font-normal text-left">Imagen</th>
-                          <th className="px-4 py-3 font-normal text-left">Acciones</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {variantes.map((v, idx) => (
-                          <tr key={v.sku} className="border-t last:border-b hover:bg-gray-50 transition-colors">
-                            <td className="px-4 py-3 font-space">{v.variante}</td>
-                            <td className="px-4 py-3 text-gray-400 font-space">{v.sku}</td>
-                            <td className="px-4 py-3 font-space">{v.stock}</td>
-                            <td className="px-4 py-3 font-space">{v.precio}</td>
-                            <td className="px-4 py-3">
-                              <img src={v.imagen} alt="variante" className="w-10 h-10 rounded object-cover" />
-                            </td>
-                            <td className="px-4 py-3 flex items-center gap-2">
-                              <button className="hover:bg-gray-100 p-2 rounded">
-                                <RiPencilFill  className="text-lg text-blue-500" />
-                              </button>
-                              <button className="hover:bg-gray-100 p-2 rounded">
-                                <FaRegTrashCan className="text-lg text-red-500" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <button className="flex items-center gap-2 text-sky-500 mt-2 text-sm font-space hover:underline">
-                      <FaPlus />
-                      Agregar variante
-                    </button>
+                    {/* Agregar nueva variante */}
+                    <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+                      <span className="font-space text-sm font-semibold block mb-2">Agregar nueva variante</span>
+                      <div className="flex gap-2 items-end">
+                        <div className="flex-1">
+                          <label className="block text-xs font-space text-gray-500 mb-1">Tipo de variante</label>
+                          <input
+                            className="w-full px-3 py-2 border rounded-lg text-sm font-space focus:outline-sky-400"
+                            type="text"
+                            placeholder="Ej: Color, Talla, Material, Madera..."
+                            value={newVariantType}
+                            onChange={(e) => setNewVariantType(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleAddVariant();
+                            }}
+                          />
+                        </div>
+                        <DesignButton
+                          variant="primary"
+                          onClick={handleAddVariant}
+                          disabled={!newVariantType.trim()}
+                          className="px-4 py-2 text-sm"
+                        >
+                          Agregar
+                        </DesignButton>
+                      </div>
+                    </div>
+
+                    {/* Lista de variantes */}
+                    {variants.map((variant, variantIndex) => (
+                      <div key={variantIndex} className="mb-6 p-4 bg-white border rounded-lg">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-space font-medium text-sm text-gray-700 capitalize">
+                            {variant.tipo}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVariant(variantIndex)}
+                            className="text-red-500 hover:text-red-700 text-sm font-space"
+                          >
+                            Eliminar variante
+                          </button>
+                        </div>
+
+                        {/* Valores de la variante */}
+                        <div className="mb-3">
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {variant.valores.map((valor, valueIndex) => (
+                              <span
+                                key={valueIndex}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-sky-100 text-sky-700 rounded text-xs font-space"
+                              >
+                                {valor}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveValue(variantIndex, valueIndex)}
+                                  className="text-sky-500 hover:text-sky-700 ml-1"
+                                >
+                                  ×
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Agregar nuevo valor */}
+                        <div className="flex gap-2">
+                          <input
+                            className="flex-1 px-2 py-1 border rounded text-xs font-space focus:outline-sky-400"
+                            type="text"
+                            placeholder={`Agregar ${variant.tipo.toLowerCase()}...`}
+                            value={newVariantValues[variantIndex] || ''}
+                            onChange={(e) => setNewVariantValues(prev => ({ ...prev, [variantIndex]: e.target.value }))}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handleAddValue(variantIndex);
+                            }}
+                          />
+                          <button
+                            className="text-sky-600 text-xs font-space hover:underline px-2"
+                            type="button"
+                            onClick={() => handleAddValue(variantIndex)}
+                          >
+                            Agregar
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {variants.length === 0 && (
+                      <div className="text-center py-8 text-gray-400">
+                        <span className="text-sm font-space">
+                          No hay variantes definidas. Agrega una nueva variante arriba.
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

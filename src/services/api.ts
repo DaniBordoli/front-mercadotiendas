@@ -106,3 +106,20 @@ export const fetchShopTemplate = async () => {
   });
   return handleResponse(response);
 };
+
+export const uploadShopLogo = async (file: File) => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No authentication token found');
+  
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const response = await fetch(`${API_URL}/shop/logo`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  return handleResponse(response);
+};

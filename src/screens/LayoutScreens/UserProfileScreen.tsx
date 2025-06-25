@@ -16,6 +16,7 @@ const UserProfileScreen: React.FC = () => {
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
+        logoUrl={editableVariables.logoUrl}
       />
       <main className="flex-1 max-w-7xl mx-auto w-full flex flex-col md:flex-row gap-8 py-10 px-4">
         <ProfileSidebar />

@@ -62,7 +62,7 @@ const ProductDetailPage: React.FC = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWritingReview, setIsWritingReview] = useState(false);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   // Mostrar el nombre de la tienda del producto, no del usuario logueado
   const shopName = selectedProduct?.shop?.name || null;
 
@@ -266,29 +266,36 @@ const ProductDetailPage: React.FC = () => {
             </div>
 
             <div className="mb-6">
-                <label className="block text-sm font-medium mb-2" style={{ color: colors.darkGray }}>Color:</label>
-                <select
-                  className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
-                  value={selectedColor || ''}
-                  onChange={e => setSelectedColor(e.target.value)}
-                >
-                  <option value="">Seleccionar color</option>
-                  {(() => {
-                    const colorArray =
-                      Array.isArray((selectedProduct as any).color) && (selectedProduct as any).color.length > 0
-                        ? (selectedProduct as any).color
-                        : Array.isArray((selectedProduct as any).colores) && (selectedProduct as any).colores.length > 0
-                        ? (selectedProduct as any).colores
-                        : Array.isArray((selectedProduct as any).variants?.color) && (selectedProduct as any).variants.color.length > 0
-                        ? (selectedProduct as any).variants.color
-                        : [];
-                    return colorArray.length > 0
-                      ? colorArray.map((color: string) => (
-                          <option key={color} value={color}>{color}</option>
-                        ))
-                      : <option disabled value="">No hay colores disponibles</option>;
-                  })()}
-                </select>
+              {selectedProduct.variantes && selectedProduct.variantes.length > 0 ? (
+                <div className="space-y-4">
+                  {selectedProduct.variantes.map((variante, index) => (
+                    <div key={index}>
+                      <label className="block text-sm font-medium mb-2" style={{ color: colors.darkGray }}>
+                        {variante.tipo}:
+                      </label>
+                      <select
+                        className="border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none w-full max-w-xs"
+                        value={selectedVariants[variante.tipo] || ''}
+                        onChange={e => setSelectedVariants(prev => ({ 
+                          ...prev, 
+                          [variante.tipo]: e.target.value 
+                        }))}
+                      >
+                        <option value="">Seleccionar {variante.tipo.toLowerCase()}...</option>
+                        {variante.valores.map((valor, valueIndex) => (
+                          <option key={valueIndex} value={valor}>
+                            {valor}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">
+                  Este producto no tiene variantes disponibles.
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4 mb-6">

@@ -234,35 +234,38 @@ export const Navbar: React.FC = () => {
                 <span>Mi carrito</span>
               </div>
               
-              <div
-                className={`flex items-center cursor-pointer transition-color'
-                }`}
-                onClick={() => toggleModal()}
-                style={isUserReady && user.shop ? { pointerEvents: 'auto' } : {}}
-              >
-                <RiRobot2Line className="text-xl mr-2" />
-                <span>{isUserReady && user.shop ? 'Editar tienda' : 'Crear tienda'}</span>
-              </div>
-              <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
-                <BsShop className="text-xl mr-2" />
-                <span
-                onClick={() => navigate('/first-layout')}>Ver mi tienda</span>
-              </div>
+              {/* Mostrar "Crear tienda" si no tiene tienda, "Ver mi tienda" si ya la tiene */}
+              {isUserReady && user.shop ? (
+                <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
+                  <BsShop className="text-xl mr-2" />
+                  <span onClick={() => navigate('/first-layout?view=true')}>Ver mi tienda</span>
+                </div>
+              ) : (
+                <div
+                  className="flex items-center cursor-pointer hover:text-red-500 transition-colors"
+                  onClick={() => toggleModal()}
+                >
+                  <RiRobot2Line className="text-xl mr-2" />
+                  <span>Crear tienda</span>
+                </div>
+              )}
               <div className={`relative flex items-center cursor-pointer transition-colors ${isDropdownOpen ? 'text-red-500' : 'hover:text-red-500'}`} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                 <FaRegUserCircle className="text-xl mr-2" />
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>
-                    <ul className="py-2">
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
                         Mi cuenta
                       </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
                         Mi carrito
                       </li>
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal} >
-                        Crear mi Tienda
-                      </li>
+                      {/* Solo mostrar la opción de Crear Tienda si el usuario no tiene una tienda */}
+                      {(!isUserReady || !user.shop) && (
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal}>
+                          Crear mi Tienda
+                        </li>
+                      )}
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={handleLogout}>
                         Cerrar Sesión
                       </li>
@@ -305,43 +308,27 @@ export const Navbar: React.FC = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
             <div className="bg-white rounded-lg p-6 w-[90%] md:w-[50%] lg:w-[30%] shadow-lg">
               <h3 className="text-lg font-bold mb-4 font-space text-center">
-                {isUserReady && user.shop
-                  ? '¿Quieres editar tu tienda vía IA?'
-                  : '¿Quieres ir por la creación manual o vía IA?'}
+                ¿Quieres ir por la creación manual o vía IA?
               </h3>
               <div className="flex flex-col gap-4">
-                {isUserReady && user.shop ? (
-                  <DesignButton
-                    variant="secondary"
-                    onClick={() => {
-                      setIsModalOpen(false);
-                      navigate('/layout-select');
-                    }}
-                  >
-                    Editar vía IA
-                  </DesignButton>
-                ) : (
-                  <>
-                    <DesignButton
-                      variant="secondary"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        navigate('/shop-create');
-                      }}
-                    >
-                      Creación Manual
-                    </DesignButton>
-                    <DesignButton
-                      variant="secondary"
-                      onClick={() => {
-                        setIsModalOpen(false);
-                        navigate('/layout-select');
-                      }}
-                    >
-                      Creación vía IA
-                    </DesignButton>
-                  </>
-                )}
+                <DesignButton
+                  variant="secondary"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    navigate('/shop-create');
+                  }}
+                >
+                  Creación Manual
+                </DesignButton>
+                <DesignButton
+                  variant="secondary"
+                  onClick={() => {
+                    setIsModalOpen(false);
+                    navigate('/layout-select');
+                  }}
+                >
+                  Creación vía IA
+                </DesignButton>
               </div>
               <button
                 className="mt-4 text-sm text-gray-900 font-space w-full text-center"

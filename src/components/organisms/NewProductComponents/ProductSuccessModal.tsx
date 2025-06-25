@@ -23,8 +23,8 @@ const ProductSuccessModal: React.FC<ProductSuccessModalProps> = ({ onClose, prod
   };
 
   const handleAddMore = () => {
-    navigate('/new-product');
-    onClose();
+    window.location.reload();
+    // onClose(); // No es necesario cerrar el modal, la página se recarga
   };
 
   return (

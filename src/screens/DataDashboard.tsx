@@ -8,6 +8,7 @@ import { AiOutlineShop } from 'react-icons/ai';
 import { colors } from '../design/colors';
 import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { FaBell } from 'react-icons/fa';
+import { useAuthStore } from '../stores';
 
 // Hook para detectar mobile
 function useIsMobile(breakpoint = 768) {
@@ -24,9 +25,38 @@ function useIsMobile(breakpoint = 768) {
 }
 
 const DataDashboard: React.FC = () => {
+    const fetchProducts = useAuthStore(state => state.fetchProducts);
+    const [productCount, setProductCount] = React.useState<number>(0);
+    const [prevProductCount, setPrevProductCount] = React.useState<number>(0);
+    const [productTrend, setProductTrend] = React.useState<string>('');
+
+    React.useEffect(() => {
+        const loadProducts = async () => {
+            try {
+                const products = await fetchProducts();
+                setPrevProductCount(productCount); // Guarda el anterior antes de actualizar
+                setProductCount(products.length);
+            } catch {
+                setPrevProductCount(productCount);
+                setProductCount(0);
+            }
+        };
+        loadProducts();
+        // eslint-disable-next-line
+    }, [fetchProducts]);
+
+    React.useEffect(() => {
+        const diff = productCount - prevProductCount;
+        if (diff > 0) {
+            setProductTrend(`+${diff} este mes`);
+        } else {
+            setProductTrend('');
+        }
+    }, [productCount, prevProductCount]);
+
     const boxes = [
         { title: 'Ventas Totales', number: 123, trend: '+15% este mes', icon: <FaDollarSign />, iconColor: `${colors.primaryRed}1A`, iconTextColor: colors.primaryRed, showTrend: true },
-        { title: 'Productos Activos', number: 456, trend: '+4 nuevos', icon: <FaBox />, iconColor: `${colors.accentTeal}1A`, iconTextColor: colors.accentTeal, showTrend: true },
+        { title: 'Productos Activos', number: productCount, trend: productTrend, icon: <FaBox />, iconColor: `${colors.accentTeal}1A`, iconTextColor: colors.accentTeal, showTrend: !!productTrend },
         { title: 'Pedidos Pendientes', number: 789, status: 'Active', icon: <FaClock />, iconColor: `${colors.primaryRed}1A`, iconTextColor: colors.primaryRed, showTrend: false },
         { title: 'Estado Tienda', number: 101, status: 'Pending', icon: <AiOutlineShop />, iconColor: `${colors.accentTeal}1A`, iconTextColor: colors.accentTeal, showTrend: false },
     ];
@@ -45,14 +75,7 @@ const DataDashboard: React.FC = () => {
         <div className="flex flex-col flex-grow p-10 md:ml-[250px]">
             <h1 className="text-2xl font-space mb-6 flex items-center justify-between">
                 Dashboard
-                <div className="flex items-center gap-4">
-                    <FaBell className="text-gray-500 cursor-pointer" />
-                    <img
-                        src="https://placehold.co/40"
-                        alt="User"
-                        className="w-10 h-10 rounded-full"
-                    />
-                </div>
+                
             </h1>
                 <div className="flex flex-wrap gap-4 justify-center">
                     {boxes.map((box, index) => (

@@ -4,8 +4,7 @@ import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores';
-import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
-import { updateUserProfile, fetchCountries, fetchProvincesForArgentina } from '../stores/slices/authSlice';
+import { updateUserProfile, fetchCountries } from '../stores/slices/authSlice';
 
 const GoogleComplete = () => {
     const navigate = useNavigate();
@@ -18,7 +17,6 @@ const GoogleComplete = () => {
     });
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [countries, setCountries] = useState<{ name: string; code: string }[]>([]);
-    const [provinces, setProvinces] = useState<string[]>([]);
 
     useEffect(() => {
         if (user) {
@@ -39,19 +37,6 @@ const GoogleComplete = () => {
                 setCountries([{ name: 'Argentina', code: 'AR' }]);
             });
     }, []);
-
-    useEffect(() => {
-        if (values.country === 'Argentina') {
-            fetchProvincesForArgentina()
-                .then((data) => setProvinces(data.length > 0 ? data : ['Buenos Aires']))
-                .catch((error) => {
-                    console.error('Error fetching provinces:', error);
-                    setProvinces(['Buenos Aires']);
-                });
-        } else {
-            setProvinces([]);
-        }
-    }, [values.country]);
 
     const validateForm = (values: Record<string, string>): Record<string, string> => {
         const errors: Record<string, string> = {};
@@ -133,6 +118,51 @@ const GoogleComplete = () => {
                                 <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
                             )}
                         </div>
+                                <div className="mb-4">
+                                    <label className="block mb-2 font-space text-darkGray">
+                                        País
+                                    </label>
+                                    <select
+                                        className="w-full border border-gray-300 rounded-md p-2"
+                                        value={values.country}
+                                        onChange={(e) => {
+                                            clearError();
+                                            setValidationErrors((prev) => ({ ...prev, country: '' }));
+                                            setValues((prev) => ({ ...prev, country: e.target.value }));
+                                        }}
+                                    >
+                                        <option value="">Selecciona tu país</option>
+                                        {countries.map((country, index) => (
+                                            <option key={index} value={country.name}>
+                                                {country.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {validationErrors.country && (
+                                        <span className="text-red-500 text-sm">{validationErrors.country}</span>
+                                    )}
+                                </div>
+                        
+                        
+                        <div className="mb-4">
+                            <label className="block mb-2 font-space text-darkGray">
+                                Provincia
+                            </label>
+                            <InputDefault
+                                type="text"
+                                placeholder="Ingresa tu provincia"
+                                className="w-full"
+                                value={values.province}
+                                onChange={(value: string) => {
+                                    clearError();
+                                    setValidationErrors((prev) => ({ ...prev, province: '' }));
+                                    setValues((prev) => ({ ...prev, province: value }));
+                                }}
+                            />
+                            {validationErrors.province && (
+                                <span className="text-red-500 text-sm">{validationErrors.province}</span>
+                            )}
+                        </div>
                         
                         <div className="mb-4">
                             <label className="block mb-2 font-space text-darkGray">
@@ -153,58 +183,6 @@ const GoogleComplete = () => {
                                 <span className="text-red-500 text-sm">{validationErrors.city}</span>
                             )}
                         </div>
-                        
-                        <div className="mb-4">
-                            <label className="block mb-2 font-space text-darkGray">
-                                Provincia
-                            </label>
-                            <select
-                                className="w-full border border-gray-300 rounded-md p-2"
-                                value={values.province}
-                                onChange={(e) => {
-                                    clearError();
-                                    setValidationErrors((prev) => ({ ...prev, province: '' }));
-                                    setValues((prev) => ({ ...prev, province: e.target.value }));
-                                }}
-                                disabled={!values.country || provinces.length === 0}
-                            >
-                                <option value="">Selecciona tu provincia</option>
-                                {provinces.map((province, index) => (
-                                    <option key={index} value={province}>
-                                        {province}
-                                    </option>
-                                ))}
-                            </select>
-                            {validationErrors.province && (
-                                <span className="text-red-500 text-sm">{validationErrors.province}</span>
-                            )}
-                        </div>
-                        
-                        <div className="mb-4">
-                            <label className="block mb-2 font-space text-darkGray">
-                                País
-                            </label>
-                            <select
-                                className="w-full border border-gray-300 rounded-md p-2"
-                                value={values.country}
-                                onChange={(e) => {
-                                    clearError();
-                                    setValidationErrors((prev) => ({ ...prev, country: '' }));
-                                    setValues((prev) => ({ ...prev, country: e.target.value }));
-                                }}
-                            >
-                                <option value="">Selecciona tu país</option>
-                                {countries.map((country, index) => (
-                                    <option key={index} value={country.name}>
-                                        {country.name}
-                                    </option>
-                                ))}
-                            </select>
-                            {validationErrors.country && (
-                                <span className="text-red-500 text-sm">{validationErrors.country}</span>
-                            )}
-                        </div>
-                        
                         <div className="mt-8">
                             <DesignButton
                                 className='w-full'

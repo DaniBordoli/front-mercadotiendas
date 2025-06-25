@@ -4,12 +4,16 @@ import { DesignButton } from '../components/atoms/DesignButton';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault';
 import { SelectDefault } from '../components/atoms/SelectDefault';
-import { fetchUserProfile, updateUserProfile, updateAvatar } from '../stores/slices/authSlice';
+import { fetchUserProfile, updateUserProfile, updateAvatar, isGoogleUser } from '../stores/slices/authSlice';
+import { useAuthStore } from '../stores';
 import Toast from '../components/atoms/Toast';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 const DataPersonalInfo: React.FC = () => {
+    const { user } = useAuthStore();
+    
     // Estado para los valores de los inputs
     const [values, setValues] = React.useState({
         fullName: '',
@@ -29,6 +33,7 @@ const DataPersonalInfo: React.FC = () => {
     });
     const [profileImage, setProfileImage] = React.useState<string | null>(null);
     const [profileImageFile, setProfileImageFile] = React.useState<File | null>(null);
+    const [isLoading, setIsLoading] = React.useState(false);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     // Cargar datos del usuario al montar
@@ -72,6 +77,7 @@ const DataPersonalInfo: React.FC = () => {
             setValidationErrors(errors);
             return;
         }
+        setIsLoading(true);
         try {
             // 1. Actualizar datos de perfil (sin imagen)
             const { fullName, ...restValues } = values;
@@ -97,6 +103,8 @@ const DataPersonalInfo: React.FC = () => {
                 message: 'Error al actualizar',
                 type: 'error'
             });
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -138,7 +146,8 @@ const DataPersonalInfo: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex">
+        <div className="min-h-screen flex relative">
+            {isLoading && <FullScreenLoader />}
             <DataSideBar />
             <div className="flex flex-col flex-grow p-4 md:p-10 md:ml-[250px]">
                 <h1 className="text-2xl font-space font-medium text-gray-800 mb-6">Datos Personales</h1>
@@ -205,6 +214,11 @@ const DataPersonalInfo: React.FC = () => {
                             <div className="w-full md:w-4/12">
                                 <label className="block text-sm font-space font-medium text-gray-600 mb-2">
                                     Correo Electrónico
+                                    {isGoogleUser(user) && (
+                                        <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            Google
+                                        </span>
+                                    )}
                                 </label>
                                 <InputDefault
                                     type="email"
@@ -284,33 +298,36 @@ const DataPersonalInfo: React.FC = () => {
                             />
                         </div>
                         <div className="border-t border-gray-300 my-2 w-full md:w-8/12"></div>
-                        <div className="w-full">
-                            <h2 className="text-lg font-space font-medium text-gray-800 mb-4 md:ml-[16%]">
-                                Cambiar contraseña
-                            </h2>
-                            <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
-                                <div className="w-full md:w-4/12">
-                                    <label className="block text-sm font-space font-medium text-gray-600 mb-2">
-                                        Contraseña actual
-                                    </label>
-                                    <InputDefault
-                                        type="password"
-                                        placeholder="••••••••"
-                                        className="w-full"
-                                    />
-                                </div>
-                                <div className="w-full md:w-4/12">
-                                    <label className="block text-sm font-space font-medium text-gray-600 mb-2">
-                                        Nueva contraseña
-                                    </label>
-                                    <InputDefault
-                                        type="password"
-                                        placeholder="••••••••"
-                                        className="w-full"
-                                    />
+                        {/* Solo mostrar sección de cambio de contraseña si el usuario no se logueó con Google */}
+                        {!isGoogleUser(user) && (
+                            <div className="w-full">
+                                <h2 className="text-lg font-space font-medium text-gray-800 mb-4 md:ml-[16%]">
+                                    Cambiar contraseña
+                                </h2>
+                                <div className="flex flex-col md:flex-row gap-4 w-full md:justify-center">
+                                    <div className="w-full md:w-4/12">
+                                        <label className="block text-sm font-space font-medium text-gray-600 mb-2">
+                                            Contraseña actual
+                                        </label>
+                                        <InputDefault
+                                            type="password"
+                                            placeholder="••••••••"
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <div className="w-full md:w-4/12">
+                                        <label className="block text-sm font-space font-medium text-gray-600 mb-2">
+                                            Nueva contraseña
+                                        </label>
+                                        <InputDefault
+                                            type="password"
+                                            placeholder="••••••••"
+                                            className="w-full"
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
                         <div className="flex flex-col items-center md:items-end mt-6 w-full">
                             <DesignButton variant="primary" onClick={handleSaveChanges}>
                                 Guardar cambios
