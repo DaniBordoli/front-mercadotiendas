@@ -23,6 +23,7 @@ const ProductDetailScreen: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [tab, setTab] = useState<'description' | 'specs' | 'reviews'>('description');
+  const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   
   const { 
@@ -73,9 +74,17 @@ const ProductDetailScreen: React.FC = () => {
         />
       </div>
     );
-  }
-  return (
+  }  return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+      {notification.show && (
+        <div 
+          className="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-md shadow-lg flex items-center"
+          style={{ backgroundColor: editableVariables.primaryColor }}
+        >
+          <span className="mr-2">✓</span>
+          {notification.message}
+        </div>
+      )}
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
         title={editableVariables.title}
@@ -180,12 +189,22 @@ const ProductDetailScreen: React.FC = () => {
  
           <div className="flex gap-2 mt-4">            <button 
               onClick={() => {
-                if (selectedProduct) {
-                  addToCart(selectedProduct, quantity);
-                  navigate('/first-layout/cart-layout');
+                if (selectedProduct) {                  addToCart(selectedProduct, quantity);
+                  
+                  // Show notification
+                  setNotification({
+                    show: true,
+                    message: `${selectedProduct.name} añadido al carrito!`
+                  });
+                    // Hide notification after 2 seconds
+                  setTimeout(() => {
+                    setNotification({show: false, message: ''});
+                    // Ya no navegamos al carrito, solo mostramos la notificación
+                  }, 1500);
+                  
                 }
               }} 
-              className="flex-1 px-4 py-2 text-white rounded font-semibold transition hover:opacity-90"
+              className="flex-1 px-4 py-2 text-white bg-blue-500 rounded font-semibold transition hover:opacity-90"
               style={{ backgroundColor: editableVariables.primaryColor }}
             >
               Añadir al Carrito

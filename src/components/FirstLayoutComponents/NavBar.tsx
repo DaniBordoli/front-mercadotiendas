@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaUser, FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { useCartStore } from '../../stores/cartStore';
 
 interface NavBarProps {
   navbarLinks?: { label: string; href: string }[];
@@ -22,6 +23,8 @@ const NavBar: React.FC<NavBarProps> = ({
   fontType = 'Arial',
 }) => {
   const navigate = useNavigate();
+  const cartItems = useCartStore(state => state.items);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <nav className="w-full shadow-sm" style={{ backgroundColor }}>
@@ -45,10 +48,17 @@ const NavBar: React.FC<NavBarProps> = ({
               {link.label}
             </a>
           ))}
-        </div>
-        <div className="flex gap-4">
+        </div>        <div className="flex gap-4">
           <FaUser onClick={() => navigate('/first-layout/user-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
-          <FaShoppingCart onClick={() => navigate('/first-layout/cart-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
+          <div className="relative cursor-pointer" onClick={() => navigate('/cart-list')}>
+            <FaShoppingCart className="text-xl" style={{ color: textColor }} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                {cartCount}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </nav>

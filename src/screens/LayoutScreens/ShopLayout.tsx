@@ -150,17 +150,17 @@ const ShopLayout: React.FC = () => {
                   </div>
                   <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
                     <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.name || prod?.nombre || `Product ${idx + 1}`}</h3>
-                    <span className="font-bold text-lg mb-2 text-left block" style={{ color: editableVariables.primaryColor }}>
+                    <span className="font-bold text-lg mb-2 text-left text-white block" style={{ color: editableVariables.primaryColor }}>
                       {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
                     </span>
                     <div className="flex justify-center">
                       <button
-                        className="px-4 w-full py-2 rounded hover:bg-blue-600 transition text-sm"
+                        className="px-4 w-full py-2 rounded text-white bg-blue-600 transition text-sm"
                         style={{
                           backgroundColor: editableVariables.featuredProductsCardButtonColor,
                           color: editableVariables.featuredProductsCardButtonTextColor,
                         }}
-                      >
+                      > Añadir al carro
                         {editableVariables.featuredProductsCardButtonText}
                       </button>
                     </div>

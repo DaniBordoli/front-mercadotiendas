@@ -189,9 +189,12 @@ export const publicRoutes = [
   {
     path: '/first-layout/contact-layout',
     element: <ContactScreen />
+  },  {
+    path: '/cart-list',
+    element: <CartList />
   },
   {
-    path: '/cart-list',
+    path: '/cart',
     element: <CartList />
   },
    {

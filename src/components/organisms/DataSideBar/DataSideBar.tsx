@@ -18,6 +18,9 @@ const DataSideBar: React.FC = () => {
     const location = useLocation();
     const { user, logout } = useAuthStore();
     const hasShop = !!(user && user.shop && user.shop._id);
+    
+    // Agregar console.log para inspeccionar el objeto user completo
+    console.log('User object in DataSideBar:', user);
  
     const [shopDropdownOpen, setShopDropdownOpen] = React.useState(false);
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
