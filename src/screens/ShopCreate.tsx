@@ -45,9 +45,16 @@ const ShopCreate: React.FC = () => {
 
     const handleCreateShop = async () => {
         try {
+            const subdomain = formData.storeName
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos (acentos)
+                .replace(/[^a-z0-9-]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/--+/g, '-');
             const shopData = {
                 shopName: formData.storeName,
-                subdomain: formData.storeName.toLowerCase().replace(/\s+/g, '-'),
+                subdomain,
                 template: formData.design || 'modern',
                 category: formData.productCategory,
                 address: 'N/A',

@@ -24,8 +24,8 @@ interface FeaturedProductsProps {
 
 const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   cardImage = 'https://placehold.co/300x400',
-  title = 'Featured Products',
-  backgroundColor = '#F9FAFB', // Igual que HeroSection
+  title = 'Productos destacados',
+  backgroundColor = '#F9FAFB',
   cardButtonText = 'Añadir al carrito',
   cardButtonColor = '#3B82F6',
   cardButtonTextColor = '#FFFFFF',
@@ -33,10 +33,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
 }) => {
   const defaultProducts = [
-    { id: 1, title: 'Product 1', price: '$49.99', image: cardImage },
-    { id: 2, title: 'Product 2', price: '$59.99', image: cardImage },
-    { id: 3, title: 'Product 3', price: '$69.99', image: cardImage },
-    { id: 4, title: 'Product 4', price: '$79.99', image: cardImage },
+    { id: 1, title: 'Producto 1', price: '$49.99', image: cardImage },
+    { id: 2, title: 'Producto 2', price: '$59.99', image: cardImage },
+    { id: 3, title: 'Producto 3', price: '$69.99', image: cardImage },
+    { id: 4, title: 'Producto 4', price: '$79.99', image: cardImage },
   ];
   const showProducts = products && products.length > 0 ? products : defaultProducts;
 

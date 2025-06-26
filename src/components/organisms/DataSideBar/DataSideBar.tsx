@@ -68,7 +68,7 @@ const DataSideBar: React.FC = () => {
     
         ...(hasShop ? [
             { key: 'general', label: 'Información general', icon: <FaCircleInfo className="text-lg" />, path: '/settings' },
-            { key: 'editShop', label: 'Editar Tienda con IA', icon: <RiRobot2Line className="text-lg" />, path: '/layout-select' },
+            { key: 'editShop', label: 'Editar Tienda con IA', icon: <RiRobot2Line className="text-lg" />, path: '/first-layout' },
             { key: 'shopState', label: 'Estado de la Tienda', icon: <IoToggleSharp className="text-lg" />, path: '/data-shop-state' },
             { key: 'shopConfig', label: 'Configuración de Tienda', icon: <FaGear className="text-lg" />, path: '/data-shop-config' },
             { key: 'layout', label: 'Layouts', icon: <FaCircleInfo className="text-lg" />, path: '/layout-select' },

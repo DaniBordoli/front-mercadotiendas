@@ -9,16 +9,16 @@ interface NewsletterSectionProps {
 const NewsletterSection: React.FC<NewsletterSectionProps> = ({ backgroundColor = "bg-gray-50", titleColor = "#000" }) => {
   return (
     <div className="py-12" style={{ backgroundColor }}>
-      <h2 className="text-2xl font-bold text-center mb-4" style={{ color: titleColor }}>Subscribe to Our Newsletter</h2>
+      <h2 className="text-2xl font-bold text-center mb-4" style={{ color: titleColor }}>Suscríbete a nuestro boletín</h2>
       <p className="text-center text-gray-600 mb-8">
-        Get the latest updates about new products and upcoming sales.
+        Recibe las últimas novedades sobre productos y próximas ofertas.
       </p>
       <div className="flex justify-center items-center mb-12 gap-4">
         <div >
-          <InputDefault className='w-80' placeholder="Enter your email" type="email" />
+          <InputDefault className='w-80' placeholder="Ingresa tu correo electrónico" type="email" />
         </div>
         <button className="px-6 py-3 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Subscribe
+          Suscribirse
         </button>
       </div>
     </div>

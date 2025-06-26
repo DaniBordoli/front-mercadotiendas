@@ -14,7 +14,7 @@ interface FooterProps {
 const Footer: React.FC<FooterProps> = ({
   backgroundColor = '#0B1120',
   textColor = '#FFFFFF',
-  footerDescription = 'Your one-stop destination for fashion and accessories.',
+  footerDescription = 'Tu destino integral para moda y accesorios.',
 }) => {
   const navigate = useNavigate();
 
@@ -34,14 +34,14 @@ const Footer: React.FC<FooterProps> = ({
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Quick Links</h3>
+          <h3 className="text-lg font-bold mb-4">Enlaces rápidos</h3>
           <ul className="space-y-2 text-sm text-gray-400">
             <li>
               <span
                 className="hover:text-white cursor-pointer"
                 onClick={() => navigate('/first-layout/aboutus-layout')}
               >
-                About Us
+                Sobre nosotros
               </span>
             </li>
             <li>
@@ -49,31 +49,31 @@ const Footer: React.FC<FooterProps> = ({
                 className="hover:text-white cursor-pointer"
                 onClick={() => navigate('/first-layout/contact-layout')}
               >
-                Contact
+                Contacto
               </span>
             </li>
             <li><a href="#blog" className="hover:text-white">Blog</a></li>
-            <li><a href="#faqs" className="hover:text-white">FAQs</a></li>
+            <li><a href="#faqs" className="hover:text-white">Preguntas frecuentes</a></li>
           </ul>
         </div>
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Customer Service</h3>
+          <h3 className="text-lg font-bold mb-4">Servicio al cliente</h3>
           <ul className="space-y-2 text-sm text-gray-400">
-            <li><a href="#shipping" className="hover:text-white">Shipping Policy</a></li>
-            <li><a href="#returns" className="hover:text-white">Returns & Exchanges</a></li>
-            <li><a href="#size-guide" className="hover:text-white">Size Guide</a></li>
-            <li><a href="#terms" className="hover:text-white">Terms & Conditions</a></li>
+            <li><a href="#shipping" className="hover:text-white">Política de envíos</a></li>
+            <li><a href="#returns" className="hover:text-white">Devoluciones y cambios</a></li>
+            <li><a href="#size-guide" className="hover:text-white">Guía de tallas</a></li>
+            <li><a href="#terms" className="hover:text-white">Términos y condiciones</a></li>
           </ul>
         </div>
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Contact Info</h3>
+          <h3 className="text-lg font-bold mb-4">Información de contacto</h3>
           <ul className="space-y-2 text-sm text-gray-400">
             <li className="flex items-center gap-2">
-              <HiLocationMarker className="text-xl" /> 123 Fashion Street, NY 10001
+              <HiLocationMarker className="text-xl" /> 123 Calle de la Moda, NY 10001
             </li>
             <li className="flex items-center gap-2">
               <FaPhone className="text-xl" /> +1 234 567 8900
@@ -86,7 +86,7 @@ const Footer: React.FC<FooterProps> = ({
       </div>
       <hr className="border-t border-gray-800 my-8 mx-auto w-10/12" />
       <div className="mt-8 text-center text-sm text-gray-400">
-        © 2025 ShopSmart. All rights reserved.
+        © 2025 ShopSmart. Todos los derechos reservados.
       </div>
     </footer>
   );

@@ -97,29 +97,27 @@ export const GeneralInfoSection: React.FC = () => {
                 <div>
                     <label className="text-sm font-space mb-2 block">País</label>
                     <SelectDefault
-                        placeholder="Seleccionar país"
+                        placeholder="Argentina"
                         className="w-full"
-                        options={selectOptions}
-                        value={formData.country}
+                        options={[{ value: 'Argentina', label: 'Argentina' }]}
+                        value={formData.country || 'Argentina'}
                         onChange={value => handleInputChange('country', value)}
                     />
                 </div>
                 <div>
                     <label className="text-sm font-space mb-2 block">Provincia</label>
-                    <SelectDefault
-                        placeholder="Seleccionar provincia"
+                    <InputDefault
+                        placeholder="Ingrese provincia"
                         className="w-full"
-                        options={selectOptions}
                         value={formData.province}
                         onChange={value => handleInputChange('province', value)}
                     />
                 </div>
                 <div>
                     <label className="text-sm font-space mb-2 block">Ciudad</label>
-                    <SelectDefault
-                        placeholder="Seleccionar ciudad"
+                    <InputDefault
+                        placeholder="Ingrese ciudad"
                         className="w-full"
-                        options={selectOptions}
                         value={formData.city}
                         onChange={value => handleInputChange('city', value)}
                     />
@@ -152,21 +150,16 @@ export const GeneralInfoSection: React.FC = () => {
                     />
                 </div>
                 <div>
-                    <label className="text-sm font-space mb-2 block">Rubro</label>
-                    <SelectDefault
-                        placeholder="Seleccionar rubro"
-                        className="w-full"
-                        options={selectOptions}
-                        value={formData.category}
-                        onChange={value => handleInputChange('category', value)}
-                    />
-                </div>
-                <div>
                     <label className="text-sm font-space mb-2 block">Moneda preferida</label>
                     <SelectDefault
-                        placeholder="ARS - Peso argentino"
+                        placeholder="Seleccionar moneda"
                         className="w-full"
-                        options={selectOptions}
+                        options={[
+                            { value: 'ARS', label: 'Peso Argentino' },
+                            { value: 'USD', label: 'Dólar' },
+                            { value: 'EUR', label: 'Euro' },
+                            { value: 'BRL', label: 'Real Brasileño' },
+                        ]}
                         value={formData.preferredCurrency}
                         onChange={value => handleInputChange('preferredCurrency', value)}
                     />
@@ -174,9 +167,13 @@ export const GeneralInfoSection: React.FC = () => {
                 <div>
                     <label className="text-sm font-space mb-2 block">Idioma principal</label>
                     <SelectDefault
-                        placeholder="Español"
+                        placeholder="Seleccionar idioma"
                         className="w-full"
-                        options={selectOptions}
+                        options={[
+                            { value: 'es', label: 'Español' },
+                            { value: 'en', label: 'Inglés' },
+                            { value: 'pt', label: 'Portugués' },
+                        ]}
                         value={formData.languageMain}
                         onChange={value => handleInputChange('languageMain', value)}
                     />

@@ -21,7 +21,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     error: null,
 
     updateShopInfo: async (shopId: string, data: any, imageFile?: File) => {
-        const token = localStorage.getItem('token');
+        const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
 
         set({ loading: true, error: null });
@@ -136,7 +136,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     getShop: async () => {
-        const token = localStorage.getItem('token');
+        const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
 
         set({ loading: true, error: null });

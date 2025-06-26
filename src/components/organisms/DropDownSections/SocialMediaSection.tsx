@@ -3,8 +3,45 @@ import { InputDefault } from '../../atoms/InputDefault';
 import { DesignButton } from '../../atoms/DesignButton';
 import { StatusTags } from '../../atoms/StatusTags';
 import { FaInstagram, FaFacebook, FaWhatsapp, FaTiktok, FaYoutube } from "react-icons/fa";
+import { useAuthStore, getShopSocial, updateShopSocial, ShopSocial } from '../../../stores/slices/authSlice';
 
 export const SocialMediaSection: React.FC = () => {
+    const { user } = useAuthStore();
+    const shopId = user?.shop?._id;
+    const [form, setForm] = React.useState<ShopSocial>({});
+    const [loading, setLoading] = React.useState(false);
+    const [success, setSuccess] = React.useState(false);
+    const [error, setError] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        if (shopId) {
+            setLoading(true);
+            getShopSocial(shopId)
+                .then(data => { if (data) setForm(data); })
+                .catch(() => {})
+                .finally(() => setLoading(false));
+        }
+    }, [shopId]);
+
+    const handleChange = (field: keyof ShopSocial) => (value: string) => {
+        setForm(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleSave = async () => {
+        if (!shopId) return;
+        setLoading(true);
+        setError(null);
+        setSuccess(false);
+        try {
+            await updateShopSocial(shopId, form);
+            setSuccess(true);
+        } catch (err: any) {
+            setError(err.message || 'Error al guardar');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
             <div className="grid grid-cols-1 gap-4">
@@ -13,7 +50,7 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaInstagram className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" />
+                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" value={form.instagram || ''} onChange={handleChange('instagram')} />
                         </div>
                     </div>
                 </div>
@@ -22,7 +59,7 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaFacebook className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="facebook.com/página" className="w-full border-none outline-none" />
+                            <InputDefault placeholder="facebook.com/página" className="w-full border-none outline-none" value={form.facebook || ''} onChange={handleChange('facebook')} />
                         </div>
                     </div>
                 </div>
@@ -31,7 +68,7 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaWhatsapp className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="+54 9 11 1234-5678" className="w-full border-none outline-none" />
+                            <InputDefault placeholder="+54 9 11 1234-5678" className="w-full border-none outline-none" value={form.whatsapp || ''} onChange={handleChange('whatsapp')} />
                         </div>
                     </div>
                 </div>
@@ -40,7 +77,7 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaTiktok className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" />
+                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" value={form.tiktok || ''} onChange={handleChange('tiktok')} />
                         </div>
                     </div>
                 </div>
@@ -49,7 +86,7 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaYoutube className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="youtube.com/canal" className="w-full border-none outline-none" />
+                            <InputDefault placeholder="youtube.com/canal" className="w-full border-none outline-none" value={form.youtube || ''} onChange={handleChange('youtube')} />
                         </div>
                     </div>
                 </div>
@@ -59,25 +96,30 @@ export const SocialMediaSection: React.FC = () => {
                 <InputDefault
                     placeholder="Ej: Lunes a Viernes de 9:00 a 18:00hs"
                     className="w-full mt-2"
+                    value={form.horarios || ''}
+                    onChange={handleChange('horarios')}
                 />
             </div>
             <div className="grid grid-cols-1 gap-4 mt-6">
                 <div>
                     <label className="text-sm font-space mb-2 block">Email Alternativo</label>
-                    <InputDefault placeholder="contacto@empresa.com" className="w-full" />
+                    <InputDefault placeholder="contacto@empresa.com" className="w-full" value={form.emailAlternativo || ''} onChange={handleChange('emailAlternativo')} />
                 </div>
                 <div>
                     <label className="text-sm font-space mb-2 block">Teléfono Adicional</label>
-                    <InputDefault placeholder="+54 11 1234-5678" className="w-full" />
+                    <InputDefault placeholder="+54 11 1234-5678" className="w-full" value={form.telefonoAdicional || ''} onChange={handleChange('telefonoAdicional')} />
                 </div>
             </div>
             <div className="flex items-center mt-6">
-                <StatusTags status="Active" className="mr-2" />
-                <span className="text-gray-700 font-space">Todos los enlaces están funcionando correctamente</span>
+                <StatusTags status={success ? 'Active' : 'Inactive'} className="mr-2" />
+                <span className="text-gray-700 font-space">
+                    {success ? 'Cambios guardados correctamente' : 'Todos los enlaces están funcionando correctamente'}
+                </span>
             </div>
+            {error && <div className="text-red-500 mt-2">{error}</div>}
             <div className="flex flex-col gap-2 mt-6">
-                <DesignButton variant="neutral">Restaurar</DesignButton>
-                <DesignButton variant="primary">Guardar cambios</DesignButton>
+                <DesignButton variant="neutral" onClick={() => setForm({})} disabled={loading}>Restaurar</DesignButton>
+                <DesignButton variant="primary" onClick={handleSave} disabled={loading}>Guardar cambios</DesignButton>
             </div>
         </div>
     );

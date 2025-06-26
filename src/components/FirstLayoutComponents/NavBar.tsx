@@ -17,9 +17,9 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({
   navbarLinks = [
-    { label: 'Home', href: '/first-layout' },
-    { label: 'Shop', href: '/first-layout/shop-layout' },
-    { label: 'Contact', href: '/first-layout/contact-layout' },
+    { label: 'Inicio', href: '/first-layout' },
+    { label: 'Tienda', href: '/first-layout/shop-layout' },
+    { label: 'Contacto', href: '/first-layout/contact-layout' },
   ],
   title = 'ShopSmarttt',
   backgroundColor = '#FFFFFF',
