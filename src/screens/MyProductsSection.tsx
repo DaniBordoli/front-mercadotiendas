@@ -7,17 +7,14 @@ import DataSideBar from '../components/organisms/DataSideBar/DataSideBar'
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa6';
 import { useAuthStore } from '../stores/slices/authSlice';
+import { fetchCategories } from '../stores/slices/authSlice';
 import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const estadoOptions = [
   { value: '', label: 'Todos' },
-  { value: 'activo', label: 'Activo' },
+  { value: 'Activo', label: 'Activo' },
   { value: 'pendiente', label: 'Pendiente' },
-];
-const categoriaOptions = [
-  { value: '', label: 'Todas' },
-  { value: 'accesorios', label: 'Accesorios' },
-  { value: 'calzado', label: 'Calzado' },
 ];
 const ordenarOptions = [
   { value: 'recientes', label: 'Más recientes' },
@@ -37,6 +34,8 @@ const MyProductsSection: React.FC = () => {
   const [loading, setLoading] = React.useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [productToDelete, setProductToDelete] = React.useState<any | null>(null);
+  const [showLoader, setShowLoader] = React.useState(false);
+  const [categoryOptions, setCategoryOptions] = React.useState<{ value: string; label: string }[]>([ { value: '', label: 'Todas' } ]);
 
   // Estados para filtros
   const [estadoFiltro, setEstadoFiltro] = React.useState('');
@@ -60,14 +59,44 @@ const MyProductsSection: React.FC = () => {
     loadProducts();
   }, [fetchProducts]);
 
+  React.useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        setCategoryOptions([
+          { value: '', label: 'Todas' },
+          ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))
+        ]);
+      } catch {
+        setCategoryOptions([{ value: '', label: 'Todas' }]);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Utilidad para normalizar texto (quita tildes y pasa a minúsculas)
+  function normalizeText(text: string) {
+    return (text || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   // Filtrado de productos
   const productosFiltrados = React.useMemo(() => {
     let filtered = [...productos];
     if (estadoFiltro) filtered = filtered.filter(p => (p.estado || '').toLowerCase() === estadoFiltro);
-    if (categoriaFiltro) filtered = filtered.filter(p => (p.categoria || '').toLowerCase() === categoriaFiltro);
+    if (categoriaFiltro) filtered = filtered.filter(p => normalizeText(p.categoria) === normalizeText(categoriaFiltro));
     if (stockFiltro === 'conStock') filtered = filtered.filter(p => Number(p.stock) > 0);
     if (stockFiltro === 'sinStock') filtered = filtered.filter(p => !p.stock || Number(p.stock) <= 0);
-    if (busqueda.trim()) filtered = filtered.filter(p => (p.nombre || '').toLowerCase().includes(busqueda.trim().toLowerCase()));
+    if (busqueda.trim()) {
+      const search = normalizeText(busqueda);
+      filtered = filtered.filter(p =>
+        normalizeText(p.nombre).includes(search)
+      );
+    }
     if (ordenarFiltro === 'recientes') filtered = filtered.sort((a, b) => {
       const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
@@ -93,12 +122,15 @@ const MyProductsSection: React.FC = () => {
 
   const handleDelete = async () => {
     if (!productToDelete) return;
+    setShowLoader(true);
     try {
       await deleteProduct(productToDelete._id);
       setProductos(prev => prev.filter(p => p._id !== productToDelete._id));
       closeDeleteModal();
     } catch (err: any) {
       alert(err?.message || 'Error al eliminar el producto');
+    } finally {
+      setShowLoader(false);
     }
   };
 
@@ -151,7 +183,7 @@ const MyProductsSection: React.FC = () => {
             </div>
             <div className="flex flex-col gap-1 w-full md:w-40">
               <span className="text-xs text-gray-500 font-space">Categoría</span>
-              <SelectDefault options={categoriaOptions} value={categoriaFiltro} onChange={val => setCategoriaFiltro(val)} />
+              <SelectDefault options={categoryOptions} value={categoriaFiltro} onChange={val => setCategoriaFiltro(val)} />
             </div>
             <div className="flex flex-col gap-1 w-full md:w-48">
               <span className="text-xs text-gray-500 font-space">Ordenar por</span>
@@ -213,7 +245,17 @@ const MyProductsSection: React.FC = () => {
                       <td className="px-4 py-3 font-space min-w-[100px]">{prod.precio}</td>
                       <td className="px-4 py-3 font-space min-w-[80px]">{prod.stock ?? '-'}</td>
                       <td className="px-4 py-3 font-space min-w-[100px]">
-                        <span className="font-medium text-green-600">{prod.estado}</span>
+                        <span
+                          className={
+                            prod.estado === 'Activo'
+                              ? "font-medium text-green-600"
+                              : prod.estado === 'Inactivo'
+                              ? "font-medium text-red-600"
+                              : "font-medium"
+                          }
+                        >
+                          {prod.estado}
+                        </span>
                       </td>
                       <td className="px-4 py-3 font-space min-w-[120px]">{prod.categoria}</td>
                       <td className="px-4 py-3 font-space min-w-[120px]">
@@ -255,6 +297,7 @@ const MyProductsSection: React.FC = () => {
           }}
         />
       )}
+      {showLoader && <FullScreenLoader />}
     </div>
   );
 };

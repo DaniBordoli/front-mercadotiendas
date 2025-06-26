@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
 import { FaArrowLeft } from 'react-icons/fa6';
@@ -12,6 +12,7 @@ import ProductSuccessModal from '../components/organisms/NewProductComponents/Pr
 import { useAuthStore } from '../stores/slices/authSlice';
 import Toast from '../components/atoms/Toast';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
+import { fetchCategories } from '../stores/slices/authSlice';
 
 const steps = [
   { label: 'Información Básica' },
@@ -35,15 +36,17 @@ const NewProductScreen: React.FC = () => {
     nombre: '',
     descripcion: '',
     sku: '',
-    estado: 'activo',
+    estado: 'Activo',
     precio: '',
     categoria: '',
     subcategoria: '',
+    stock: '', // nuevo campo
   });
 
   // Estado para imágenes
   const [productImages, setProductImages] = React.useState<(File | string)[]>([]);
   const variantsRef = useRef<{ getVariants: () => { tipo: string; valores: string[] }[] }>(null);
+  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar categoría' } ]);
 
   const handleBasicInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
@@ -67,7 +70,12 @@ const NewProductScreen: React.FC = () => {
       if (productImages.length > 0) {
         formData = new FormData();
         Object.entries(basicInfo).forEach(([key, value]) => {
-          formData!.append(key, value);
+          // Convertir stock a número si es posible
+          if (key === 'stock') {
+            formData!.append(key, value ? String(Number(value)) : '0');
+          } else {
+            formData!.append(key, value);
+          }
         });
         formData!.append('variantes', JSON.stringify(variants));
         productImages.forEach((img) => {
@@ -81,6 +89,7 @@ const NewProductScreen: React.FC = () => {
         ? (formData as any)
         : {
             ...basicInfo,
+            stock: basicInfo.stock ? Number(basicInfo.stock) : 0, // Enviar como número
             variantes: variants,
           };
       
@@ -90,6 +99,7 @@ const NewProductScreen: React.FC = () => {
         sku: result.data?.sku || basicInfo.sku,
         precio: result.data?.precio || basicInfo.precio,
         estado: result.data?.estado || basicInfo.estado,
+        stock: result.data?.stock || basicInfo.stock, // mostrar stock si lo necesitas
         productImages: result.data?.productImages || [],
       });
       setShowModal(true);
@@ -103,6 +113,21 @@ const NewProductScreen: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        setCategoryOptions([
+          { value: '', label: 'Seleccionar categoría' },
+          ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))
+        ]);
+      } catch {
+        setCategoryOptions([{ value: '', label: 'Seleccionar categoría' }]);
+      }
+    };
+    loadCategories();
+  }, []);
 
   return (
     <div className="min-h-screen flex relative">
@@ -186,6 +211,7 @@ const NewProductScreen: React.FC = () => {
             onNext={() => setStep(2)}
             values={basicInfo}
             onChange={handleBasicInfoChange}
+            categoryOptions={categoryOptions}
           />
         )}
         {step === 2 && (

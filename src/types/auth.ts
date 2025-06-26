@@ -92,6 +92,7 @@ export type AuthStore = AuthState & {
       estado: string;
       precio: string;
       categoria: string;
+      stock: string;
       subcategoria: string;
       variantes?: { tipo: string; valores: string[] }[];
     } | FormData

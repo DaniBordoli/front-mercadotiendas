@@ -10,6 +10,7 @@ import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { fetchProvincesForArgentina } from '../stores/slices/authSlice';
 import { fetchCountries } from '../stores/slices/authSlice'
 import { Navbar } from '../components/organisms/Navbar';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -118,6 +119,7 @@ const Register = () => {
 
   return (
     <div className="flex flex-col items-center mb-4">
+      {isLoading && <FullScreenLoader />}
       <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
         <div className="flex items-center justify-center w-full">
           <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />

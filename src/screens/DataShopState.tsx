@@ -39,7 +39,6 @@ const DataShopState: React.FC = () => {
                 </div>
                 <div
                     className="p-6 bg-white rounded-md flex items-center justify-between border"
-                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
                     <div className="flex items-center">
                         <div
@@ -76,7 +75,6 @@ const DataShopState: React.FC = () => {
                 </div>
                 <div
                     className="p-6 bg-white rounded-md border"
-                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
                     {shopStateItems.map((item, index) => (
                         <React.Fragment key={index}>
@@ -92,7 +90,7 @@ const DataShopState: React.FC = () => {
                                     <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>{item.subtext}</p>
                                 </div>
                             </div>
-                            {index < 2 && <hr className={isActive ? 'border-gray-300' : 'border-red-300'} />}
+                            {index < 2 && <hr className="border-gray-300" />}
                         </React.Fragment>
                     ))}
                 </div>

@@ -2,12 +2,6 @@ import React from 'react';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
 import { SelectDefault } from '../../atoms/SelectDefault/SelectDefault';
 
-const categoriaOptions = [
-  { value: '', label: 'Seleccionar categoría' },
-  { value: 'Accesorios', label: 'Accesorios' },
-  { value: 'Calzado', label: 'Calzado' },
-   { value: 'Indumentaria', label: 'Indumentaria' },
-];
 const subcategoriaOptions = [
   { value: '', label: 'Seleccionar subcategoría' },
   { value: 'Relojes', label: 'Relojes' },
@@ -28,22 +22,25 @@ interface StepBasicInfoProps {
     precio: string;
     categoria: string;
     subcategoria: string;
+    stock: string; // nuevo campo
   };
   onChange: (
     e:
       | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
       | { name: string; value: string }
   ) => void;
+  categoryOptions: { value: string; label: string }[];
 }
 
-const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange }) => {
+const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange, categoryOptions }) => {
   // Validar campos obligatorios
   const isNextDisabled =
     !values.nombre.trim() ||
     !values.descripcion.trim() ||
     !values.sku.trim() ||
     !values.precio.trim() ||
-    !values.categoria.trim();
+    !values.categoria.trim() ||
+    !values.stock.trim(); // stock requerido
 
   return (
     <div className="w-full py-8 px-8">
@@ -109,9 +106,21 @@ const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange 
             />
           </div>
           <div>
+            <label className="block text-xs font-space text-gray-500 mb-1">Stock *</label>
+            <input
+              className="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none"
+              placeholder="Ej: 10"
+              name="stock"
+              value={values.stock}
+              onChange={onChange}
+              type="number"
+              min="0"
+            />
+          </div>
+          <div>
             <label className="block text-xs font-space text-gray-500 mb-1">Categoría *</label>
             <SelectDefault
-              options={categoriaOptions}
+              options={categoryOptions}
               value={values.categoria}
               onChange={val => onChange({ name: 'categoria', value: val })}
             />

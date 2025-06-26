@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
 import { FaPlus, FaRegImage, FaBox, FaPenToSquare, FaTrash, FaChevronDown, FaChevronRight, FaTriangleExclamation } from 'react-icons/fa6';
-import { createCategory, fetchCategories, deleteCategory } from '../stores/slices/authSlice';
+import { updateCategory, fetchCategories, createCategory, deleteCategory } from '../stores/slices/authSlice';
 import { getStorageItem } from '../utils/storage';
 
 // Máximo de categorías principales y subcategorías
@@ -30,7 +30,8 @@ const CollapsibleCategory: React.FC<{
   cat: any;
   onDelete: (cat: any) => void;
   onAddSubcategory: (parentCat: any) => void;
-}> = ({ cat, onDelete, onAddSubcategory }) => {
+  onEdit: (cat: any) => void;
+}> = ({ cat, onDelete, onAddSubcategory, onEdit }) => {
   const [open, setOpen] = useState(true);
   const hasChildren = cat.children && cat.children.length > 0;
   const maxSubcats = cat.children && cat.children.length >= MAX_CATEGORIES;
@@ -61,7 +62,7 @@ const CollapsibleCategory: React.FC<{
           >
             <FaPlus size={16} />
           </button>
-          <button className="text-gray-400 hover:text-[#FF4D4F]">
+          <button className="text-gray-400 hover:text-[#FF4D4F]" onClick={() => onEdit(cat)}>
             <FaPenToSquare size={16} />
           </button>
           <button
@@ -76,7 +77,7 @@ const CollapsibleCategory: React.FC<{
         <div>
           {cat.children.map((child: any) => (
             <div key={child.id} className="pl-8">
-              <CollapsibleCategory cat={child} onDelete={onDelete} onAddSubcategory={onAddSubcategory} />
+              <CollapsibleCategory cat={child} onDelete={onDelete} onAddSubcategory={onAddSubcategory} onEdit={onEdit} />
             </div>
           ))}
         </div>
@@ -90,6 +91,8 @@ const DataCatalog: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [categoryToEdit, setCategoryToEdit] = useState<any>(null);
 
   // Estado para radio buttons del modal de eliminar
   const [productAction, setProductAction] = useState<'move' | 'delete'>('move');
@@ -225,6 +228,10 @@ const DataCatalog: React.FC = () => {
                     onAddSubcategory={(parentCat) => {
                       setParentCategory(parentCat);
                       setShowModal(true);
+                    }}
+                    onEdit={(cat) => {
+                      setCategoryToEdit(cat);
+                      setEditModalOpen(true);
                     }}
                   />
                 ))
@@ -437,6 +444,67 @@ const DataCatalog: React.FC = () => {
                     <span className="font-space">Eliminar</span>
                   </DesignButton>
                 </div>
+              </div>
+            </div>
+          )}
+          {/* Modal de editar */}
+          {editModalOpen && categoryToEdit && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 px-2">
+              <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-4 md:p-6 relative">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-space">Editar categoría</h2>
+                  <button
+                    className="text-gray-400 hover:text-gray-600 text-xl font-space"
+                    onClick={() => { setEditModalOpen(false); setCategoryToEdit(null); }}
+                  >
+                    ×
+                  </button>
+                </div>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  try {
+                    await updateCategory(categoryToEdit.id, { name: categoryToEdit.name, description: categoryToEdit.description });
+                    const flat = await fetchCategories();
+                    setCategories(buildCategoryTree(flat));
+                    setEditModalOpen(false);
+                    setCategoryToEdit(null);
+                  } catch (err: any) {
+                    alert(err.message || 'Error al actualizar la categoría');
+                  }
+                }}>
+                  <div className="mb-4">
+                    <label className="block text-sm mb-1 font-space">Nombre</label>
+                    <input
+                      type="text"
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4D4F] placeholder-gray-300 font-space"
+                      value={categoryToEdit.name}
+                      onChange={e => setCategoryToEdit((prev: any) => ({ ...prev, name: e.target.value }))}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <label className="block text-sm mb-1 font-space">Descripción</label>
+                    <textarea
+                      className="w-full border border-gray-200 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF4D4F] placeholder-gray-300 font-space"
+                      value={categoryToEdit.description}
+                      onChange={e => setCategoryToEdit((prev: any) => ({ ...prev, description: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <DesignButton
+                      variant="neutral"
+                      type="button"
+                      onClick={() => { setEditModalOpen(false); setCategoryToEdit(null); }}
+                    >
+                      Cancelar
+                    </DesignButton>
+                    <DesignButton
+                      variant="primary"
+                      type="submit"
+                    >
+                      Guardar
+                    </DesignButton>
+                  </div>
+                </form>
               </div>
             </div>
           )}

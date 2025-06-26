@@ -91,7 +91,7 @@ const NavBar: React.FC<NavBarProps> = ({
             </a>
           ))}
         </div>        <div className="flex gap-4">
-          <FaUser onClick={() => navigate('/first-layout/user-layout')} className="text-xl cursor-pointer" style={{ color: textColor }} />
+          <FaUser onClick={() => navigate('/data-profile')} className="text-xl cursor-pointer" style={{ color: textColor }} />
           <div className="relative cursor-pointer" onClick={() => navigate('/cart-list')}>
             <FaShoppingCart className="text-xl" style={{ color: textColor }} />
             {cartCount > 0 && (

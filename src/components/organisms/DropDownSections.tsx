@@ -127,27 +127,7 @@ export const DropDownSections: React.FC<DropDownSectionsProps> = ({ openSection,
                     <OperationPoliciesSection />
                 </motion.div>
             </div>
-
-            {/* Dropdown for Shop Design */}
-            <div className="mt-6">
-                <button
-                    onClick={() => toggleSection('shopDesign')}
-                    className={`w-full text-left text-lg font-space flex justify-between items-center border border-gray-300 p-3 rounded-t-md ${
-                        openSection === 'shopDesign' ? '' : 'rounded-md'
-                    }`}
-                >
-                    Diseño de Tienda
-                    <FaChevronDown className="text-gray-500" />
-                </button>
-                <motion.div
-                    initial="hidden"
-                    animate={openSection === 'shopDesign' ? 'visible' : 'hidden'}
-                    variants={sectionVariants}
-                    className="overflow-hidden"
-                >
-                    <ShopDesignSection />
-                </motion.div>
-            </div>
+          
         </>
     );
 };

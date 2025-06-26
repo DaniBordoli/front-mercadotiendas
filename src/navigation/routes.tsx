@@ -222,7 +222,7 @@ export const publicRoutes = [
     element: <NewProductScreen />
   },
   {
-    path: '/data-catalog',
+    path: '/data-category',
     element: <DataCatalog />
   },
   {

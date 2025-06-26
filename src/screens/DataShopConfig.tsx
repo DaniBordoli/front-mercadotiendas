@@ -165,20 +165,7 @@ const DataShopConfig: React.FC = () => {
                                     currentLogoUrl={editableVariables.logoUrl || '/logo.png'} 
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-space font-medium text-gray-600 mb-2">
-                                    Banner Principal
-                                </label>
-                                <div
-                                    className="h-40 border-dashed border-2 border-gray-300 rounded-md flex flex-col items-center justify-center"
-                                >
-                                    <FaImage className="text-4xl text-gray-600" />
-                                    <p className="text-sm text-gray-600 mt-2">Arrastra tu banner aquí</p>
-                                    <p className="text-sm text-gray-600"
-                                    style={{color: colors.primaryRed}}>o selecciona un archivo</p>
-
-                                </div>
-                            </div>
+                      
                         </div>
                     </div>
                 <div className="flex justify-end mt-6">
