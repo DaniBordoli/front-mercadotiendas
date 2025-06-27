@@ -59,7 +59,7 @@ const ProductDetailScreen: React.FC = () => {
       <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
         <NavBar
           navbarLinks={editableVariables.navbarLinks}
-          title={editableVariables.title}
+          navbarTitle={editableVariables.navbarTitle}
           backgroundColor={editableVariables.navbarBackgroundColor}
           textColor={editableVariables.textColor}
           fontType={editableVariables.fontType}
@@ -88,7 +88,7 @@ const ProductDetailScreen: React.FC = () => {
       )}
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
-        title={editableVariables.title}
+        navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
@@ -148,7 +148,7 @@ const ProductDetailScreen: React.FC = () => {
           <div className="text-2xl font-bold text-gray-900 mb-4">${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
 
           <p className="text-gray-600 mb-4">
-            {selectedProduct?.description || "No hay descripción disponible para este producto."}
+            {selectedProduct?.descripcion || selectedProduct?.description || "No hay descripción disponible para este producto."}
           </p>
 
           <div className="mb-4">
@@ -274,7 +274,7 @@ const ProductDetailScreen: React.FC = () => {
               <>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: editableVariables.textColor }}>Descripción del Producto</h3>
                 <p className="mb-4" style={{ color: editableVariables.secondaryColor }}>
-                  {selectedProduct?.description || 
+                  {selectedProduct?.descripcion || selectedProduct?.description || 
                     `Experimenta el máximo rendimiento con la "${selectedProduct?.name}".
                      ${selectedProduct?.condition === 'new' ? 'Totalmente nuevo y listo para usar.' : 'En excelente estado, comprobado para asegurar su rendimiento.'}`
                   }

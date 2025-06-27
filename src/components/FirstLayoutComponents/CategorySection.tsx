@@ -1,7 +1,8 @@
 import React from 'react';
 
 interface CategorySectionProps {
-  title?: string;
+  categoryTitle?: string;
+  categoryTitleColor?: string;
   backgroundColor?: string;
   titleColor?: string;
 }
@@ -22,13 +23,14 @@ const categories = [
 ];
 
 const CategorySection: React.FC<CategorySectionProps> = ({
-  title = "Compra por categoría",
+  categoryTitle = "Compra por categoría",
+  categoryTitleColor = "#000",
   backgroundColor = "#fff",
   titleColor = "#000",
 }) => {
   return (
     <div className="py-12" style={{ backgroundColor }}>
-      <h2 className="text-2xl font-bold text-center mb-8" style={{ color: titleColor }}>{title}</h2>
+      <h2 className="text-2xl font-bold text-center mb-8" style={{ color: categoryTitleColor }}>{categoryTitle}</h2>
       <div className="flex justify-center mx-28 gap-8">
         {categories.map((cat, idx) => (
           <div key={idx} className="relative w-1/3 h-96 rounded-lg overflow-hidden shadow-md">

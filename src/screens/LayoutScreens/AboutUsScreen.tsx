@@ -15,7 +15,7 @@ const AboutUsScreen: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-gray-50" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
-        title={editableVariables.title}
+        navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}

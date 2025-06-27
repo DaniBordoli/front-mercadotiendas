@@ -8,7 +8,10 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 interface NavBarProps {
   navbarLinks?: { label: string; href: string }[];
-  title?: string;
+  navbarTitle?: string;
+  navbarTitleColor?: string;
+  navbarLinksColor?: string;
+  navbarIconsColor?: string;
   backgroundColor?: string;
   textColor?: string;
   fontType?: string;
@@ -21,7 +24,10 @@ const NavBar: React.FC<NavBarProps> = ({
     { label: 'Tienda', href: '/first-layout/shop-layout' },
     { label: 'Contacto', href: '/first-layout/contact-layout' },
   ],
-  title = 'ShopSmarttt',
+  navbarTitle = 'ShopSmarttt',
+  navbarTitleColor,
+  navbarLinksColor,
+  navbarIconsColor,
   backgroundColor = '#FFFFFF',
   textColor = '#000000',
   fontType = 'Arial',
@@ -53,29 +59,37 @@ const NavBar: React.FC<NavBarProps> = ({
 
   const shopFromStore = shop?.name;
   const shopFromUser = user?.shop?.name;
-  const displayTitle = shopFromStore || shopFromUser || title;
+  const displayTitle = shopFromStore || shopFromUser || navbarTitle;
 
   return (
     <nav className="w-full shadow-sm" style={{ backgroundColor }}>
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <div
-          className="flex items-center gap-3 ml-8 cursor-pointer"
-          onClick={() => navigate('/first-layout')}
-        >
+        <div className="flex items-center gap-4">
           <img 
-            src={currentLogoUrl} 
-            alt="Logo" 
-            className="h-8 w-8 object-contain"
-            onError={(e) => {
-              // Fallback al logo por defecto si hay error cargando el logo personalizado
-              e.currentTarget.src = '/logo.png';
-            }}
+            src="/logo.png" 
+            alt="Dashboard Logo" 
+            className="h-8 w-8 object-contain cursor-pointer"
+            onClick={() => navigate('/dashboard')}
           />
           <div
-            className="text-2xl font-bold"
-            style={{ color: textColor, fontFamily: fontType }}
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate('/first-layout')}
           >
-            {displayTitle}
+            <img 
+              src={currentLogoUrl} 
+              alt="Logo" 
+              className="h-8 w-8 object-contain"
+              onError={(e) => {
+                // Fallback al logo por defecto si hay error cargando el logo personalizado
+                e.currentTarget.src = '/logo.png';
+              }}
+            />
+            <div
+              className="text-2xl font-bold"
+              style={{ color: navbarTitleColor || textColor, fontFamily: fontType }}
+            >
+              {displayTitle}
+            </div>
           </div>
         </div>
         <div className="flex gap-4">
@@ -83,17 +97,18 @@ const NavBar: React.FC<NavBarProps> = ({
             <a
               key={idx}
               className="hover:text-blue-500 cursor-pointer"
-              style={{ color: textColor, fontFamily: fontType }}
+              style={{ color: navbarLinksColor || textColor, fontFamily: fontType }}
               onClick={() => link.href.startsWith('/') ? navigate(link.href.startsWith('/first-layout') ? link.href : `/first-layout${link.href}`) : undefined}
               href={link.href.startsWith('/') ? undefined : link.href}
             >
               {link.label}
             </a>
           ))}
-        </div>        <div className="flex gap-4">
-          <FaUser onClick={() => navigate('/data-profile')} className="text-xl cursor-pointer" style={{ color: textColor }} />
+        </div>
+        <div className="flex gap-4">
+          <FaUser onClick={() => navigate('/data-profile')} className="text-xl cursor-pointer" style={{ color: navbarIconsColor || textColor }} />
           <div className="relative cursor-pointer" onClick={() => navigate('/cart-list')}>
-            <FaShoppingCart className="text-xl" style={{ color: textColor }} />
+            <FaShoppingCart className="text-xl" style={{ color: navbarIconsColor || textColor }} />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
                 style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

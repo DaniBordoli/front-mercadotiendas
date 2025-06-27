@@ -6,6 +6,7 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
+import { FiShoppingCart } from 'react-icons/fi';
 
 const ShopLayout: React.FC = () => {
   const [price, setPrice] = useState(500);
@@ -42,7 +43,7 @@ const ShopLayout: React.FC = () => {
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
-        title={editableVariables.title}
+        navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
@@ -130,41 +131,39 @@ const ShopLayout: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
               <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
-            ) : (              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (                <div                  key={prod?.id || prod?._id || idx}
-                  className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
+            ) : (
+              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
+                <div
+                  key={prod?.id || prod?._id || idx}
+                  className="bg-white rounded-lg overflow-hidden shadow my-8 w-full flex flex-col cursor-pointer hover:shadow-lg transition"
                   onClick={() => {
-                    // Usar cualquier ID disponible (del backend o store)
                     const productId = prod?.id || prod?._id;
                     navigate(productId ? `/first-layout/detail-layout/${productId}` : '/first-layout/detail-layout');
                   }}
-                  style={{ backgroundColor: editableVariables.heroBackgroundColor }}
-                >                  <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
-                    {prod ? (
-                      <img 
-                        src={prod.imageUrls?.[0] || prod.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"} 
-                        alt={prod.name || prod.nombre || "Producto"} 
-                        className="object-cover w-full h-full" 
-                      />
-                    ) : (
-                      <span className="text-2xl" style={{ color: editableVariables.secondaryColor }}>Image</span>
-                    )}
-                  </div>
-                  <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
-                    <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.name || prod?.nombre || `Product ${idx + 1}`}</h3>
-                    <span className="font-bold text-lg mb-2 text-left text-white block" style={{ color: editableVariables.primaryColor }}>
-                      {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
-                    </span>
-                    <div className="flex justify-center">
-                      <button
-                        className="px-4 w-full py-2 rounded text-white bg-blue-600 transition text-sm"
-                        style={{
-                          backgroundColor: editableVariables.featuredProductsCardButtonColor,
-                          color: editableVariables.featuredProductsCardButtonTextColor,
-                        }}
-                      > Añadir al carro
-                        {editableVariables.featuredProductsCardButtonText}
-                      </button>
+                  style={{ backgroundColor: '#fff' }}
+                >
+                  <img
+                    src={prod?.imageUrls?.[0] || prod?.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"}
+                    alt={prod?.name || prod?.nombre || `Producto ${idx + 1}`}
+                    className="w-full h-[220px] object-cover"
+                  />
+                  <div className="flex-1 flex flex-col justify-between p-4 bg-white">
+                    <div>
+                      <h3 className="text-base font-semibold mb-1 text-gray-900">{prod?.name || prod?.nombre || `Producto ${idx + 1}`}</h3>
+                      <span className="text-lg font-bold text-gray-800 mb-4 block">
+                        {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
+                      </span>
                     </div>
+                    <button
+                      className="mt-auto w-full flex items-center justify-center gap-2 py-2 rounded font-semibold transition-colors duration-200"
+                      style={{
+                        backgroundColor: editableVariables.featuredProductsCardButtonColor,
+                        color: editableVariables.featuredProductsCardButtonTextColor,
+                      }}
+                    >
+                      Añadir al carrito
+                      <span className="ml-2"><FiShoppingCart size={20} color={editableVariables.featuredProductsCardButtonTextColor} /></span>
+                    </button>
                   </div>
                 </div>
               ))

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaRobot } from 'react-icons/fa';
+import { FaPaperPlane, FaRobot, FaTimes } from 'react-icons/fa';
 import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
@@ -51,6 +51,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   const [input, setInput] = useState('');
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState<any>(initialVariables || {});
+  const [previousTemplate, setPreviousTemplate] = useState<any>(null);
   const [pendingShopData, setPendingShopData] = useState<any>(null);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<any>(null);
@@ -172,17 +173,25 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         setPendingShopData(null);
         pendingShopDataRef.current = null;
       }
-      // Add AI's conversational reply
-      const newAiMessage: Message = {
-        id: Date.now().toString() + '-ai-reply', // Distinct ID for reply
-        text: aiResponse.reply,
-        sender: 'ai',
-        timestamp: new Date(),
-      };
-      let messagesToAddAfterReply: Message[] = [newAiMessage];
+      // Add AI's conversational reply (solo si no está vacío)
+      let messagesToAddAfterReply: Message[] = [];
+      
+      if (aiResponse.reply && aiResponse.reply.trim() !== '') {
+        const newAiMessage: Message = {
+          id: Date.now().toString() + '-ai-reply',
+          text: aiResponse.reply,
+          sender: 'ai',
+          timestamp: new Date(),
+        };
+        messagesToAddAfterReply.push(newAiMessage);
+      }
 
      
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
+        // Guardar el template actual antes de aplicar cambios para poder revertir
+        setPreviousTemplate(currentTemplate);
+        // Aplicar cambios inmediatamente para vista previa
+        onApplyTemplateChanges(aiResponse.templateUpdates);
         setPendingTemplateUpdate(aiResponse.templateUpdates);
         setShowTemplateModal(true);
       }
@@ -242,6 +251,17 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       handleSendMessage();
     }
   };
+  // Función para cancelar cambios de template
+  const handleCancelTemplateUpdate = () => {
+    if (previousTemplate) {
+      // Revertir los cambios aplicando el template anterior
+      onApplyTemplateChanges(previousTemplate);
+    }
+    setShowTemplateModal(false);
+    setPendingTemplateUpdate(null);
+    setPreviousTemplate(null);
+  };
+
   // Confirmar y guardar cambios de template
   const handleConfirmTemplateUpdate = async () => {
     if (!pendingTemplateUpdate) return;
@@ -286,6 +306,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       onApplyTemplateChanges(pendingTemplateUpdate);
       setShowTemplateModal(false);
       setPendingTemplateUpdate(null);
+      setPreviousTemplate(null); // Limpiar el template anterior ya que se confirmaron los cambios
     } catch (err: any) {
       setTemplateSaveError('Error al guardar los cambios.');
     } finally {
@@ -306,9 +327,19 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       >
         {/* Chat header */}
         <div className="bg-[#FF4F41] rounded-t-lg p-4 text-white">
-          <div className="flex items-center">
-            <FaRobot className="mr-2" />
-            <h3 className="font-bold">Asistente de Creación de Tienda</h3>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <FaRobot className="mr-2" />
+              <h3 className="font-bold">Asistente de Creación de Tienda</h3>
+            </div>
+            <button
+              className="ml-2 p-1 rounded hover:bg-[#E04437] transition-colors"
+              onClick={toggleChat}
+              aria-label="Minimizar chat"
+              type="button"
+            >
+              <FaTimes className="text-white text-lg" />
+            </button>
           </div>
         </div>
         
@@ -359,18 +390,79 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       {/* Modal de confirmación de cambios de template */}
       <Modal
         isOpen={showTemplateModal}
-        onClose={() => setShowTemplateModal(false)}
+        onClose={handleCancelTemplateUpdate}
         title="Confirmar cambios de diseño"
       >
         <div className="mb-4">
-          <p>¿Quieres aplicar y guardar estos cambios de diseño en tu tienda?</p>
-         
+          <p className="mb-3">¿Quieres aplicar y guardar estos cambios de diseño en tu tienda?</p>
+          
+          {pendingTemplateUpdate && (
+            <div className="bg-gray-50 p-3 rounded-lg mb-3">
+              <h4 className="font-semibold mb-2 text-gray-700">Cambios a aplicar:</h4>
+              <ul className="space-y-1 text-sm">
+                {Object.entries(pendingTemplateUpdate).map(([key, value]) => {
+                  // Mapear claves técnicas a nombres amigables
+                  const friendlyNames: { [key: string]: string } = {
+                    navbarTitle: 'Título del navbar',
+                    navbarTitleColor: 'Color del título del navbar',
+                    navbarLinksColor: 'Color de los enlaces del navbar',
+                    navbarIconsColor: 'Color de los iconos del navbar',
+                    navbarBackgroundColor: 'Color de fondo del navbar',
+                    heroTitle: 'Título principal',
+                    heroTitleColor: 'Color del título principal',
+                    heroDescription: 'Descripción principal',
+                    heroBackgroundColor: 'Color de fondo del hero',
+                    categoryTitle: 'Título de categorías',
+                    categoryTitleColor: 'Color del título de categorías',
+                    featuredProductsTitle: 'Título de productos destacados',
+                    featuredProductsTitleColor: 'Color del título de productos',
+                    purpleSectionTitle: 'Título de sección especial',
+                    purpleSectionTitleColor: 'Color del título de sección especial',
+                    newsletterTitle: 'Título del newsletter',
+                    newsletterTitleColor: 'Color del título del newsletter',
+                    footerTitle: 'Título del footer',
+                    footerTitleColor: 'Color del título del footer',
+                    footerBackgroundColor: 'Color de fondo del footer',
+                    mainBackgroundColor: 'Color de fondo principal',
+                    primaryColor: 'Color primario',
+                    secondaryColor: 'Color secundario',
+                    buttonBackgroundColor: 'Color de fondo de botones',
+                    buttonTextColor: 'Color de texto de botones',
+                    fontType: 'Tipo de fuente',
+                    logoUrl: 'Logo de la tienda'
+                  };
+                  
+                  const friendlyName = friendlyNames[key] || key;
+                  const displayValue = typeof value === 'string' && value.startsWith('#') 
+                    ? (
+                        <span className="flex items-center gap-2">
+                          <span 
+                            className="w-4 h-4 rounded border border-gray-300 inline-block"
+                            style={{ backgroundColor: value }}
+                          ></span>
+                          {value}
+                        </span>
+                      )
+                    : String(value).length > 50 
+                      ? String(value).substring(0, 50) + '...'
+                      : String(value);
+                  
+                  return (
+                    <li key={key} className="flex justify-between items-center">
+                      <span className="text-gray-600">{friendlyName}:</span>
+                      <span className="font-medium text-gray-800">{displayValue}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
         {templateSaveError && <div className="text-red-500 mb-2">{templateSaveError}</div>}
         <div className="flex justify-end gap-2">
           <button
             className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-            onClick={() => setShowTemplateModal(false)}
+            onClick={handleCancelTemplateUpdate}
             disabled={savingTemplate}
           >Cancelar</button>
           <button

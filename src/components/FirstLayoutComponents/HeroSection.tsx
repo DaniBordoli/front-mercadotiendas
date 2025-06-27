@@ -1,7 +1,8 @@
 import React from 'react';
 
 interface HeroSectionProps {
-  title?: string;
+  heroTitle?: string;
+  heroTitleColor?: string;
   image?: string;
   buttonText?: string;
   textColor?: string;
@@ -15,7 +16,8 @@ interface HeroSectionProps {
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({
-  title = "Descubre tu estilo con nuestra colección",
+  heroTitle = "Descubre tu estilo con nuestra colección",
+  heroTitleColor = "#000000",
   image = "https://images.unsplash.com/photo-1529810313688-44ea1c2d81d3?q=80&w=2141&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
   buttonText = "Comprar ahora",
   textColor = "#000000",
@@ -30,7 +32,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <div className="flex h-[700px] p-8" style={{ backgroundColor }}>
       <div className="flex-1 flex flex-col justify-center pl-40">
-        <h1 className="text-4xl w-6/12 font-bold mb-4" style={{ color: textColor }}>{title}</h1>
+        <h1 className="text-4xl w-6/12 font-bold mb-4" style={{ color: heroTitleColor }}>{heroTitle}</h1>
         <p className="text-lg text-gray-600 mb-8">
           {description}
         </p>

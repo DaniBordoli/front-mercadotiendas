@@ -1,6 +1,8 @@
 import React from 'react';
 
 interface PurpleSectionProps {
+  purpleSectionTitle?: string;
+  purpleSectionTitleColor?: string;
   titleColor?: string;
   buttonColor?: string;
   buttonTextColor?: string;
@@ -8,6 +10,8 @@ interface PurpleSectionProps {
 }
 
 const PurpleSection: React.FC<PurpleSectionProps> = ({
+  purpleSectionTitle = "Oferta de verano",
+  purpleSectionTitleColor = "#fff",
   titleColor = "#fff",
   buttonColor = "#fff",
   buttonTextColor = "#63459C",
@@ -18,7 +22,7 @@ const PurpleSection: React.FC<PurpleSectionProps> = ({
       <div className="p-6 md:p-8 rounded-lg" style={{ backgroundColor }}>
         <div className="flex flex-col md:flex-row h-auto md:h-[700px]">
           <div className="flex-1 flex flex-col justify-center md:ml-40 md:pr-40">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4 md:w-6/12" style={{ color: titleColor }}>Oferta de verano</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 md:w-6/12" style={{ color: purpleSectionTitleColor }}>{purpleSectionTitle}</h1>
             <p className="text-base md:text-lg text-white my-8 md:my-12">
               Obtén hasta un 50% de descuento en artículos seleccionados. ¡Oferta por tiempo limitado!
             </p>

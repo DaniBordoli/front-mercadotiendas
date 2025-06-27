@@ -6,12 +6,16 @@ import { IoMail } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 
 interface FooterProps {
+  footerTitle?: string;
+  footerTitleColor?: string;
   backgroundColor?: string;
   textColor?: string;
   footerDescription?: string;
 }
 
 const Footer: React.FC<FooterProps> = ({
+  footerTitle = 'ShopSmart',
+  footerTitleColor = '#FFFFFF',
   backgroundColor = '#0B1120',
   textColor = '#FFFFFF',
   footerDescription = 'Tu destino integral para moda y accesorios.',
@@ -23,7 +27,7 @@ const Footer: React.FC<FooterProps> = ({
       <div className="container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
       
         <div>
-          <h3 className="text-lg font-bold mb-4">ShopSmart</h3>
+          <h3 className="text-lg font-bold mb-4" style={{ color: footerTitleColor }}>{footerTitle}</h3>
           <p className="text-sm mb-4">{footerDescription}</p>
           <div className="flex gap-4 text-gray-400">
             <FaFacebook className="text-xl cursor-pointer hover:text-white" />
