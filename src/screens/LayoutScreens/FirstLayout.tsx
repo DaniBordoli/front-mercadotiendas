@@ -57,13 +57,43 @@ const FirstLayout: React.FC = () => {
         const data = await fetchShopTemplate();
         if (data && data.templateUpdate) {
           setEditableVariables(data.templateUpdate);
+          
+          // Después de cargar el template, aplicar inmediatamente los colores del shop si existen
+          if (shop && (shop.primaryColor || shop.secondaryColor)) {
+            const colorUpdates: Partial<FirstLayoutEditableVariables> = {};
+            
+            if (shop.primaryColor) {
+              colorUpdates.primaryColor = shop.primaryColor;
+              colorUpdates.navbarBackgroundColor = shop.primaryColor;
+              colorUpdates.navbarTitleColor = '#FFFFFF';
+              colorUpdates.heroBackgroundColor = shop.primaryColor;
+            }
+            
+            if (shop.secondaryColor) {
+              colorUpdates.secondaryColor = shop.secondaryColor;
+              colorUpdates.buttonBackgroundColor = shop.secondaryColor;
+              colorUpdates.buttonTextColor = '#FFFFFF';
+              colorUpdates.featuredProductsCardButtonColor = shop.secondaryColor;
+              colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
+            }
+            
+            // Si solo hay color principal, usar blanco para los botones
+            if (shop.primaryColor && !shop.secondaryColor) {
+              colorUpdates.buttonBackgroundColor = '#FFFFFF';
+              colorUpdates.buttonTextColor = shop.primaryColor;
+              colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';
+              colorUpdates.featuredProductsCardButtonTextColor = shop.primaryColor;
+            }
+            
+            updateEditableVariables(colorUpdates);
+          }
         }
       } catch (err) {
        
       }
     };
     getTemplate();
-  }, [setEditableVariables]);
+  }, [setEditableVariables, shop, updateEditableVariables]);
 
   // Cargar datos del shop y aplicar colores
   useEffect(() => {
@@ -78,43 +108,6 @@ const FirstLayout: React.FC = () => {
     };
     loadShopData();
   }, [shop, getShop]);
-
-  // Aplicar colores del shop al template cuando estén disponibles
-  useEffect(() => {
-    if (shop && (shop.primaryColor || shop.secondaryColor)) {
-      const colorUpdates: Partial<FirstLayoutEditableVariables> = {};
-      
-      if (shop.primaryColor) {
-        colorUpdates.primaryColor = shop.primaryColor;
-        // Navbar usa el color principal
-        colorUpdates.navbarBackgroundColor = shop.primaryColor;
-        colorUpdates.navbarTitleColor = '#FFFFFF';
-        // Hero section usa el color principal como background
-        colorUpdates.heroBackgroundColor = shop.primaryColor;
-      }
-      
-      if (shop.secondaryColor) {
-        colorUpdates.secondaryColor = shop.secondaryColor;
-        // Los botones usan el color secundario para contrastar con el fondo principal
-        colorUpdates.buttonBackgroundColor = shop.secondaryColor;
-        colorUpdates.buttonTextColor = '#FFFFFF';
-        colorUpdates.featuredProductsCardButtonColor = shop.secondaryColor;
-        colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
-      }
-      
-      // Si solo hay color principal, usar blanco para los botones
-      if (shop.primaryColor && !shop.secondaryColor) {
-        colorUpdates.buttonBackgroundColor = '#FFFFFF';
-        colorUpdates.buttonTextColor = shop.primaryColor;
-        colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';
-        colorUpdates.featuredProductsCardButtonTextColor = shop.primaryColor;
-      }
-      
-      if (Object.keys(colorUpdates).length > 0) {
-        updateEditableVariables(colorUpdates);
-      }
-    }
-  }, [shop, updateEditableVariables]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);
