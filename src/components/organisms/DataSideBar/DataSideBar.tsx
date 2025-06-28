@@ -48,13 +48,16 @@ const DataSideBar: React.FC = () => {
     const menuOptions = [
         { key: 'home', label: 'Dashboard', icon: <FaTachometerAlt className="text-lg" />, path: '/data-dashboard' },
         { key: 'profile', label: 'Datos Personales', icon: <FaUser className="text-lg" />, path: '/data-profile' },
-        ...(isAdmin ? [
-            { key: 'catalog', label: 'Catálogo', icon: <FaBoxArchive className="text-lg" />, path: '/data-catalog' }
-        ] : []),
-        { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
-     
+        // Mi Tienda irá como dropdown, así que aquí solo se deja el espacio
+        // Mis productos
         ...(hasShop ? [
             { key: 'products', label: 'Mis productos', icon: <FaBox className="text-lg" />, path: '/data-products', match: (pathname: string) => pathname.startsWith('/data-products') || pathname.startsWith('/edit-products') }
+        ] : []),
+        // Compras
+        { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
+        // Resto
+        ...(isAdmin ? [
+            { key: 'category', label: 'Categorias', icon: <FaBoxArchive className="text-lg" />, path: '/data-category' }
         ] : []),
         { key: 'subscription', label: 'Suscripción', icon: <FaCreditCard className="text-lg" />, path: '/data-subscription' },
         { key: 'billing', label: 'Facturación', icon: <IoDocumentText className="text-lg" />, path: '/data-billing' },
@@ -64,13 +67,13 @@ const DataSideBar: React.FC = () => {
     const shopOptions = [
     
         ...(hasShop ? [
-            { key: 'editShop', label: 'Editar Tienda', icon: <RiRobot2Line className="text-lg" />, path: '/layout-select' },
+            { key: 'general', label: 'Información general', icon: <FaCircleInfo className="text-lg" />, path: '/settings' },
+            { key: 'editShop', label: 'Editar Tienda con IA', icon: <RiRobot2Line className="text-lg" />, path: '/first-layout' },
             { key: 'shopState', label: 'Estado de la Tienda', icon: <IoToggleSharp className="text-lg" />, path: '/data-shop-state' },
             { key: 'shopConfig', label: 'Configuración de Tienda', icon: <FaGear className="text-lg" />, path: '/data-shop-config' },
             { key: 'layout', label: 'Layouts', icon: <FaCircleInfo className="text-lg" />, path: '/layout-select' },
         
             { key: 'seo', label: 'SEO y Metadata', icon: <AiFillDatabase className="text-lg" />, path: '/seo-metadata' },
-            { key: 'general', label: 'Información general', icon: <FaCircleInfo className="text-lg" />, path: '/settings' }
         ] : []),
      
         ...(!hasShop ? [
@@ -130,7 +133,8 @@ const DataSideBar: React.FC = () => {
                     ×
                 </button>
                 <div className='flex flex-col mt-4 relative'>
-                    {menuOptions.map((option) => {
+                    {/* Dashboard, Datos Personales */}
+                    {menuOptions.slice(0, 2).map((option) => {
                    
                         const isActive = option.match
                             ? option.match(location.pathname)
@@ -161,6 +165,7 @@ const DataSideBar: React.FC = () => {
                         );
                     })}
 
+                    {/* Mi Tienda dropdown */}
                     {shopOptions.length > 0 && (
                         <div className="relative">
                             <button
@@ -207,6 +212,38 @@ const DataSideBar: React.FC = () => {
                             )}
                         </div>
                     )}
+
+                    {/* Mis productos, Compras, resto */}
+                    {menuOptions.slice(2).map((option) => {
+                        const isActive = option.match
+                            ? option.match(location.pathname)
+                            : location.pathname === option.path;
+                        return (
+                            <div key={option.key} className="relative">
+                                {isActive && (
+                                    <motion.div
+                                        className="absolute inset-0"
+                                        style={{ backgroundColor: `${colors.primaryRed}1A` }}
+                                        layoutId="activeBackground"
+                                        initial={{ x: '-100%' }}
+                                        animate={{ x: 0 }}
+                                        transition={{ duration: 0.1 }}
+                                    />
+                                )}
+                                <button
+                                    className={`relative flex items-center gap-3 p-3 ${
+                                        isActive ? 'text-[${colors.primaryRed}]' : ''
+                                    }`}
+                                    style={isActive ? { color: colors.primaryRed } : {}}
+                                    onClick={() => navigate(option.path)}
+                                >
+                                    {option.icon}
+                                    <span className='font-space'>{option.label}</span>
+                                </button>
+                            </div>
+                        );
+                    })}
+
                     <div className="relative mt-2">
                         <button
                             className="relative flex items-center gap-3 p-3 w-full text-left hover:text-red-600 transition-colors"

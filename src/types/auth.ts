@@ -26,6 +26,11 @@ export interface CreateShopData {
 export interface Shop {
   _id: string;
   name: string;
+  description?: string;
+  mission?: string;
+  vision?: string;
+  history?: string;
+  values?: string;
   subdomain: string;
   template: string;
   category: string;
@@ -39,11 +44,14 @@ export interface Shop {
   country?: string;
   province?: string;
   city?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
   
   imageUrl?: string;
   owner: string;
   createdAt: string;
   updatedAt: string;
+  active?: boolean; 
 }
 
 export interface User {
@@ -92,6 +100,7 @@ export type AuthStore = AuthState & {
       estado: string;
       precio: string;
       categoria: string;
+      stock: string;
       subcategoria: string;
       variantes?: { tipo: string; valores: string[] }[];
     } | FormData

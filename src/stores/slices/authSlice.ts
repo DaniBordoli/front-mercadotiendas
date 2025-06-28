@@ -982,3 +982,67 @@ export const deleteCategory = async (id: string) => {
   if (!response.ok) throw new Error(responseData.message || 'Error al eliminar la categoría');
   return responseData.data;
 };
+
+// Actualiza una categoría por ID
+export const updateCategory = async (
+  id: string,
+  data: { name?: string; description?: string; status?: string; image?: string; parent?: string }
+): Promise<any> => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No autenticado');
+  const response = await fetch(`${API_URL}/categories/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message || 'Error al actualizar la categoría');
+  return responseData.data;
+};
+
+// --- SHOP SOCIAL MEDIA ENDPOINTS ---
+export interface ShopSocial {
+  instagram?: string;
+  facebook?: string;
+  whatsapp?: string;
+  tiktok?: string;
+  youtube?: string;
+  horarios?: string;
+  emailAlternativo?: string;
+  telefonoAdicional?: string;
+}
+
+export const getShopSocial = async (shopId: string): Promise<ShopSocial | null> => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No token provided');
+  const response = await fetch(`${API_URL}/shopsocial/${shopId}`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  if (response.status === 404) return null;
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al obtener redes sociales');
+  return data;
+};
+
+export const updateShopSocial = async (shopId: string, socialData: ShopSocial): Promise<ShopSocial> => {
+  const token = getStorageItem('token');
+  if (!token) throw new Error('No token provided');
+  const response = await fetch(`${API_URL}/shopsocial/${shopId}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(socialData),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || 'Error al actualizar redes sociales');
+  return data;
+};

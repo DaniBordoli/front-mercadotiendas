@@ -25,6 +25,7 @@ export interface Product {
     name: string;
     _id?: string;
   };
+  descripcion?: string; 
 }
 
 // --- NUEVO: Tipo para Opiniones ---
@@ -89,6 +90,7 @@ const mockProducts: Product[] = [
       { tipo: 'Color', valores: ['Negro', 'Plata', 'Azul'] },
       { tipo: 'Memoria RAM', valores: ['16GB', '32GB', '64GB'] }
     ],
+    descripcion: 'Potente laptop gamer con lo último en tecnología gráfica y de memoria. Ideal para gamers exigentes.',
   },
   {
     id: 'prod2',
@@ -111,6 +113,7 @@ const mockProducts: Product[] = [
       { tipo: 'Color', valores: ['Gris', 'Negro'] },
       { tipo: 'Almacenamiento', valores: ['256GB SSD', '512GB SSD', '1TB SSD'] }
     ],
+    descripcion: 'Laptop ligera y potente, perfecta para oficina y estudiantes. Rendimiento confiable con procesador Intel i5.',
   },
   {
     id: 'prod3',
@@ -133,6 +136,7 @@ const mockProducts: Product[] = [
       { tipo: 'Switch', valores: ['Cherry MX Red', 'Cherry MX Blue', 'Cherry MX Brown'] },
       { tipo: 'Layout', valores: ['Español', 'Inglés'] }
     ],
+    descripcion: 'Teclado mecánico gamer con retroiluminación RGB personalizable. Ideal para largas sesiones de juego.',
   },
    {
     id: 'prod4',
@@ -155,6 +159,7 @@ const mockProducts: Product[] = [
       { tipo: 'Color', valores: ['Negro', 'Blanco'] },
       { tipo: 'Resolución', valores: ['3440x1440', '2560x1080'] }
     ],
+    descripcion: 'Monitor curvo ultrawide para una experiencia inmersiva. Ideal para juegos y productividad.',
   },
   // Añadir más productos mock para probar paginación y filtros
   {
@@ -172,6 +177,7 @@ const mockProducts: Product[] = [
       { tipo: 'Color', valores: ['Negro', 'Blanco', 'Azul'] },
       { tipo: 'DPI', valores: ['1600 DPI', '3200 DPI', '6400 DPI'] }
     ],
+    descripcion: 'Mouse inalámbrico ergonómico para mayor comodidad. Alta precisión y múltiples niveles de DPI.',
   },
     {
     id: 'prod6',
@@ -188,6 +194,7 @@ const mockProducts: Product[] = [
       { tipo: 'Layout', valores: ['Español', 'Inglés'] },
       { tipo: 'Color', valores: ['Blanco', 'Negro'] }
     ],
+    descripcion: 'Teclado Apple Magic Keyboard, usado pero en excelente estado. Conectividad Bluetooth y diseño elegante.',
   },
 ];
 
@@ -261,22 +268,21 @@ const calculateAvailableFilters = (products: Product[]): AvailableFilters => {
 
 // --- Helper para mapear productos del backend al formato Product ---
 function mapBackendProductToProduct(backendProduct: any): Product {
+  console.log('[mapBackendProductToProduct] backendProduct:', backendProduct);
   return {
-    id: backendProduct._id || backendProduct.id || backendProduct.sku || Math.random().toString(),
-    name: backendProduct.nombre,
-    price: Number(backendProduct.precio) || 0,
-    imageUrls: Array.isArray(backendProduct.productImages) ? backendProduct.productImages : [],
-    rating: backendProduct.rating ?? undefined, // Si el backend lo provee
-    storeName: backendProduct.storeName ?? undefined, // Si el backend lo provee
-    brand: backendProduct.brand ?? undefined, // Si el backend lo provee
-    condition: backendProduct.estado === 'used' ? 'used' : 'new', // Mapear 'estado' a 'condition'
-    hasFreeShipping: backendProduct.hasFreeShipping ?? undefined,
-    isFeatured: backendProduct.isFeatured ?? undefined,
-    variantes: Array.isArray(backendProduct.variantes) ? backendProduct.variantes : [],
-    // mapea shop si viene del backend
-    shop: backendProduct.shop && typeof backendProduct.shop === 'object' && backendProduct.shop.name
-      ? { name: backendProduct.shop.name, _id: backendProduct.shop._id }
-      : undefined,
+    id: backendProduct._id || backendProduct.id,
+    name: backendProduct.nombre || backendProduct.name,
+    price: Number(backendProduct.precio || backendProduct.price),
+    imageUrls: backendProduct.productImages || backendProduct.imageUrls || [],
+    rating: backendProduct.rating,
+    storeName: backendProduct.storeName,
+    brand: backendProduct.brand,
+    condition: backendProduct.estado === 'nuevo' || backendProduct.estado === 'new' ? 'new' : 'used',
+    hasFreeShipping: backendProduct.hasFreeShipping,
+    isFeatured: backendProduct.isFeatured,
+    variantes: backendProduct.variantes,
+    shop: backendProduct.shop ? { name: backendProduct.shop.name, _id: backendProduct.shop._id } : undefined,
+    descripcion: backendProduct.descripcion || backendProduct.description, // <-- Mapeo de descripción
   };
 }
 
@@ -572,6 +578,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       // Buscar primero en el backend (todos los productos) y mocks combinados
       const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
       const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
+      console.log('[fetchProductById] allProducts:', allProducts); 
       const foundProduct = allProducts.find(p => p.id === productId);
       if (foundProduct) {
         console.log(`[Store] Producto encontrado por ID ${productId} (backend+mock):`, foundProduct);

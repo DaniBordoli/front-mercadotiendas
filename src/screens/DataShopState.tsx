@@ -3,11 +3,42 @@ import DataSideBar from '../components/organisms/DataSideBar/DataSideBar';
 import { motion } from 'framer-motion';
 import { FaStore, FaCheckCircle, FaShoppingCart, FaBell } from 'react-icons/fa';
 import { colors } from '../design/colors';
+import { useShopStore } from '../stores/slices/shopStore';
+import { useAuthStore } from '../stores';
 
 const DataShopState: React.FC = () => {
+    const { shop, loading, error, updateShopStatus, getShop } = useShopStore();
+    const { user } = useAuthStore();
     const [isActive, setIsActive] = React.useState(true);
 
- 
+    // Cargar datos de la tienda al montar el componente
+    React.useEffect(() => {
+        if (user?.shop) {
+            getShop().catch(console.error);
+        }
+    }, [user?.shop, getShop]);
+
+    // Sincronizar el estado local con el estado de la tienda
+    React.useEffect(() => {
+        if (shop && typeof shop.active === 'boolean') {
+            setIsActive(shop.active);
+        }
+    }, [shop]);
+
+    // Función para manejar el cambio de estado
+    const handleToggleStatus = async () => {
+        if (!shop) return;
+        
+        try {
+            const newStatus = !isActive;
+            await updateShopStatus(shop._id, newStatus);
+            setIsActive(newStatus);
+        } catch (error) {
+            console.error('Error al cambiar el estado de la tienda:', error);
+            // Aquí podrías mostrar un toast de error
+        }
+    };
+
     const gray800 = '#1F2937';
     const gray600 = '#4B5563';
     const gray500 = '#6B7280'; 
@@ -36,10 +67,14 @@ const DataShopState: React.FC = () => {
                     <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>
                         {isActive ? 'Administra la visibilidad de tu tienda para los compradores' : 'Tu tienda no está visible para los compradores'}
                     </p>
+                    {error && (
+                        <p className="text-sm font-space text-red-500 mt-2">
+                            Error: {error}
+                        </p>
+                    )}
                 </div>
                 <div
                     className="p-6 bg-white rounded-md flex items-center justify-between border"
-                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
                     <div className="flex items-center">
                         <div
@@ -58,8 +93,8 @@ const DataShopState: React.FC = () => {
                         </div>
                     </div>
                     <motion.div
-                        className="w-14 h-8 flex items-center rounded-full p-1 cursor-pointer"
-                        onClick={() => setIsActive(!isActive)}
+                        className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        onClick={!loading ? handleToggleStatus : undefined}
                         style={{
                             backgroundColor: isActive ? colors.accentTeal : colors.primaryRed,
                         }}
@@ -76,7 +111,6 @@ const DataShopState: React.FC = () => {
                 </div>
                 <div
                     className="p-6 bg-white rounded-md border"
-                    style={{ borderColor: isActive ? colors.lightGray : colors.primaryRed }}
                 >
                     {shopStateItems.map((item, index) => (
                         <React.Fragment key={index}>
@@ -92,7 +126,7 @@ const DataShopState: React.FC = () => {
                                     <p className="text-sm font-space" style={{ color: isActive ? gray500 : colors.primaryRed }}>{item.subtext}</p>
                                 </div>
                             </div>
-                            {index < 2 && <hr className={isActive ? 'border-gray-300' : 'border-red-300'} />}
+                            {index < 2 && <hr className="border-gray-300" />}
                         </React.Fragment>
                     ))}
                 </div>

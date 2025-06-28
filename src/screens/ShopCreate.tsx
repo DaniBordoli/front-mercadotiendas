@@ -6,6 +6,7 @@ import DesignSelectionForm from '../components/CreateShopComponents/DesignSelect
 import MainForm from '../components/CreateShopComponents/MainForm';
 import ProductSelectionForm from '../components/CreateShopComponents/ProductSelectionForm';
 import PaymentSelectionForm from '../components/CreateShopComponents/PaymentSelectionForm';
+import ColorBrandForm from '../components/CreateShopComponents/ColorBrandForm';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores';
 import { Navbar } from '../components/organisms/Navbar/Navbar';
@@ -16,7 +17,10 @@ interface FormData {
     design: string | null;
     productCategory: string;
     currency: string;
-    layoutDesign?: string; 
+    layoutDesign: string;
+    primaryColor?: string;
+    secondaryColor?: string;
+    logoUrl?: string;
 }
 
 const ShopCreate: React.FC = () => {
@@ -27,7 +31,10 @@ const ShopCreate: React.FC = () => {
         design: null,
         productCategory: '',
         currency: '',
-        layoutDesign: '', 
+        layoutDesign: '',
+        primaryColor: '',
+        secondaryColor: '',
+        logoUrl: '',
     });
 
     const navigate = useNavigate();
@@ -35,7 +42,7 @@ const ShopCreate: React.FC = () => {
 
     const handleNextStep = (data: Partial<FormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
-        setCurrentStep((prevStep) => (prevStep < 4 ? prevStep + 1 : prevStep));
+        setCurrentStep((prevStep) => (prevStep < 5 ? prevStep + 1 : prevStep));
     };
 
     // Nuevo handler para guardar el layout seleccionado
@@ -45,9 +52,16 @@ const ShopCreate: React.FC = () => {
 
     const handleCreateShop = async () => {
         try {
+            const subdomain = formData.storeName
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos (acentos)
+                .replace(/[^a-z0-9-]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .replace(/--+/g, '-');
             const shopData = {
                 shopName: formData.storeName,
-                subdomain: formData.storeName.toLowerCase().replace(/\s+/g, '-'),
+                subdomain,
                 template: formData.design || 'modern',
                 category: formData.productCategory,
                 address: 'N/A',
@@ -55,6 +69,9 @@ const ShopCreate: React.FC = () => {
                 contactEmail: formData.email,
                 shopPhone: 'N/A',
                 layoutDesign: formData.layoutDesign || '',
+                primaryColor: formData.primaryColor,
+                secondaryColor: formData.secondaryColor,
+                logoUrl: formData.logoUrl,
             };
             await createShop(shopData);
             navigate('/dashboard');
@@ -62,6 +79,8 @@ const ShopCreate: React.FC = () => {
             console.error(e);
         }
     };
+
+    const steps = ['Información', 'Diseño', 'Colores y Marca', 'Productos', 'Pagos', 'Finalizar'];
 
     return (
         <>
@@ -75,8 +94,8 @@ const ShopCreate: React.FC = () => {
                     
                     <div className="flex flex-col items-center my-8">
                         <div className="flex justify-between w-full items-center relative">
-                            {['Información', 'Diseño', 'Productos', 'Pagos', 'Finalizar'].map((step, index) => (
-                                <div key={index} className="flex flex-col items-center w-1/5 relative">
+                            {steps.map((step, index) => (
+                                <div key={index} className="flex flex-col items-center w-1/6 relative">
                                     <div
                                         className="w-8 h-8 flex items-center justify-center rounded-full font-space mb-2"
                                         style={{
@@ -117,16 +136,27 @@ const ShopCreate: React.FC = () => {
                             />
                         )}
                         {currentStep === 2 && (
+                            <ColorBrandForm 
+                                onNext={(data: { primaryColor: string; secondaryColor: string; logoUrl?: string }) => 
+                                    handleNextStep({ 
+                                        primaryColor: data.primaryColor,
+                                        secondaryColor: data.secondaryColor,
+                                        logoUrl: data.logoUrl
+                                    })
+                                }
+                            />
+                        )}
+                        {currentStep === 3 && (
                             <ProductSelectionForm 
                                 onNext={(data: string) => handleNextStep({ productCategory: data })}
                             />
                         )}
-                        {currentStep === 3 && (
+                        {currentStep === 4 && (
                             <PaymentSelectionForm 
                                 onNext={(data: string) => handleNextStep({ currency: data })}
                             />
                         )}
-                        {currentStep === 4 && (
+                        {currentStep === 5 && (
                             <div className="text-center">
                                 <h2 className="text-xl font-space font-medium text-gray-800 mb-4">¡Todo listo!</h2>
                                 <p className="text-gray-600 mb-6">Revisa la información y haz clic en "Crear Tienda" para finalizar.</p>

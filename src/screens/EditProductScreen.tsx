@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DesignButton } from '../components/atoms/DesignButton/DesignButton';
 import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { FaTrash, FaStore, FaPlus, FaRegEdit, FaSearch } from 'react-icons/fa';
@@ -8,19 +8,10 @@ import { FaEye, FaPowerOff, FaRegFolderOpen, FaRegTrashCan, FaRegImages, FaArrow
 import { colors } from '../design/colors';
 import { RiPencilFill } from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuthStore, addProductImages, deleteProductImage } from '../stores/slices/authSlice';
+import { useAuthStore, addProductImages, deleteProductImage, fetchCategories } from '../stores/slices/authSlice';
 import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
 import Toast from '../components/atoms/Toast';
-
-const categoriaOptions = [
-  { value: '', label: 'Seleccionar' },
-  { value: 'accesorios', label: 'Accesorios' },
-  { value: 'calzado', label: 'Calzado' },
-];
-const estadoOptions = [
-  { value: 'activo', label: 'Activo' },
-  { value: 'inactivo', label: 'Inactivo' },
-];
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const EditProductScreen: React.FC = () => {
   const [hasVariants, setHasVariants] = React.useState(true);
@@ -47,6 +38,8 @@ const EditProductScreen: React.FC = () => {
     message: '',
     type: 'error' as 'success' | 'error' | 'info',
   });
+  const [showLoader, setShowLoader] = React.useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar' } ]);
 
   React.useEffect(() => {
     const loadProduct = async () => {
@@ -62,7 +55,7 @@ const EditProductScreen: React.FC = () => {
             precio: found.precio || '',
             stock: found.stock?.toString() || '',
             categoria: found.categoria || '',
-            estado: found.estado || 'activo',
+            estado: found.estado || 'Activo',
           });
           
           // Cargar variantes del producto
@@ -91,6 +84,21 @@ const EditProductScreen: React.FC = () => {
     };
     if (id) loadProduct();
   }, [id, fetchProductById]);
+
+  React.useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await fetchCategories();
+        setCategoryOptions([
+          { value: '', label: 'Seleccionar' },
+          ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))
+        ]);
+      } catch {
+        setCategoryOptions([{ value: '', label: 'Seleccionar' }]);
+      }
+    };
+    loadCategories();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -282,6 +290,7 @@ const EditProductScreen: React.FC = () => {
 
   const handleDelete = async () => {
     if (!product) return;
+    setShowLoader(true);
     try {
       await deleteProduct(product._id);
       closeDeleteModal();
@@ -292,6 +301,8 @@ const EditProductScreen: React.FC = () => {
         message: err?.message || 'Error al eliminar el producto',
         type: 'error',
       });
+    } finally {
+      setShowLoader(false);
     }
   };
 
@@ -324,14 +335,7 @@ const EditProductScreen: React.FC = () => {
             <h1 className="text-2xl font-space">Editar Producto</h1>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Buscar productos..."
-                className="border border-gray-200 rounded-lg px-4 py-2 pl-10 w-64 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primaryRed"
-              />
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-base" />
-            </div>
+
             <DesignButton variant="primary"
             icon={FaPlus}>Nuevo Producto</DesignButton>
           </div>
@@ -349,7 +353,8 @@ const EditProductScreen: React.FC = () => {
               </div>
               <div className="flex gap-3">
                 <DesignButton variant="green"
-                icon={FaEye}>
+                icon={FaEye}
+                onClick={() => navigate(`/producto/${product._id}`)}>
                   Ver en tienda
                 </DesignButton>
                 <DesignButton variant="secondary"
@@ -421,7 +426,7 @@ const EditProductScreen: React.FC = () => {
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Categoría *</label>
                     <SelectDefault
-                      options={categoriaOptions}
+                      options={categoryOptions}
                       value={product.categoria}
                       onChange={val => handleSelectChange('categoria', val)}
                     />
@@ -431,17 +436,17 @@ const EditProductScreen: React.FC = () => {
                   <div>
                     <label className="block text-xs font-space text-gray-500 mb-1">Estado *</label>
                     <div className="flex items-center gap-3">
-                      <span className={`text-xs font-space font-semibold ${product.estado === 'activo' ? 'text-green-600' : 'text-red-500'}`}>{product.estado === 'activo' ? 'Activo' : 'Inactivo'}</span>
+                      <span className={`text-xs font-space font-semibold ${product.estado === 'Activo' ? 'text-green-600' : 'text-red-500'}`}>{product.estado === 'Activo' ? 'Activo' : 'Inactivo'}</span>
                       <button
                         type="button"
-                        className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${product.estado === 'activo' ? 'bg-green-500' : 'bg-gray-300'}`}
-                        onClick={() => setProduct((prev: any) => ({ ...prev, estado: prev.estado === 'activo' ? 'inactivo' : 'activo' }))}
-                        aria-pressed={product.estado === 'activo'}
+                        className={`relative w-11 h-6 rounded-full transition-colors focus:outline-none ${product.estado === 'Activo' ? 'bg-green-500' : 'bg-gray-300'}`}
+                        onClick={() => setProduct((prev: any) => ({ ...prev, estado: prev.estado === 'Activo' ? 'Inactivo' : 'Activo' }))}
+                        aria-pressed={product.estado === 'Activo'}
                         aria-label="Cambiar estado"
                       >
                         <motion.span
                           className="absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow"
-                          animate={{ x: product.estado === 'activo' ? 20 : 0 }}
+                          animate={{ x: product.estado === 'Activo' ? 20 : 0 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                         />
                       </button>
@@ -608,11 +613,6 @@ const EditProductScreen: React.FC = () => {
             </div>
         
             <div className="flex items-center justify-end gap-3 mt-8">
-              <DesignButton variant="neutral"
-                icon={() => <FaPowerOff style={{ color: '#FFD600' }} />}
-              >
-                Desactivar
-              </DesignButton>
               <DesignButton variant="neutral">
                 Cancelar
               </DesignButton>
@@ -643,6 +643,7 @@ const EditProductScreen: React.FC = () => {
         onClose={() => setToast(prev => ({ ...prev, show: false }))}
         duration={3000}
       />
+      {showLoader && <FullScreenLoader />}
     </div>
   );
 };

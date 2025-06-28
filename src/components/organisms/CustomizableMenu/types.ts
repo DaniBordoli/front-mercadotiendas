@@ -40,11 +40,26 @@ export interface EditableVariables {
 
 // Variables específicas para FirstLayout
 export interface FirstLayoutEditableVariables extends EditableVariables {
+    navbarTitle?: string;
+    navbarTitleColor?: string;
+    navbarLinksColor?: string;
+    navbarIconsColor?: string;
+    heroTitle?: string;
+    heroTitleColor?: string;
+    categoryTitle?: string;
+    categoryTitleColor?: string;
+    featuredProductsTitle?: string;
+    featuredProductsTitleColor?: string;
+    purpleSectionTitle?: string;
+    purpleSectionTitleColor?: string;
+    newsletterTitle?: string;
+    newsletterTitleColor?: string;
+    footerTitle?: string;
+    footerTitleColor?: string;
     button2Text?: string;
     button2BackgroundColor?: string;
     button2TextColor?: string;
     heroBackgroundColor?: string;
-    featuredProductsTitle?: string;
     categorySectionTitle?: string;
     heroDescription?: string;
     featuredProductsCardButtonText?: string;

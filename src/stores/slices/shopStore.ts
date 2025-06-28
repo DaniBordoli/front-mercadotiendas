@@ -13,6 +13,11 @@ interface ShopState {
     setShop: (shop: Shop | null) => void;
     clearError: () => void;
     getShop: () => Promise<void>;
+    updateShopStatus: (shopId: string, active: boolean) => Promise<void>;
+    isShopActive: () => boolean;
+    checkShopAccess: () => { canAccess: boolean; message: string };
+    updateShopInstitutional: (data: { description?: string; mission?: string; vision?: string; history?: string; values?: string }) => Promise<void>;
+    updateShopColors: (data: { primaryColor?: string; secondaryColor?: string }) => Promise<void>;
 }
 
 export const useShopStore = create<ShopState>((set, get) => ({
@@ -21,7 +26,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     error: null,
 
     updateShopInfo: async (shopId: string, data: any, imageFile?: File) => {
-        const token = localStorage.getItem('token');
+        const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
 
         set({ loading: true, error: null });
@@ -136,7 +141,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     getShop: async () => {
-        const token = localStorage.getItem('token');
+        const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
 
         set({ loading: true, error: null });
@@ -160,6 +165,106 @@ export const useShopStore = create<ShopState>((set, get) => ({
             set({ error: (error as Error).message, loading: false });
             throw error;
         }
+    },
+
+    updateShopStatus: async (shopId: string, active: boolean) => {
+        const token = getStorageItem('token');
+        if (!token) throw new Error('No authentication token found');
+
+        set({ loading: true, error: null });
+
+        try {
+            const response = await fetch(`${API_URL}/shops/${shopId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ active }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Error al actualizar el estado de la tienda');
+            }
+
+            const result = await response.json();
+            set({ shop: result.shop, loading: false });
+            
+            // Actualizar el usuario en authStore
+            const authStore = useAuthStore.getState();
+            if (authStore.user) {
+                authStore.user.shop = result.shop;
+                useAuthStore.setState({ user: authStore.user });
+            }
+        } catch (error) {
+            set({ error: (error as Error).message, loading: false });
+            throw error;
+        }
+    },
+
+    isShopActive: () => {
+        const { shop } = get();
+        return shop?.active === true;
+    },
+
+    checkShopAccess: () => {
+        const { shop } = get();
+        if (!shop) {
+            return { canAccess: false, message: 'No tiene una tienda asociada' };
+        }
+        if (!shop.active) {
+            return { canAccess: false, message: 'Habilite su tienda para ingresar' };
+        }
+        return { canAccess: true, message: '' };
+    },
+
+    updateShopInstitutional: async (data: { description?: string; mission?: string; vision?: string; history?: string; values?: string }) => {
+        const { shop } = get();
+        if (!shop) throw new Error('No shop found');
+        
+       
+        await get().updateShopInfo(shop._id, data);
+    },
+
+    updateShopColors: async (data: { primaryColor?: string; secondaryColor?: string }) => {
+        const { shop } = get();
+        if (!shop) throw new Error('No shop found');
+        
+       
+        await get().updateShopInfo(shop._id, data);
+        
+       
+        const { useFirstLayoutStore } = await import('../firstLayoutStore');
+        const { updateEditableVariables } = useFirstLayoutStore.getState();
+        
+        const colorUpdates: any = {
+            primaryColor: data.primaryColor,
+            secondaryColor: data.secondaryColor,
+        };
+        
+    
+        if (data.primaryColor) {
+            colorUpdates.navbarBackgroundColor = data.primaryColor;
+            colorUpdates.heroBackgroundColor = data.primaryColor;
+            colorUpdates.navbarTitleColor = '#FFFFFF';
+        }
+        
+        if (data.secondaryColor) {
+            
+            colorUpdates.buttonBackgroundColor = data.secondaryColor;
+            colorUpdates.buttonTextColor = '#FFFFFF';
+            colorUpdates.featuredProductsCardButtonColor = data.secondaryColor;
+            colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
+        } else if (data.primaryColor) {
+            
+            colorUpdates.buttonBackgroundColor = '#FFFFFF';
+            colorUpdates.buttonTextColor = data.primaryColor;
+            colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';
+            colorUpdates.featuredProductsCardButtonTextColor = data.primaryColor;
+        }
+        
+        updateEditableVariables(colorUpdates);
     },
 
     setShop: (shop: Shop | null) => set({ shop }),

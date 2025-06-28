@@ -342,14 +342,11 @@ const ProductDetailPage: React.FC = () => {
             <div className="mt-8 pt-6 border-t" style={{ borderColor: colors.lightGray }}>
                 <h2 className="text-lg font-bold font-space mb-3" style={{ color: colors.darkGray }}>Descripción</h2>
                 <div className="text-sm leading-relaxed space-y-3" style={{ color: colors.mediumGray }}>
-                    <p>
-                        Experimenta el máximo rendimiento con la "{selectedProduct.name}".
-                        Equipada con componentes de última generación y diseñada para los gamers más exigentes.
-                    </p>
-                    <p>
-                        {selectedProduct.storeName ? `Vendido por ${selectedProduct.storeName}, esta` : 'Esta'} laptop ofrece gráficos impresionantes y una velocidad de procesamiento increíble para tus juegos y tareas intensivas.
-                        {selectedProduct.condition === 'new' ? ' Totalmente nueva y lista para desatar su poder.' : ' En excelente estado de segunda mano, comprobada para asegurar su rendimiento.'}
-                    </p>
+                    {selectedProduct.descripcion || selectedProduct.description ? (
+                      <p>{selectedProduct.descripcion || selectedProduct.description}</p>
+                    ) : (
+                      <p className="italic text-gray-400">Este producto no tiene descripción.</p>
+                    )}
                 </div>
             </div>
 

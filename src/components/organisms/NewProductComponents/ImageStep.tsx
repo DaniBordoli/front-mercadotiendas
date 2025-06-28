@@ -16,6 +16,8 @@ const ImageStep: React.FC<ImageStepProps> = ({ onNext, productImages, setProduct
     message: '',
     type: 'error' as 'success' | 'error' | 'info',
   });
+  // Estado para el índice de la imagen que se está arrastrando
+  const [draggedIdx, setDraggedIdx] = React.useState<number | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -26,6 +28,7 @@ const ImageStep: React.FC<ImageStepProps> = ({ onNext, productImages, setProduct
         message: 'Solo se permiten archivos de imagen',
         type: 'error',
       });
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
   
@@ -35,13 +38,37 @@ const ImageStep: React.FC<ImageStepProps> = ({ onNext, productImages, setProduct
         message: 'Máximo 3 imágenes',
         type: 'error',
       });
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
     setProductImages(prev => [...prev, ...validFiles]);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleRemoveImage = (idx: number) => {
     setProductImages(prev => prev.filter((_, i) => i !== idx));
+  };
+
+  // Función para manejar el inicio del drag
+  const handleDragStart = (idx: number) => {
+    setDraggedIdx(idx);
+  };
+
+  // Función para permitir el drop
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
+  // Función para manejar el drop y reordenar
+  const handleDrop = (idx: number) => {
+    if (draggedIdx === null || draggedIdx === idx) return;
+    setProductImages(prev => {
+      const updated = [...prev];
+      const [removed] = updated.splice(draggedIdx, 1);
+      updated.splice(idx, 0, removed);
+      return updated;
+    });
+    setDraggedIdx(null);
   };
 
   return (
@@ -83,6 +110,11 @@ const ImageStep: React.FC<ImageStepProps> = ({ onNext, productImages, setProduct
               <div
                 key={idx}
                 className={`relative border-2 ${idx === 0 ? 'border-[#FF4F41]' : 'border-transparent'} rounded-xl w-32 h-32 flex flex-col items-center justify-center bg-gray-100`}
+                draggable
+                onDragStart={() => handleDragStart(idx)}
+                onDragOver={handleDragOver}
+                onDrop={() => handleDrop(idx)}
+                style={{ cursor: 'grab' }}
               >
                 {typeof img === 'string' ? (
                   <img src={img} alt="preview" className="w-full h-full object-cover rounded-xl" />
@@ -93,7 +125,13 @@ const ImageStep: React.FC<ImageStepProps> = ({ onNext, productImages, setProduct
                   <span className="absolute bottom-0 left-0 right-0 text-xs font-space bg-[#FF4F41] text-white rounded-b-xl py-1 text-center">Principal</span>
                 )}
                 <div className="absolute top-2 right-2 flex gap-1">
-                  <button className="bg-white rounded-full p-1 border border-gray-200 shadow hover:bg-gray-50 cursor-move" title="Arrastrar para reordenar">
+                  <button
+                    className="bg-white rounded-full p-1 border border-gray-200 shadow hover:bg-gray-50 cursor-move"
+                    title="Arrastrar para reordenar"
+                    draggable
+                    onMouseDown={e => e.currentTarget.parentElement?.parentElement?.setAttribute('draggable', 'true')}
+                    onDragStart={() => handleDragStart(idx)}
+                  >
                     <FaGripVertical className="text-gray-400 text-xs" />
                   </button>
                   <button className="bg-white rounded-full p-1 border border-gray-200 shadow hover:bg-gray-50" onClick={() => handleRemoveImage(idx)} title="Eliminar imagen">

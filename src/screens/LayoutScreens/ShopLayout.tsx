@@ -6,6 +6,7 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
+import { FiShoppingCart } from 'react-icons/fi';
 
 const ShopLayout: React.FC = () => {
   const [price, setPrice] = useState(500);
@@ -42,7 +43,7 @@ const ShopLayout: React.FC = () => {
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
-        title={editableVariables.title}
+        navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
@@ -50,36 +51,36 @@ const ShopLayout: React.FC = () => {
       />
       <section className="py-8" style={{ backgroundColor: editableVariables.heroBackgroundColor }}>
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2" style={{ color: editableVariables.textColor }}>Shop</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: editableVariables.textColor }}>Inicio</h1>
           <div className="flex items-center space-x-1" style={{ color: editableVariables.textColor }}>
-            <span>Home</span>
+            <span>Inicio</span>
             <FaChevronRight className="text-gray-400" size={14} />
-            <span className="font-semibold" style={{ color: editableVariables.primaryColor }}>Shop</span>
+            <span className="font-semibold" style={{ color: editableVariables.primaryColor }}>Inicio</span>
           </div>
         </div>
       </section>
       <div className="max-w-7xl mx-auto flex mt-8">
         <aside className="w-64 px-4 rounded-lg" style={{ backgroundColor: editableVariables.navbarBackgroundColor }}>
           <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">Categories</h2>
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">Categorias</h2>
             <div className="flex flex-col gap-2 mb-6">
               <label className="flex items-center text-gray-600">
                 <input type="checkbox" className="mr-2" />
-                Women's Fashion
+               Moda para Mujeres
               </label>
               <label className="flex items-center text-gray-600">
                 <input type="checkbox" className="mr-2" />
-                Men's Collection
+                Colección para Hombres
               </label>
               <label className="flex items-center text-gray-600">
                 <input type="checkbox" className="mr-2" />
-                Accessories
+                Accesorios
               </label>
             </div>
           </div>
           <hr className="my-4" />
           <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">Price Range</h2>
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">Rango de Precio</h2>
             <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
               <span>$0</span>
               <span>$1000</span>
@@ -92,11 +93,11 @@ const ShopLayout: React.FC = () => {
               onChange={e => setPrice(Number(e.target.value))}
               className="w-full accent-blue-500"
             />
-            <div className="text-xs text-gray-600 mt-1">Selected: ${price}</div>
+            <div className="text-xs text-gray-600 mt-1">Seleccionado: ${price}</div>
           </div>
           <hr className="my-4" />
           <div>
-            <h2 className="text-sm font-semibold text-gray-700 mb-4">Size</h2>
+            <h2 className="text-sm font-semibold text-gray-700 mb-4">Talla</h2>
             <div className="flex gap-2">
               {['XS', 'S', 'M', 'L', 'XL'].map(size => (
                 <button
@@ -130,41 +131,39 @@ const ShopLayout: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
               <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
-            ) : (              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (                <div                  key={prod?.id || prod?._id || idx}
-                  className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch cursor-pointer hover:shadow-lg transition"
+            ) : (
+              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
+                <div
+                  key={prod?.id || prod?._id || idx}
+                  className="bg-white rounded-lg overflow-hidden shadow my-8 w-full flex flex-col cursor-pointer hover:shadow-lg transition"
                   onClick={() => {
-                    // Usar cualquier ID disponible (del backend o store)
                     const productId = prod?.id || prod?._id;
                     navigate(productId ? `/first-layout/detail-layout/${productId}` : '/first-layout/detail-layout');
                   }}
-                  style={{ backgroundColor: editableVariables.heroBackgroundColor }}
-                >                  <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: editableVariables.placeholderCardImage }}>
-                    {prod ? (
-                      <img 
-                        src={prod.imageUrls?.[0] || prod.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"} 
-                        alt={prod.name || prod.nombre || "Producto"} 
-                        className="object-cover w-full h-full" 
-                      />
-                    ) : (
-                      <span className="text-2xl" style={{ color: editableVariables.secondaryColor }}>Image</span>
-                    )}
-                  </div>
-                  <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
-                    <h3 className="text-lg font-semibold text-left mb-1 text-white" style={{ color: editableVariables.textColor }}>{prod?.name || prod?.nombre || `Product ${idx + 1}`}</h3>
-                    <span className="font-bold text-lg mb-2 text-left text-white block" style={{ color: editableVariables.primaryColor }}>
-                      {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
-                    </span>
-                    <div className="flex justify-center">
-                      <button
-                        className="px-4 w-full py-2 rounded text-white bg-blue-600 transition text-sm"
-                        style={{
-                          backgroundColor: editableVariables.featuredProductsCardButtonColor,
-                          color: editableVariables.featuredProductsCardButtonTextColor,
-                        }}
-                      > Añadir al carro
-                        {editableVariables.featuredProductsCardButtonText}
-                      </button>
+                  style={{ backgroundColor: '#fff' }}
+                >
+                  <img
+                    src={prod?.imageUrls?.[0] || prod?.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"}
+                    alt={prod?.name || prod?.nombre || `Producto ${idx + 1}`}
+                    className="w-full h-[220px] object-cover"
+                  />
+                  <div className="flex-1 flex flex-col justify-between p-4 bg-white">
+                    <div>
+                      <h3 className="text-base font-semibold mb-1 text-gray-900">{prod?.name || prod?.nombre || `Producto ${idx + 1}`}</h3>
+                      <span className="text-lg font-bold text-gray-800 mb-4 block">
+                        {prod?.price ? `$${prod.price.toLocaleString()}` : prod?.precio ? `$${prod.precio}` : '$99.99'}
+                      </span>
                     </div>
+                    <button
+                      className="mt-auto w-full flex items-center justify-center gap-2 py-2 rounded font-semibold transition-colors duration-200"
+                      style={{
+                        backgroundColor: editableVariables.featuredProductsCardButtonColor,
+                        color: editableVariables.featuredProductsCardButtonTextColor,
+                      }}
+                    >
+                      Añadir al carrito
+                      <span className="ml-2"><FiShoppingCart size={20} color={editableVariables.featuredProductsCardButtonTextColor} /></span>
+                    </button>
                   </div>
                 </div>
               ))
@@ -173,14 +172,14 @@ const ShopLayout: React.FC = () => {
           <div className="flex justify-center mt-10 mb-16">
             <nav className="inline-flex items-center space-x-2">
               <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
-                <span className="sr-only">Previous</span>
+                <span className="sr-only">Anterior</span>
                 <FaChevronLeft />
               </button>
               <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-blue-600 text-white font-semibold">1</button>
               <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">2</button>
               <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">3</button>
               <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
-                <span className="sr-only">Next</span>
+                <span className="sr-only">Siguiente</span>
                 <FaChevronRight />
               </button>
             </nav>

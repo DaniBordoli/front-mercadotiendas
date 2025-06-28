@@ -19,6 +19,7 @@ const FirstLayout: React.FC = () => {
   const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
   const shop = useShopStore(state => state.shop);
+  const getShop = useShopStore(state => state.getShop);
   const location = useLocation();
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
@@ -56,13 +57,57 @@ const FirstLayout: React.FC = () => {
         const data = await fetchShopTemplate();
         if (data && data.templateUpdate) {
           setEditableVariables(data.templateUpdate);
+          
+          // Después de cargar el template, aplicar inmediatamente los colores del shop si existen
+          if (shop && (shop.primaryColor || shop.secondaryColor)) {
+            const colorUpdates: Partial<FirstLayoutEditableVariables> = {};
+            
+            if (shop.primaryColor) {
+              colorUpdates.primaryColor = shop.primaryColor;
+              colorUpdates.navbarBackgroundColor = shop.primaryColor;
+              colorUpdates.navbarTitleColor = '#FFFFFF';
+              colorUpdates.heroBackgroundColor = shop.primaryColor;
+            }
+            
+            if (shop.secondaryColor) {
+              colorUpdates.secondaryColor = shop.secondaryColor;
+              colorUpdates.buttonBackgroundColor = shop.secondaryColor;
+              colorUpdates.buttonTextColor = '#FFFFFF';
+              colorUpdates.featuredProductsCardButtonColor = shop.secondaryColor;
+              colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
+            }
+            
+            // Si solo hay color principal, usar blanco para los botones
+            if (shop.primaryColor && !shop.secondaryColor) {
+              colorUpdates.buttonBackgroundColor = '#FFFFFF';
+              colorUpdates.buttonTextColor = shop.primaryColor;
+              colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';
+              colorUpdates.featuredProductsCardButtonTextColor = shop.primaryColor;
+            }
+            
+            updateEditableVariables(colorUpdates);
+          }
         }
       } catch (err) {
        
       }
     };
     getTemplate();
-  }, [setEditableVariables]);
+  }, [setEditableVariables, shop, updateEditableVariables]);
+
+  // Cargar datos del shop y aplicar colores
+  useEffect(() => {
+    const loadShopData = async () => {
+      try {
+        if (!shop) {
+          await getShop();
+        }
+      } catch (err) {
+        console.error('Error loading shop data:', err);
+      }
+    };
+    loadShopData();
+  }, [shop, getShop]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);
@@ -79,17 +124,18 @@ const FirstLayout: React.FC = () => {
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
-        title={editableVariables.title}
+        navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
-        textColor={editableVariables.textColor}
+        textColor={editableVariables.navbarTitleColor || editableVariables.textColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
       />
       <HeroSection
-        title={editableVariables.searchTitle}
+        heroTitle={editableVariables.heroTitle}
+        heroTitleColor={editableVariables.heroTitleColor}
         image={editableVariables.placeholderHeroImage}
         buttonText={editableVariables.buttonText}
-        textColor={editableVariables.textColor}
+        textColor={editableVariables.heroTitleColor || editableVariables.textColor}
         buttonColor={editableVariables.buttonBackgroundColor}
         buttonTextColor={editableVariables.buttonTextColor}
         button2Text={editableVariables.button2Text}
@@ -99,33 +145,39 @@ const FirstLayout: React.FC = () => {
         description={editableVariables.heroDescription}
       />
       <CategorySection
-        title={editableVariables.categorySectionTitle}
+        categoryTitle={editableVariables.categoryTitle}
+        categoryTitleColor={editableVariables.categoryTitleColor}
         backgroundColor={editableVariables.mainBackgroundColor}
-        titleColor={editableVariables.textColor}
+        titleColor={editableVariables.categoryTitleColor || editableVariables.textColor}
       />
       <FeaturedProducts
         cardImage={editableVariables.placeholderCardImage}
-        title={editableVariables.featuredProductsTitle}
+        featuredProductsTitle={editableVariables.featuredProductsTitle}
+        featuredProductsTitleColor={editableVariables.featuredProductsTitleColor}
         backgroundColor={editableVariables.heroBackgroundColor}
         cardButtonText={editableVariables.featuredProductsCardButtonText}
         cardButtonColor={editableVariables.featuredProductsCardButtonColor}
         cardButtonTextColor={editableVariables.featuredProductsCardButtonTextColor}
-        titleColor={editableVariables.textColor}
+        titleColor={editableVariables.featuredProductsTitleColor || editableVariables.textColor}
         products={!loadingProducts && featuredProducts.length > 0 ? featuredProducts : []}
       />
       <PurpleSection
-        titleColor={editableVariables.textColor}
+        purpleSectionTitle={editableVariables.purpleSectionTitle}
+        titleColor={editableVariables.purpleSectionTitleColor || editableVariables.textColor}
         buttonColor={editableVariables.buttonBackgroundColor}
         buttonTextColor={editableVariables.buttonTextColor}
         backgroundColor={editableVariables.primaryColor}
       />
       <NewsletterSection
+        newsletterTitle={editableVariables.newsletterTitle}
+        titleColor={editableVariables.newsletterTitleColor || editableVariables.textColor}
         backgroundColor={editableVariables.mainBackgroundColor}
-        titleColor={editableVariables.textColor}
       />
       <Footer
+        footerTitle={editableVariables.footerTitle}
+        footerTitleColor={editableVariables.footerTitleColor}
         backgroundColor={editableVariables.footerBackgroundColor}
-        textColor={editableVariables.footerTextColor}
+        textColor={editableVariables.footerTitleColor || editableVariables.footerTextColor}
         footerDescription={editableVariables.footerDescription}
       />
       {/* Solo mostrar AIChat si no es previsualización */}

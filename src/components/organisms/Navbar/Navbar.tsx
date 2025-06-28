@@ -14,12 +14,19 @@ import { BsShop } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import { InputDefault } from '../../atoms/InputDefault/InputDefault';
 import { useCartStore } from '../../../stores/cartStore';
+import Toast from '../../atoms/Toast';
+import { useShopStore } from '../../../stores/slices/shopStore';
 import './NavbarMobile.css';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState({
+    show: false,
+    message: '',
+    type: 'error' as 'success' | 'error' | 'info',
+  });
   const navigate = useNavigate();
   
 
@@ -41,6 +48,10 @@ export const Navbar: React.FC = () => {
   const categoryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const cartItems = useCartStore(state => state.items);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { checkShopAccess } = useShopStore();
+  const { 
+    getShop: getShopInfo 
+  } = useShopStore();
 
   const handleLogout = () => {
     logout();
@@ -113,6 +124,19 @@ export const Navbar: React.FC = () => {
 
   const toggleModal = () => setIsModalOpen((prev) => !prev);
 
+  const handleShopAccess = (targetPath: string) => {
+    const { canAccess, message } = checkShopAccess();
+    if (!canAccess) {
+      setToast({
+        show: true,
+        message: message,
+        type: 'error',
+      });
+      return;
+    }
+    navigate(targetPath);
+  };
+
   useEffect(() => {
     if (searchTerm.trim() !== '' && suggestions.length > 0) {
       setShowSuggestions(true);
@@ -159,7 +183,14 @@ export const Navbar: React.FC = () => {
         
         try {
           const loadedUser = await loadProfile();
-          // Solo mostrar errores en consola
+          // Cargar información de la tienda si el usuario tiene una
+          if (loadedUser?.shop && isMounted) {
+            try {
+              await getShopInfo();
+            } catch (error) {
+              // Error silencioso al cargar tienda
+            }
+          }
         } catch (error) {
           // Error silencioso
         }
@@ -180,7 +211,6 @@ export const Navbar: React.FC = () => {
 
   const [forceUpdate, setForceUpdate] = useState(0);
   
-
 
   return (
     <>
@@ -238,7 +268,7 @@ export const Navbar: React.FC = () => {
               {isUserReady && user.shop ? (
                 <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
                   <BsShop className="text-xl mr-2" />
-                  <span onClick={() => navigate('/first-layout?view=true')}>Ver mi tienda</span>
+                  <span onClick={() => handleShopAccess('/first-layout?view=true')}>Ver mi tienda</span>
                 </div>
               ) : (
                 <div
@@ -254,8 +284,8 @@ export const Navbar: React.FC = () => {
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
-                        Mi cuenta
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => handleShopAccess('/data-dashboard')}>
+                        Administrar tienda
                       </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
                         Mi carrito
@@ -393,6 +423,13 @@ export const Navbar: React.FC = () => {
           />
         </div>
       </nav>
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast(prev => ({ ...prev, show: false }))}
+        duration={3000}
+      />
     </>
   );
 };
