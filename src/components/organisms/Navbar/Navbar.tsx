@@ -267,7 +267,7 @@ export const Navbar: React.FC = () => {
               {/* Mostrar "Crear tienda" si no tiene tienda, "Ver mi tienda" si ya la tiene */}
               {isUserReady && user.shop ? (
                 <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
-                  <BsShop className="text-xl mr-2" />
+                  <BsShop onClick={() => handleShopAccess('/first-layout?view=true')} className="text-xl mr-2" />
                   <span onClick={() => handleShopAccess('/first-layout?view=true')}>Ver mi tienda</span>
                 </div>
               ) : (

@@ -111,13 +111,39 @@ export const useShopStore = create<ShopState>((set, get) => ({
         set({ loading: true, error: null });
         try {
             console.log("Sending data to backend for shop creation:", data);
+            
+           
+            let body;
+            let headers: any = {
+                'Authorization': `Bearer ${token}`
+            };
+
+            if (data.image) {
+              
+                const formData = new FormData();
+                
+               
+                Object.keys(data).forEach(key => {
+                    if (key !== 'image' && data[key] !== undefined) {
+                        formData.append(key, String(data[key]));
+                    }
+                });
+                
+           
+                formData.append('image', data.image);
+                
+                body = formData;
+             
+            } else {
+               
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify(data);
+            }
+
             const response = await fetch(`${API_URL}/shops`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
+                headers,
+                body
             });
 
             const result = await response.json();
@@ -294,21 +320,19 @@ export const useShopStore = create<ShopState>((set, get) => ({
             secondaryColor: data.secondaryColor,
         };
         
-    
+        // NavBar con fondo blanco y título en color principal para mejor contraste
         if (data.primaryColor) {
-            colorUpdates.navbarBackgroundColor = data.primaryColor;
+            colorUpdates.navbarBackgroundColor = '#FFFFFF';
+            colorUpdates.navbarTitleColor = data.primaryColor;
             colorUpdates.heroBackgroundColor = data.primaryColor;
-            colorUpdates.navbarTitleColor = '#FFFFFF';
         }
         
         if (data.secondaryColor) {
-            
             colorUpdates.buttonBackgroundColor = data.secondaryColor;
             colorUpdates.buttonTextColor = '#FFFFFF';
             colorUpdates.featuredProductsCardButtonColor = data.secondaryColor;
             colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
         } else if (data.primaryColor) {
-            
             colorUpdates.buttonBackgroundColor = '#FFFFFF';
             colorUpdates.buttonTextColor = data.primaryColor;
             colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';

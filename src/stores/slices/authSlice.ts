@@ -663,14 +663,38 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const apiUrl = `${API_URL}/shops`;
 
+    
+      let body;
+      let headers: any = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      if (data.image) {
+       
+        const formData = new FormData();
+        
+     
+        Object.keys(data).forEach(key => {
+          if (key !== 'image' && data[key as keyof CreateShopData] !== undefined) {
+            formData.append(key, String(data[key as keyof CreateShopData]));
+          }
+        });
+        
+     
+        formData.append('image', data.image);
+        
+        body = formData;
+        
+      } else {
+       
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(data);
+      }
 
       const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
+        headers,
+        body,
       });
       const responseData = await response.json();
       if (!response.ok) {
