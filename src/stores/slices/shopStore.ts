@@ -55,11 +55,18 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
-                // Actualizar el usuario en authStore
+                
+                // Actualizar el usuario en authStore y forzar refresh completo
                 const authStore = useAuthStore.getState();
                 if (authStore.user) {
+                    // Actualizar la referencia de la tienda en el usuario
                     authStore.user.shop = result.shop;
                     useAuthStore.setState({ user: authStore.user });
+                    
+                    // Forzar recarga del perfil para mantener sincronización
+                    if (authStore.forceLoadProfile) {
+                        authStore.forceLoadProfile().catch(console.error);
+                    }
                 }
             } else {
                 const response = await fetch(`${API_URL}/shops/${shopId}`, {
@@ -78,11 +85,18 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
-                // Actualizar el usuario en authStore
+                
+                // Actualizar el usuario en authStore y forzar refresh completo
                 const authStore = useAuthStore.getState();
                 if (authStore.user) {
+                    // Actualizar la referencia de la tienda en el usuario
                     authStore.user.shop = result.shop;
                     useAuthStore.setState({ user: authStore.user });
+                    
+                    // Forzar recarga del perfil para mantener sincronización
+                    if (authStore.forceLoadProfile) {
+                        authStore.forceLoadProfile().catch(console.error);
+                    }
                 }
             }
         } catch (error) {
@@ -191,11 +205,17 @@ export const useShopStore = create<ShopState>((set, get) => ({
             const result = await response.json();
             set({ shop: result.shop, loading: false });
             
-            // Actualizar el usuario en authStore
+            // Actualizar el usuario en authStore y forzar refresh completo
             const authStore = useAuthStore.getState();
             if (authStore.user) {
+                // Actualizar la referencia de la tienda en el usuario
                 authStore.user.shop = result.shop;
                 useAuthStore.setState({ user: authStore.user });
+                
+                // Forzar recarga del perfil para mantener sincronización
+                if (authStore.forceLoadProfile) {
+                    authStore.forceLoadProfile().catch(console.error);
+                }
             }
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
@@ -205,14 +225,45 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
     isShopActive: () => {
         const { shop } = get();
+        
+        // Si no hay tienda en shopStore, intentar obtenerla del authStore
+        if (!shop) {
+            const authStore = useAuthStore.getState();
+            const userShop = authStore.user?.shop;
+            
+            if (userShop) {
+                // Sincronizar la tienda del authStore al shopStore
+                set({ shop: userShop });
+                return userShop.active === true;
+            }
+            
+            return false;
+        }
+        
         return shop?.active === true;
     },
 
     checkShopAccess: () => {
         const { shop } = get();
+        
+        // Si no hay tienda en shopStore, intentar obtenerla del authStore
         if (!shop) {
+            const authStore = useAuthStore.getState();
+            const userShop = authStore.user?.shop;
+            
+            if (userShop) {
+                // Sincronizar la tienda del authStore al shopStore
+                set({ shop: userShop });
+                
+                if (!userShop.active) {
+                    return { canAccess: false, message: 'Habilite su tienda para ingresar' };
+                }
+                return { canAccess: true, message: '' };
+            }
+            
             return { canAccess: false, message: 'No tiene una tienda asociada' };
         }
+        
         if (!shop.active) {
             return { canAccess: false, message: 'Habilite su tienda para ingresar' };
         }

@@ -84,6 +84,7 @@ export interface AuthState {
 
 export type AuthStore = AuthState & {
   loadProfile: () => Promise<User | null>;
+  forceLoadProfile: () => Promise<User | null>;
   login: (credentials: LoginCredentials) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   register: (data: RegisterData) => Promise<void>;

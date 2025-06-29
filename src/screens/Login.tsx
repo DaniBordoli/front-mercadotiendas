@@ -10,6 +10,7 @@ import { FaGoogle } from "react-icons/fa";
 import { BsFacebook } from 'react-icons/bs';
 import { Loading } from '../components/molecules/Loading';
 import { DesignButton } from '../components/atoms/DesignButton';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 function Login() {
   const navigate = useNavigate();
   const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
@@ -53,6 +54,7 @@ function Login() {
 
   return (
     <div className="bg-white h-screen flex flex-col items-center">
+      {isLoading && <FullScreenLoader />}
       <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
         <div className="flex items-center justify-center w-full">
           <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />

@@ -87,9 +87,7 @@ const SeoMetadata = () => {
                         </p>
                     </div>
                     <div className="mt-4 flex justify-end space-x-4">
-                        <DesignButton variant="neutral" icon={MdOutlineRestore}>
-                            Restaurar
-                        </DesignButton>
+                  
                         <DesignButton variant="primary">Guardar cambios</DesignButton>
                     </div>
                 </div>

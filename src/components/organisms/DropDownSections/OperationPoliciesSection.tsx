@@ -44,7 +44,7 @@ export const OperationPoliciesSection: React.FC = () => {
                 <InputDefault placeholder="Ingrese domicilio fiscal" className="w-full" />
             </div>
             <div className="flex flex-col gap-2">
-                <DesignButton variant="neutral">Restaurar</DesignButton>
+             
                 <DesignButton variant="primary">Guardar cambios</DesignButton>
             </div>
         </div>

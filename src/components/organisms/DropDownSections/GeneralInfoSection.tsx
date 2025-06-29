@@ -4,6 +4,7 @@ import { InputDefault } from '../../atoms/InputDefault';
 import { SelectDefault } from '../../atoms/SelectDefault';
 import { DesignButton } from '../../atoms/DesignButton';
 import { useAuthStore, useShopStore } from '../../../stores'; 
+import FullScreenLoader from '../../molecules/FullScreenLoader'; 
 
 export const GeneralInfoSection: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -84,6 +85,7 @@ export const GeneralInfoSection: React.FC = () => {
 
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
+            {loading && <FullScreenLoader />}
             <div className="grid grid-cols-1 gap-4">
                 <div>
                     <label className="text-sm font-space mb-2 block">Nombre de la tienda</label>
@@ -181,7 +183,7 @@ export const GeneralInfoSection: React.FC = () => {
             </div>
             {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
             <div className="mt-6 flex flex-col gap-2">
-                <DesignButton variant="neutral" onClick={() => console.log('Restaurar')}>Restaurar</DesignButton>
+           
                 <DesignButton variant="primary" onClick={handleSubmit} disabled={loading}>
                     {loading ? 'Guardando...' : 'Guardar cambios'}
                 </DesignButton>

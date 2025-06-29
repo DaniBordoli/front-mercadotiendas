@@ -2,6 +2,7 @@ import * as React from 'react';
 import { DesignButton } from '../../atoms/DesignButton';
 import { useShopStore } from '../../../stores/slices/shopStore';
 import Toast from '../../atoms/Toast';
+import FullScreenLoader from '../../molecules/FullScreenLoader';
 
 export const InstitutionalDescriptionSection: React.FC = () => {
     const { shop, updateShopInstitutional, loading, error } = useShopStore();
@@ -71,6 +72,7 @@ export const InstitutionalDescriptionSection: React.FC = () => {
 
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
+            {loading && <FullScreenLoader />}
             <div className="mb-4">
                 <label className="text-sm font-space mb-2 block">Descripción de la tienda</label>
                 <textarea
@@ -124,13 +126,6 @@ export const InstitutionalDescriptionSection: React.FC = () => {
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <DesignButton 
-                    variant="neutral" 
-                    onClick={handleRestore}
-                    disabled={loading}
-                >
-                    Restaurar
-                </DesignButton>
                 <DesignButton 
                     variant="primary" 
                     onClick={handleSave}

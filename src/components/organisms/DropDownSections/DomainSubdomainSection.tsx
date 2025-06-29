@@ -3,6 +3,7 @@ import { InputDefault } from '../../atoms/InputDefault';
 import { DesignButton } from '../../atoms/DesignButton';
 import { StatusTags } from '../../atoms/StatusTags';
 import { useShopStore, useAuthStore } from '../../../stores';
+import FullScreenLoader from '../../molecules/FullScreenLoader';
 
 export const DomainSubdomainSection: React.FC = () => {
     const { user } = useAuthStore();
@@ -35,6 +36,7 @@ export const DomainSubdomainSection: React.FC = () => {
 
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
+            {loading && <FullScreenLoader />}
             <div className="flex flex-col gap-4">
                 <div className="mb-4">
                     <label className="text-sm font-space mb-2 block">Subdominio actual</label>
@@ -56,7 +58,7 @@ export const DomainSubdomainSection: React.FC = () => {
                 </div>
                 {error && <div className="text-red-500 mb-2">{error}</div>}
                 <div className="flex flex-col gap-2">
-                    <DesignButton variant="neutral" onClick={() => { setSubdomain(shop?.subdomain || ''); setSuccess(false); }}>Restaurar</DesignButton>
+                 
                     <DesignButton variant="primary" onClick={handleSave} disabled={loading}>Guardar cambios</DesignButton>
                 </div>
             </div>

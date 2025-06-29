@@ -5,6 +5,7 @@ import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores';
 import { updateUserProfile, fetchCountries } from '../stores/slices/authSlice';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const GoogleComplete = () => {
     const navigate = useNavigate();
@@ -88,6 +89,7 @@ const GoogleComplete = () => {
 
     return (
         <div className="bg-white h-screen flex flex-col items-center">
+            {isLoading && <FullScreenLoader />}
             <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
                 <div className="flex items-center justify-center w-full">
                     <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />

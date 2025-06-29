@@ -4,6 +4,7 @@ import { DesignButton } from '../../atoms/DesignButton';
 import { StatusTags } from '../../atoms/StatusTags';
 import { FaInstagram, FaFacebook, FaWhatsapp, FaTiktok, FaYoutube } from "react-icons/fa";
 import { useAuthStore, getShopSocial, updateShopSocial, ShopSocial } from '../../../stores/slices/authSlice';
+import FullScreenLoader from '../../molecules/FullScreenLoader';
 
 export const SocialMediaSection: React.FC = () => {
     const { user } = useAuthStore();
@@ -44,6 +45,7 @@ export const SocialMediaSection: React.FC = () => {
 
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
+            {loading && <FullScreenLoader />}
             <div className="grid grid-cols-1 gap-4">
                 <div>
                     <label className="text-sm font-space mb-2 block">Instagram</label>
@@ -118,7 +120,7 @@ export const SocialMediaSection: React.FC = () => {
             </div>
             {error && <div className="text-red-500 mt-2">{error}</div>}
             <div className="flex flex-col gap-2 mt-6">
-                <DesignButton variant="neutral" onClick={() => setForm({})} disabled={loading}>Restaurar</DesignButton>
+     
                 <DesignButton variant="primary" onClick={handleSave} disabled={loading}>Guardar cambios</DesignButton>
             </div>
         </div>

@@ -21,7 +21,7 @@ export const SeoMetadataSection: React.FC = () => {
                 />
             </div>
             <div className="flex flex-col gap-2">
-                <DesignButton variant="neutral">Restaurar</DesignButton>
+              
                 <DesignButton variant="primary">Guardar cambios</DesignButton>
             </div>
         </div>

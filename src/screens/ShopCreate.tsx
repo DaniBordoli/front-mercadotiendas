@@ -8,7 +8,7 @@ import ProductSelectionForm from '../components/CreateShopComponents/ProductSele
 import PaymentSelectionForm from '../components/CreateShopComponents/PaymentSelectionForm';
 import ColorBrandForm from '../components/CreateShopComponents/ColorBrandForm';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../stores';
+import { useAuthStore, useShopStore } from '../stores';
 import { Navbar } from '../components/organisms/Navbar/Navbar';
 
 interface FormData {
@@ -39,6 +39,7 @@ const ShopCreate: React.FC = () => {
 
     const navigate = useNavigate();
     const { createShop, isLoading, error, clearError } = useAuthStore();
+    const { setShop } = useShopStore();
 
     const handleNextStep = (data: Partial<FormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
@@ -74,6 +75,13 @@ const ShopCreate: React.FC = () => {
                 logoUrl: formData.logoUrl,
             };
             await createShop(shopData);
+            
+            // Sincronizar shopStore con la tienda recién creada
+            const updatedUser = useAuthStore.getState().user;
+            if (updatedUser?.shop) {
+                setShop(updatedUser.shop);
+            }
+            
             navigate('/dashboard');
         } catch (e) {
             console.error(e);
