@@ -397,6 +397,48 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
+  forceLoadProfile: async () => {
+    const token = get().token;
+    console.log('[Auth] forceLoadProfile - forzando recarga del perfil');
+    
+    if (!token) {
+      console.log('[Auth] No hay token disponible para forzar recarga');
+      return null;
+    }
+
+    try {
+     
+      const user = await fetchUserProfile();
+      
+      if (!user || !user.email) {
+        throw new Error('Datos de usuario incompletos');
+      }
+      
+      // Preservar el método de autenticación
+      const currentUser = get().user;
+      const userWithAuthMethod = {
+        ...user,
+        authMethod: currentUser?.authMethod || user.authMethod || 'email'
+      };
+      
+      // Guardar y actualizar estado
+      setStorageItem('user', JSON.stringify(userWithAuthMethod));
+      set({ 
+        user: userWithAuthMethod, 
+        isAuthenticated: true 
+      });
+      
+      console.log('[Auth] Perfil recargado exitosamente');
+      return userWithAuthMethod;
+    } catch (error) {
+      console.error('[Auth] Error al forzar recarga del perfil:', error);
+      if (error instanceof Error && error.message.includes('401')) {
+        get().logout();
+      }
+      return null;
+    }
+  },
+
   user: null,
   isAuthenticated: initialState.isAuthenticated,
   isLoading: false,
@@ -621,14 +663,38 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const apiUrl = `${API_URL}/shops`;
 
+    
+      let body;
+      let headers: any = {
+        'Authorization': `Bearer ${token}`,
+      };
+
+      if (data.image) {
+       
+        const formData = new FormData();
+        
+     
+        Object.keys(data).forEach(key => {
+          if (key !== 'image' && data[key as keyof CreateShopData] !== undefined) {
+            formData.append(key, String(data[key as keyof CreateShopData]));
+          }
+        });
+        
+     
+        formData.append('image', data.image);
+        
+        body = formData;
+        
+      } else {
+       
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(data);
+      }
 
       const response = await fetch(apiUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
+        headers,
+        body,
       });
       const responseData = await response.json();
       if (!response.ok) {

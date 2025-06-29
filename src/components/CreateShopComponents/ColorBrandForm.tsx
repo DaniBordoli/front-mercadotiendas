@@ -6,7 +6,7 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { FirstLayoutEditableVariables } from '../organisms/CustomizableMenu/types';
 
 interface ColorBrandFormProps {
-    onNext: (data: { primaryColor: string; secondaryColor: string; logoUrl?: string }) => void;
+    onNext: (data: { primaryColor: string; secondaryColor: string; logoUrl?: string; logoFile?: File }) => void;
 }
 
 const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
@@ -16,6 +16,7 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
     const [primaryColor, setPrimaryColor] = useState(editableVariables.primaryColor || colors.primaryRed);
     const [secondaryColor, setSecondaryColor] = useState(editableVariables.secondaryColor || colors.accentTeal);
     const [logoUrl, setLogoUrl] = useState(editableVariables.logoUrl || '');
+    const [logoFile, setLogoFile] = useState<File | null>(null);
 
     // Opciones de colores predefinidos
     const primaryColorOptions = [
@@ -50,17 +51,17 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
             primaryColor,
             secondaryColor,
             logoUrl,
-            // Navbar siempre usa el color principal
-            navbarBackgroundColor: primaryColor,
-            navbarTitleColor: '#FFFFFF',
-            // Hero section usa el color principal como background
+          
+            navbarBackgroundColor: '#FFFFFF', 
+            navbarTitleColor: primaryColor, 
+            
             heroBackgroundColor: primaryColor,
-            // Los botones en hero section usan el color secundario para contrastar
+           
             buttonBackgroundColor: secondaryColor,
             buttonTextColor: '#FFFFFF',
             button2BackgroundColor: '#FFFFFF',
             button2TextColor: primaryColor,
-            // Productos destacados usan el color secundario
+          
             featuredProductsCardButtonColor: secondaryColor,
             featuredProductsCardButtonTextColor: '#FFFFFF',
         };
@@ -72,8 +73,32 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
         onNext({ 
             primaryColor, 
             secondaryColor, 
-            logoUrl 
+            logoUrl,
+            logoFile: logoFile || undefined
         });
+    };
+
+   
+    const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        // Validaciones
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor selecciona una imagen válida');
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) { // 10MB
+            alert('La imagen debe ser menor a 10MB');
+            return;
+        }
+
+        setLogoFile(file);
+        
+     
+        const tempUrl = URL.createObjectURL(file);
+        setLogoUrl(tempUrl);
     };
 
     const ColorPicker: React.FC<{
@@ -147,15 +172,40 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                     <div className="flex-1">
                         <h3 className="text-base font-space font-medium text-gray-800 mb-4">Marca y Vista Previa</h3>
                         
-                        {/* Logo uploader */}
+                        {/* Logo uploader simple para creación */}
                         <div className="mb-6">
                             <label className="block text-sm font-space font-medium text-gray-600 mb-3">
                                 Logo de Tienda
                             </label>
-                            <LogoUploader 
-                                currentLogoUrl={logoUrl || '/logo.png'}
-                                onLogoUpdate={setLogoUrl}
-                            />
+                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleLogoChange}
+                                    className="hidden"
+                                    id="logo-upload"
+                                />
+                                <label htmlFor="logo-upload" className="cursor-pointer">
+                                    {logoUrl ? (
+                                        <div className="flex flex-col items-center">
+                                            <img 
+                                                src={logoUrl} 
+                                                alt="Logo preview" 
+                                                className="w-20 h-20 object-contain mb-2"
+                                            />
+                                            <span className="text-sm text-gray-600">Cambiar logo</span>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-2">
+                                                <span className="text-gray-400 text-xl">+</span>
+                                            </div>
+                                            <span className="text-sm text-gray-600">Subir logo</span>
+                                            <span className="text-xs text-gray-400">Máximo 10MB</span>
+                                        </div>
+                                    )}
+                                </label>
+                            </div>
                         </div>
 
                         {/* Vista previa con contraste mejorado */}
@@ -177,6 +227,25 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                     <span className="text-xs text-gray-500">Secundario (Botones)</span>
                                 </div>
                             </div>
+                            
+                            {/* Simulación del navbar con fondo blanco */}
+                            <div className="w-full rounded-md overflow-hidden mb-2 border border-gray-200" style={{ backgroundColor: '#FFFFFF' }}>
+                                <div className="p-3 flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+                                        <span className="text-sm font-medium" style={{ color: primaryColor }}>
+                                            Mi Tienda
+                                        </span>
+                                    </div>
+                                    <div className="flex gap-3 text-xs" style={{ color: primaryColor }}>
+                                        <span>Inicio</span>
+                                        <span>Tienda</span>
+                                        <span>Contacto</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <span className="text-xs text-gray-500 mb-3 block">NavBar con fondo blanco y texto en color principal</span>
+                            
                             {/* Simulación del hero section con contraste */}
                             <div className="w-full rounded-md overflow-hidden mb-3" style={{ backgroundColor: primaryColor }}>
                                 <div className="p-4">
@@ -192,7 +261,7 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                     </div>
                                 </div>
                             </div>
-                            <span className="text-xs text-gray-500">Ejemplo: Hero Section con botones contrastantes</span>
+                            <span className="text-xs text-gray-500">Hero Section con fondo en color principal</span>
                         </div>
                     </div>
                 </div>

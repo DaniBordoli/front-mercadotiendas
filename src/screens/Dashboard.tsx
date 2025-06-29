@@ -10,8 +10,33 @@ import { BenefitsSection } from '../components/organisms/BenefitsSection';
 import { Footer } from '../components/organisms/Footer';
 import Carousel from '../components/organisms/Carousel/Carousel';
 import { Navbar } from '../components/organisms/Navbar';
+import { useAuthStore, useShopStore } from '../stores';
 
 const Dashboard: React.FC = () => {
+    const { forceLoadProfile, token, isAuthenticated } = useAuthStore();
+    const { setShop } = useShopStore();
+
+    React.useEffect(() => {
+        const loadUserData = async () => {
+            if (isAuthenticated && token) {
+                try {
+                    console.log('[Dashboard] Forzando recarga de perfil de usuario...');
+                    const userData = await forceLoadProfile();
+                    
+                    // Sincronizar shopStore con los datos del usuario
+                    if (userData?.shop) {
+                        setShop(userData.shop);
+                        console.log('[Dashboard] Tienda sincronizada en shopStore');
+                    }
+                } catch (error) {
+                    console.error('[Dashboard] Error al cargar perfil:', error);
+                }
+            }
+        };
+
+        loadUserData();
+    }, [forceLoadProfile, token, isAuthenticated, setShop]);
+
     return (
         <div className="flex flex-col h-screen">
             <Navbar /> 

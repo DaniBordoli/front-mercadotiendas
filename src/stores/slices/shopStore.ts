@@ -55,11 +55,18 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
-                // Actualizar el usuario en authStore
+                
+                // Actualizar el usuario en authStore y forzar refresh completo
                 const authStore = useAuthStore.getState();
                 if (authStore.user) {
+                    // Actualizar la referencia de la tienda en el usuario
                     authStore.user.shop = result.shop;
                     useAuthStore.setState({ user: authStore.user });
+                    
+                    // Forzar recarga del perfil para mantener sincronización
+                    if (authStore.forceLoadProfile) {
+                        authStore.forceLoadProfile().catch(console.error);
+                    }
                 }
             } else {
                 const response = await fetch(`${API_URL}/shops/${shopId}`, {
@@ -78,11 +85,18 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const result = await response.json();
                 set({ shop: result.shop, loading: false });
-                // Actualizar el usuario en authStore
+                
+                // Actualizar el usuario en authStore y forzar refresh completo
                 const authStore = useAuthStore.getState();
                 if (authStore.user) {
+                    // Actualizar la referencia de la tienda en el usuario
                     authStore.user.shop = result.shop;
                     useAuthStore.setState({ user: authStore.user });
+                    
+                    // Forzar recarga del perfil para mantener sincronización
+                    if (authStore.forceLoadProfile) {
+                        authStore.forceLoadProfile().catch(console.error);
+                    }
                 }
             }
         } catch (error) {
@@ -97,13 +111,39 @@ export const useShopStore = create<ShopState>((set, get) => ({
         set({ loading: true, error: null });
         try {
             console.log("Sending data to backend for shop creation:", data);
+            
+           
+            let body;
+            let headers: any = {
+                'Authorization': `Bearer ${token}`
+            };
+
+            if (data.image) {
+              
+                const formData = new FormData();
+                
+               
+                Object.keys(data).forEach(key => {
+                    if (key !== 'image' && data[key] !== undefined) {
+                        formData.append(key, String(data[key]));
+                    }
+                });
+                
+           
+                formData.append('image', data.image);
+                
+                body = formData;
+             
+            } else {
+               
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify(data);
+            }
+
             const response = await fetch(`${API_URL}/shops`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(data)
+                headers,
+                body
             });
 
             const result = await response.json();
@@ -191,11 +231,17 @@ export const useShopStore = create<ShopState>((set, get) => ({
             const result = await response.json();
             set({ shop: result.shop, loading: false });
             
-            // Actualizar el usuario en authStore
+            // Actualizar el usuario en authStore y forzar refresh completo
             const authStore = useAuthStore.getState();
             if (authStore.user) {
+                // Actualizar la referencia de la tienda en el usuario
                 authStore.user.shop = result.shop;
                 useAuthStore.setState({ user: authStore.user });
+                
+                // Forzar recarga del perfil para mantener sincronización
+                if (authStore.forceLoadProfile) {
+                    authStore.forceLoadProfile().catch(console.error);
+                }
             }
         } catch (error) {
             set({ error: (error as Error).message, loading: false });
@@ -205,14 +251,45 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
     isShopActive: () => {
         const { shop } = get();
+        
+        // Si no hay tienda en shopStore, intentar obtenerla del authStore
+        if (!shop) {
+            const authStore = useAuthStore.getState();
+            const userShop = authStore.user?.shop;
+            
+            if (userShop) {
+                // Sincronizar la tienda del authStore al shopStore
+                set({ shop: userShop });
+                return userShop.active === true;
+            }
+            
+            return false;
+        }
+        
         return shop?.active === true;
     },
 
     checkShopAccess: () => {
         const { shop } = get();
+        
+        // Si no hay tienda en shopStore, intentar obtenerla del authStore
         if (!shop) {
+            const authStore = useAuthStore.getState();
+            const userShop = authStore.user?.shop;
+            
+            if (userShop) {
+                // Sincronizar la tienda del authStore al shopStore
+                set({ shop: userShop });
+                
+                if (!userShop.active) {
+                    return { canAccess: false, message: 'Habilite su tienda para ingresar' };
+                }
+                return { canAccess: true, message: '' };
+            }
+            
             return { canAccess: false, message: 'No tiene una tienda asociada' };
         }
+        
         if (!shop.active) {
             return { canAccess: false, message: 'Habilite su tienda para ingresar' };
         }
@@ -243,21 +320,19 @@ export const useShopStore = create<ShopState>((set, get) => ({
             secondaryColor: data.secondaryColor,
         };
         
-    
+        // NavBar con fondo blanco y título en color principal para mejor contraste
         if (data.primaryColor) {
-            colorUpdates.navbarBackgroundColor = data.primaryColor;
+            colorUpdates.navbarBackgroundColor = '#FFFFFF';
+            colorUpdates.navbarTitleColor = data.primaryColor;
             colorUpdates.heroBackgroundColor = data.primaryColor;
-            colorUpdates.navbarTitleColor = '#FFFFFF';
         }
         
         if (data.secondaryColor) {
-            
             colorUpdates.buttonBackgroundColor = data.secondaryColor;
             colorUpdates.buttonTextColor = '#FFFFFF';
             colorUpdates.featuredProductsCardButtonColor = data.secondaryColor;
             colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
         } else if (data.primaryColor) {
-            
             colorUpdates.buttonBackgroundColor = '#FFFFFF';
             colorUpdates.buttonTextColor = data.primaryColor;
             colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';

@@ -34,7 +34,7 @@ export const Navbar: React.FC = () => {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const user = useAuthStore(state => state.user);
   const token = useAuthStore(state => state.token);
-  const loadProfile = useAuthStore(state => state.loadProfile);
+  const forceLoadProfile = useAuthStore(state => state.forceLoadProfile);
   const {
     searchTerm,
     suggestions,
@@ -178,11 +178,11 @@ export const Navbar: React.FC = () => {
     
     const loadUserProfile = async () => {
 
-      if (token && (!user || user.loading) && isMounted) {
+      if (token && isMounted) {
 
         
         try {
-          const loadedUser = await loadProfile();
+          const loadedUser = await forceLoadProfile();
           // Cargar información de la tienda si el usuario tiene una
           if (loadedUser?.shop && isMounted) {
             try {
@@ -203,7 +203,7 @@ export const Navbar: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [token, forceLoadProfile, getShopInfo]);
   
 
   const isUserReady = user && !user.loading;
@@ -267,7 +267,7 @@ export const Navbar: React.FC = () => {
               {/* Mostrar "Crear tienda" si no tiene tienda, "Ver mi tienda" si ya la tiene */}
               {isUserReady && user.shop ? (
                 <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
-                  <BsShop className="text-xl mr-2" />
+                  <BsShop onClick={() => handleShopAccess('/first-layout?view=true')} className="text-xl mr-2" />
                   <span onClick={() => handleShopAccess('/first-layout?view=true')}>Ver mi tienda</span>
                 </div>
               ) : (
@@ -284,8 +284,8 @@ export const Navbar: React.FC = () => {
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
-                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => handleShopAccess('/data-dashboard')}>
-                        Administrar tienda
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
+                        Mi usuario
                       </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
                         Mi carrito

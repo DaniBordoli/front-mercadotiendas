@@ -8,7 +8,7 @@ import ProductSelectionForm from '../components/CreateShopComponents/ProductSele
 import PaymentSelectionForm from '../components/CreateShopComponents/PaymentSelectionForm';
 import ColorBrandForm from '../components/CreateShopComponents/ColorBrandForm';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../stores';
+import { useAuthStore, useShopStore } from '../stores';
 import { Navbar } from '../components/organisms/Navbar/Navbar';
 
 interface FormData {
@@ -21,6 +21,7 @@ interface FormData {
     primaryColor?: string;
     secondaryColor?: string;
     logoUrl?: string;
+    logoFile?: File;
 }
 
 const ShopCreate: React.FC = () => {
@@ -35,10 +36,11 @@ const ShopCreate: React.FC = () => {
         primaryColor: '',
         secondaryColor: '',
         logoUrl: '',
+        logoFile: undefined,
     });
 
     const navigate = useNavigate();
-    const { createShop, isLoading, error, clearError } = useAuthStore();
+    const { createShop, setShop, loading, error } = useShopStore();
 
     const handleNextStep = (data: Partial<FormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));
@@ -72,8 +74,11 @@ const ShopCreate: React.FC = () => {
                 primaryColor: formData.primaryColor,
                 secondaryColor: formData.secondaryColor,
                 logoUrl: formData.logoUrl,
+                image: formData.logoFile, 
             };
             await createShop(shopData);
+            
+            
             navigate('/dashboard');
         } catch (e) {
             console.error(e);
@@ -137,11 +142,12 @@ const ShopCreate: React.FC = () => {
                         )}
                         {currentStep === 2 && (
                             <ColorBrandForm 
-                                onNext={(data: { primaryColor: string; secondaryColor: string; logoUrl?: string }) => 
+                                onNext={(data: { primaryColor: string; secondaryColor: string; logoUrl?: string; logoFile?: File }) => 
                                     handleNextStep({ 
                                         primaryColor: data.primaryColor,
                                         secondaryColor: data.secondaryColor,
-                                        logoUrl: data.logoUrl
+                                        logoUrl: data.logoUrl,
+                                        logoFile: data.logoFile
                                     })
                                 }
                             />
@@ -164,9 +170,9 @@ const ShopCreate: React.FC = () => {
                                     variant="primary" 
                                     fullWidth={true} 
                                     onClick={handleCreateShop}
-                                    disabled={isLoading}
+                                    disabled={loading}
                                 >
-                                    {isLoading ? 'Creando...' : 'Crear Tienda'}
+                                    {loading ? 'Creando...' : 'Crear Tienda'}
                                 </DesignButton>
                                 {error && (
                                     <p className="text-red-500 text-sm mt-4">{error}</p>
