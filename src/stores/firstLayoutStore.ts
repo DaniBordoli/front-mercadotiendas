@@ -13,6 +13,7 @@ const defaultEditableVariables: FirstLayoutEditableVariables = {
     { label: 'Inicio', href: '/first-layout' },
     { label: 'Tienda', href: '/first-layout/shop-layout' },
     { label: 'Contacto', href: '/first-layout/contact-layout' },
+    { label: 'Acerca de', href: '/first-layout/aboutus-layout' },
   ],
   title: 'Mi Tienda',
   fontType: 'Arial',

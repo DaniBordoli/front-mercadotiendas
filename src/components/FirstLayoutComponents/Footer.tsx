@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { HiLocationMarker } from 'react-icons/hi';
 import { FaPhone } from 'react-icons/fa6';
 import { IoMail } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
+import { useShopStore } from '../../stores/slices/shopStore';
+import { useAuthStore } from '../../stores';
+import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 
 interface FooterProps {
   footerTitle?: string;
@@ -21,14 +24,42 @@ const Footer: React.FC<FooterProps> = ({
   footerDescription = 'Tu destino integral para moda y accesorios.',
 }) => {
   const navigate = useNavigate();
+  const { shop, getShop, setShop } = useShopStore();
+  const { isAuthenticated, user } = useAuthStore();
+  const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+
+  useEffect(() => {
+    if (user?.shop && !shop) {
+      setShop(user.shop);
+      return; 
+    }
+    
+    if (isAuthenticated && !shop && !user?.shop) {
+      getShop().catch(() => {
+        // Error silencioso, el footer puede funcionar sin datos de la tienda
+      });
+    }
+  }, [isAuthenticated, shop, getShop, user?.shop, setShop]);
+
+  // Obtener información dinámica de la tienda
+  const shopFromStore = shop?.name;
+  const shopFromUser = user?.shop?.name;
+  const shopFromTemplate = editableVariables.navbarTitle || editableVariables.title;
+  const displayTitle = shopFromStore || shopFromUser || shopFromTemplate || footerTitle;
+
+  // Información de contacto de la tienda
+  const shopAddress = shop?.address || "123 Calle de la Moda, Nueva York, NY 10001";
+  const shopPhone = shop?.shopPhone || "+1 234 567 8900";
+  const shopEmail = shop?.contactEmail || "info@shopsmart.com";
+  const shopDescription = editableVariables.footerDescription || footerDescription;
 
   return (
     <footer className="py-12" style={{ backgroundColor, color: textColor }}>
       <div className="container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
       
         <div>
-          <h3 className="text-lg font-bold mb-4" style={{ color: footerTitleColor }}>{footerTitle}</h3>
-          <p className="text-sm mb-4">{footerDescription}</p>
+          <h3 className="text-lg font-bold mb-4" style={{ color: footerTitleColor }}>{displayTitle}</h3>
+          <p className="text-sm mb-4">{shopDescription}</p>
           <div className="flex gap-4 text-gray-400">
             <FaFacebook className="text-xl cursor-pointer hover:text-white" />
             <FaInstagram className="text-xl cursor-pointer hover:text-white" />
@@ -77,21 +108,20 @@ const Footer: React.FC<FooterProps> = ({
           <h3 className="text-lg font-bold mb-4">Información de contacto</h3>
           <ul className="space-y-2 text-sm text-gray-400">
             <li className="flex items-center gap-2">
-              <HiLocationMarker className="text-xl" /> 123 Calle de la Moda, NY 10001
+              <HiLocationMarker className="text-xl" /> {shopAddress}
             </li>
             <li className="flex items-center gap-2">
-              <FaPhone className="text-xl" /> +1 234 567 8900
+              <FaPhone className="text-xl" /> {shopPhone}
             </li>
             <li className="flex items-center gap-2">
-              <IoMail className="text-xl" /> info@shopsmart.com
+              <IoMail className="text-xl" /> {shopEmail}
             </li>
           </ul>
         </div>
       </div>
-      <hr className="border-t border-gray-800 my-8 mx-auto w-10/12" />
-      <div className="mt-8 text-center text-sm text-gray-400">
-        © 2025 ShopSmart. Todos los derechos reservados.
-      </div>
+      <hr className="border-t border-gray-800 my-8 mx-auto w-10/12" />        <div className="mt-8 text-center text-sm text-gray-400">
+          © 2025 {displayTitle}. Todos los derechos reservados.
+        </div>
     </footer>
   );
 };

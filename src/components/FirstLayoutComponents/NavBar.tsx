@@ -20,7 +20,7 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({
   navbarLinks,
-  navbarTitle = 'ShopSmarttt',
+  navbarTitle = 'ShopSmart',
   navbarTitleColor,
   navbarLinksColor,
   navbarIconsColor,
@@ -45,6 +45,7 @@ const NavBar: React.FC<NavBarProps> = ({
     { label: 'Inicio', href: '/first-layout' },
     { label: 'Tienda', href: '/first-layout/shop-layout' },
     { label: 'Contacto', href: '/first-layout/contact-layout' },
+     { label: 'Acerca de', href: '/first-layout/aboutus-layout' },
   ];
   
   const currentNavbarLinks = navbarLinks && navbarLinks.length > 0 ? navbarLinks : defaultLinks;
@@ -85,7 +86,7 @@ const NavBar: React.FC<NavBarProps> = ({
               alt="Logo" 
               className="h-8 w-8 object-contain"
               onError={(e) => {
-                // Fallback al logo por defecto si hay error cargando el logo personalizado
+                
                 e.currentTarget.src = '/logo.png';
               }}
             />
