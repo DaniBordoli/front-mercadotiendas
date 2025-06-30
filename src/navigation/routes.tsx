@@ -20,6 +20,7 @@ import DataSalesManagement from '../screens/DataSalesManagement';
 import DataDashboard from '../screens/DataDashboard';
 import DataPurchaseHistory from '../screens/DataPurchaseHistory';
 import DataBilling from '../screens/DataBilling';
+import DataPaymentMethod from '../screens/DataPaymentMethod';
 import DataSubscription from '../screens/DataSubscription';
 import DataShopState from '../screens/DataShopState';
 import DataCreateShop from '../screens/DataCreateShop';
@@ -126,6 +127,10 @@ export const publicRoutes = [
   {
     path: '/data-billing',
     element: <DataBilling />
+  },
+  {
+    path: '/data-payment-method',
+    element: <DataPaymentMethod />
   },
   {
     path: '/data-subscription',

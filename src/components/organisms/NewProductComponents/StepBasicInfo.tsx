@@ -113,6 +113,13 @@ const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange,
               min="0"
             />
           </div>
+        </div>
+
+        {/* Divisor */}
+        <hr className="border-gray-300 my-6" />
+
+        {/* Categorías en la misma línea */}
+        <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
             <label className="block text-xs font-space text-gray-500 mb-1">Categoría *</label>
             <SelectDefault

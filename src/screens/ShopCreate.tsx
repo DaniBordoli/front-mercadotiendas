@@ -14,6 +14,8 @@ import { Navbar } from '../components/organisms/Navbar/Navbar';
 interface FormData {
     storeName: string;
     email: string;
+    address: string;
+    shopPhone: string;
     design: string | null;
     productCategory: string;
     currency: string;
@@ -30,6 +32,8 @@ const ShopCreate: React.FC = () => {
     const [formData, setFormData] = React.useState<FormData>({
         storeName: '',
         email: '',
+        address: '',
+        shopPhone: '',
         design: null,
         productCategory: '',
         currency: '',
@@ -86,10 +90,10 @@ const ShopCreate: React.FC = () => {
                 subdomain,
                 template: formData.design || 'modern',
                 category: formData.productCategory,
-                address: 'N/A',
+                address: formData.address,
                 brandName: formData.storeName,
                 contactEmail: formData.email,
-                shopPhone: 'N/A',
+                shopPhone: formData.shopPhone,
                 layoutDesign: formData.layoutDesign || '',
                 logoUrl: formData.logoUrl,
                 image: formData.logoFile,
@@ -160,8 +164,13 @@ const ShopCreate: React.FC = () => {
                     <div className="w-full max-w-4xl mx-auto">
                         {currentStep === 0 && (
                             <MainForm 
-                                onNext={(data: { storeName: string; email: string }) => 
-                                    handleNextStep({ storeName: data.storeName, email: data.email })
+                                onNext={(data: { storeName: string; email: string; address: string; shopPhone: string }) => 
+                                    handleNextStep({ 
+                                        storeName: data.storeName, 
+                                        email: data.email,
+                                        address: data.address,
+                                        shopPhone: data.shopPhone
+                                    })
                                 }
                             />
                         )}

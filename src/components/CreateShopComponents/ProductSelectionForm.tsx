@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SelectDefault } from '../atoms/SelectDefault';
+import { fetchMainCategories } from '../../stores/slices/authSlice';
 
 interface ProductSelectionFormProps {
     onNext: (category: string) => void;
@@ -7,6 +8,10 @@ interface ProductSelectionFormProps {
 
 const ProductSelectionForm: React.FC<ProductSelectionFormProps> = ({ onNext }) => {
     const [selected, setSelected] = useState('');
+    const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([
+        { value: '', label: 'Cargando categorías...' }
+    ]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleChange = (value: string) => {
         setSelected(value);
@@ -18,6 +23,30 @@ const ProductSelectionForm: React.FC<ProductSelectionFormProps> = ({ onNext }) =
         }
     };
 
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                setIsLoading(true);
+                const categories = await fetchMainCategories();
+                
+                const formattedOptions = categories.map((category: any) => ({
+                    value: category.id || category._id,
+                    label: category.name
+                }));
+
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                setCategoryOptions([
+                    { value: '', label: 'Error al cargar categorías' }
+                ]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadCategories();
+    }, []);
+
     return (
         <div className="w-full max-w-md mx-auto">
             <div className="mb-4">
@@ -25,25 +54,24 @@ const ProductSelectionForm: React.FC<ProductSelectionFormProps> = ({ onNext }) =
                     Selecciona el tipo de productos que deseas vender
                 </label>
                 <SelectDefault 
-                    options={[
-                        { value: 'ropa', label: 'Ropa' },
-                        { value: 'electronica', label: 'Electrónica' },
-                        { value: 'hogar', label: 'Hogar' },
-                        { value: 'alimentos', label: 'Alimentos' },
-                        { value: 'otros', label: 'Otros' },
-                    ]}
+                    options={categoryOptions}
                     placeholder="Selecciona una categoría"
                     className="w-full"
                     onChange={handleChange}
+                    disabled={isLoading}
                 />
             </div>
             <div className="mt-6">
                 <button 
-                    className="bg-red-500 text-white py-2 px-4 rounded-md w-full"
+                    className={`py-2 px-4 rounded-md w-full ${
+                        !selected || isLoading 
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                            : 'bg-red-500 text-white hover:bg-red-600'
+                    }`}
                     onClick={handleContinue}
-                    disabled={!selected}
+                    disabled={!selected || isLoading}
                 >
-                    Continuar
+                    {isLoading ? 'Cargando...' : 'Continuar'}
                 </button>
             </div>
         </div>

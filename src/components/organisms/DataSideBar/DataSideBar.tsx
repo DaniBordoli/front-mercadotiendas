@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Logo } from '../../atoms/Logo/Logo';
-import { FaUser, FaTachometerAlt, FaShoppingCart, FaCreditCard, FaShoppingBag, FaBox } from 'react-icons/fa';
+import { FaUser, FaTachometerAlt, FaShoppingCart, FaCreditCard, FaShoppingBag, FaBox, FaChartLine } from 'react-icons/fa';
 import { FaCoins } from 'react-icons/fa6';
 import { GoGraph } from 'react-icons/go';
 import { IoDocumentText, IoChevronDown, IoToggleSharp } from "react-icons/io5";
@@ -26,6 +26,7 @@ const DataSideBar: React.FC = () => {
  
     const [shopDropdownOpen, setShopDropdownOpen] = React.useState(false);
     const [adminDropdownOpen, setAdminDropdownOpen] = React.useState(false);
+    const [salesDropdownOpen, setSalesDropdownOpen] = React.useState(false);
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
     React.useEffect(() => {
@@ -57,10 +58,8 @@ const DataSideBar: React.FC = () => {
         ] : []),
         // Compras
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
-        // Resto
+        // Suscripción
         { key: 'subscription', label: 'Suscripción', icon: <FaCreditCard className="text-lg" />, path: '/data-subscription' },
-        { key: 'billing', label: 'Facturación', icon: <IoDocumentText className="text-lg" />, path: '/data-billing' },
-        { key: 'sellManagement', label: 'Gestión de Ventas', icon: <GoGraph className="text-lg" />, path: '/data-sales-management' },
     ];
 
     const shopOptions = [
@@ -80,6 +79,12 @@ const DataSideBar: React.FC = () => {
         ] : [])
     ];
 
+    const salesOptions = [
+        { key: 'sellManagement', label: 'Gestión de Ventas', icon: <GoGraph className="text-lg" />, path: '/data-sales-management' },
+        { key: 'billing', label: 'Facturación', icon: <IoDocumentText className="text-lg" />, path: '/data-billing' },
+        { key: 'paymentMethod', label: 'Método de pago', icon: <FaCreditCard className="text-lg" />, path: '/data-payment-method' },
+    ];
+
     const adminOptions = [
         { key: 'category', label: 'Categorías', icon: <FaBoxArchive className="text-lg" />, path: '/data-category' },
         { key: 'currency', label: 'Monedas', icon: <FaCoins className="text-lg" />, path: '/data-currency' }
@@ -87,6 +92,7 @@ const DataSideBar: React.FC = () => {
 
     const isShopActive = shopOptions.some(opt => location.pathname === opt.path);
     const isAdminActive = adminOptions.some(opt => location.pathname === opt.path);
+    const isSalesActive = salesOptions.some(opt => location.pathname === opt.path);
 
     const isDropdownOpen = shopDropdownOpen || isShopActive;
 
@@ -207,6 +213,54 @@ const DataSideBar: React.FC = () => {
                                             onClick={() => {
                                                 navigate(option.path);
                                                 if (shopDropdownOpen) setShopDropdownOpen(false);
+                                            }}
+                                        >
+                                            {option.icon}
+                                            <span className='font-space'>{option.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Ventas dropdown */}
+                    {salesOptions.length > 0 && (
+                        <div className="relative">
+                            <button
+                                className={`relative flex items-center gap-3 p-3 w-full justify-between ${isSalesActive ? 'font-bold' : ''}`}
+                                style={isSalesActive ? { color: colors.primaryRed } : {}}
+                                onClick={() => setSalesDropdownOpen((prev) => !prev)}
+                                type="button"
+                            >
+                                {isSalesActive && (
+                                    <motion.div
+                                        className="absolute inset-0 z-0"
+                                        style={{ backgroundColor: `${colors.primaryRed}1A` }}
+                                        layoutId="activeBackground"
+                                        initial={{ x: '-100%' }}
+                                        animate={{ x: 0 }}
+                                        transition={{ duration: 0.1 }}
+                                    />
+                                )}
+                                <span className="flex items-center gap-3 z-10">
+                                    <FaChartLine className="text-lg" />
+                                    <span className='font-space'>Ventas</span>
+                                </span>
+                                <IoChevronDown className={`transition-transform z-10 ${(salesDropdownOpen || isSalesActive) ? 'rotate-180' : ''}`} />
+                            </button>
+                            {(salesDropdownOpen || isSalesActive) && (
+                                <div className="ml-8 flex flex-col">
+                                    {salesOptions.map(option => (
+                                        <button
+                                            key={option.key}
+                                            className={`flex items-center gap-2 p-2 text-left rounded transition-colors ${
+                                                location.pathname === option.path ? 'font-bold' : ''
+                                            }`}
+                                            style={location.pathname === option.path ? { color: colors.primaryRed } : {}}
+                                            onClick={() => {
+                                                navigate(option.path);
+                                                if (salesDropdownOpen) setSalesDropdownOpen(false);
                                             }}
                                         >
                                             {option.icon}

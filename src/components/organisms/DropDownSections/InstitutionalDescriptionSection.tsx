@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { DesignButton } from '../../atoms/DesignButton';
-import { useShopStore } from '../../../stores/slices/shopStore';
+import { useShopInstitutionalStore } from '../../../stores/slices/shopInstitutionalStore';
 import Toast from '../../atoms/Toast';
 import FullScreenLoader from '../../molecules/FullScreenLoader';
 
 export const InstitutionalDescriptionSection: React.FC = () => {
-    const { shop, updateShopInstitutional, loading, error } = useShopStore();
+    const { institutional, getShopInstitutional, updateShopInstitutional, loading, error } = useShopInstitutionalStore();
     
     const [formData, setFormData] = React.useState({
         description: '',
@@ -21,18 +21,22 @@ export const InstitutionalDescriptionSection: React.FC = () => {
         type: 'success' as 'success' | 'error' | 'info',
     });
 
-    // Cargar datos existentes cuando el shop se carga
+    // Cargar datos existentes cuando el institutional se carga
     React.useEffect(() => {
-        if (shop) {
+        getShopInstitutional();
+    }, []);
+
+    React.useEffect(() => {
+        if (institutional) {
             setFormData({
-                description: shop.description || '',
-                mission: shop.mission || '',
-                vision: shop.vision || '',
-                history: shop.history || '',
-                values: shop.values || ''
+                description: institutional.description || '',
+                mission: institutional.mission || '',
+                vision: institutional.vision || '',
+                history: institutional.history || '',
+                values: institutional.values || ''
             });
         }
-    }, [shop]);
+    }, [institutional]);
 
     const handleInputChange = (field: string, value: string) => {
         setFormData(prev => ({
@@ -59,13 +63,13 @@ export const InstitutionalDescriptionSection: React.FC = () => {
     };
 
     const handleRestore = () => {
-        if (shop) {
+        if (institutional) {
             setFormData({
-                description: shop.description || '',
-                mission: shop.mission || '',
-                vision: shop.vision || '',
-                history: shop.history || '',
-                values: shop.values || ''
+                description: institutional.description || '',
+                mission: institutional.mission || '',
+                vision: institutional.vision || '',
+                history: institutional.history || '',
+                values: institutional.values || ''
             });
         }
     };

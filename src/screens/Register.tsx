@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
@@ -7,8 +7,6 @@ import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores'; 
 import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
-import { fetchProvincesForArgentina } from '../stores/slices/authSlice';
-import { fetchCountries } from '../stores/slices/authSlice'
 import { Navbar } from '../components/organisms/Navbar';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
@@ -26,43 +24,6 @@ const Register = () => {
     country: ''
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [provinces, setProvinces] = useState<string[]>([]);
-  const [countries, setCountries] = useState<{ name: string; code: string }[]>([]);
-
-  useEffect(() => {
-    if (values.country === 'Argentina') {
-      fetchProvincesForArgentina()
-        .then((data) => {
-          if (Array.isArray(data) && data.length > 0) {
-            setProvinces(data);
-          } else {
-            setProvinces(['Buenos Aires']);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching provinces:', error);
-          setProvinces(['Buenos Aires']);
-        });
-    } else {
-      setProvinces([]);
-    }
-  }, [values.country]);
-
-  useEffect(() => {
-    fetchCountries()
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setCountries(data);
-        } else {
-          // Si la API no devuelve países, usar Argentina por defecto
-          setCountries([{ name: 'Argentina', code: 'AR' }]);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching countries:', error);
-        setCountries([{ name: 'Argentina', code: 'AR' }]);
-      });
-  }, []);
 
   const validateForm = (values: Record<string, string>): Record<string, string> => {
     const errors: Record<string, string> = {};
@@ -206,22 +167,19 @@ const Register = () => {
           
             <div className="mb-4">
               <label className="block mb-2 font-space text-darkGray">País</label>
-              <select
-                className="w-full border border-gray-300 rounded-md p-2"
+              <SelectDefault
+                options={[
+                  { value: 'Argentina', label: 'Argentina' }
+                ]}
                 value={values.country}
-                onChange={(e) => {
+                onChange={(value: string) => {
                   clearError();
                   setValidationErrors((prev) => ({ ...prev, country: '' }));
-                  setValues((prev) => ({ ...prev, country: e.target.value }));
+                  setValues((prev) => ({ ...prev, country: value }));
                 }}
-              >
-                <option value="">Selecciona tu país</option>
-                {countries.map((country, index) => (
-                  <option key={index} value={country.name}>
-                    {country.name}
-                  </option>
-                ))}
-              </select>
+                placeholder="Selecciona tu país"
+                className="w-full"
+              />
               {validationErrors.country && (
                 <span className="text-red-500 text-sm">{validationErrors.country}</span>
               )}
@@ -231,23 +189,17 @@ const Register = () => {
           <label className="block mb-2 font-space text-darkGray">
             Provincia
           </label>
-          <select
-            className="w-full border border-gray-300 rounded-md p-2"
+          <InputDefault
+            type="text"
+            placeholder="Ingresa tu provincia"
+            className="w-full"
             value={values.province}
-            onChange={(e) => {
+            onChange={(value: string) => {
               clearError();
               setValidationErrors((prev) => ({ ...prev, province: '' }));
-              setValues((prev) => ({ ...prev, province: e.target.value }));
+              setValues((prev) => ({ ...prev, province: value }));
             }}
-            disabled={!values.country || provinces.length === 0}
-          >
-            <option value="">Selecciona tu provincia</option>
-            {provinces.map((province, index) => (
-              <option key={index} value={province}>
-                {province}
-              </option>
-            ))}
-          </select>
+          />
           {validationErrors.province && (
             <span className="text-red-500 text-sm">{validationErrors.province}</span>
           )}

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaRobot, FaTimes } from 'react-icons/fa';
+import { FaPaperPlane, FaRobot, FaMinus } from 'react-icons/fa';
 import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
@@ -329,7 +329,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
               aria-label="Minimizar chat"
               type="button"
             >
-              <FaTimes className="text-white text-lg" />
+              <FaMinus className="text-white text-lg" />
             </button>
           </div>
         </div>
