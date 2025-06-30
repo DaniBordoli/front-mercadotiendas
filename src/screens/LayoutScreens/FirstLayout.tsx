@@ -68,10 +68,11 @@ const FirstLayout: React.FC = () => {
   useEffect(() => {
     const getTemplate = async () => {
       try {
-        const data = await fetchShopTemplate();
-        if (data && data.templateUpdate) {
+        const response = await fetchShopTemplate();
+        console.log('Template response:', response); // Para debug
+        if (response && response.data && response.data.templateUpdate) {
           // Solo cargar el template - los colores ya están en templateUpdate
-          setEditableVariables(data.templateUpdate);
+          setEditableVariables(response.data.templateUpdate);
         }
       } catch (err) {
         console.error('Error loading template:', err);

@@ -36,9 +36,9 @@ const ShopLayout: React.FC = () => {
           await getShop();
         }
         // Cargar template
-        const data = await fetchShopTemplate();
-        if (data && data.templateUpdate) {
-          setEditableVariables(data.templateUpdate);
+        const response = await fetchShopTemplate();
+        if (response && response.data && response.data.templateUpdate) {
+          setEditableVariables(response.data.templateUpdate);
         }
       } catch (err) {
         console.error('Error loading shop or template:', err);
