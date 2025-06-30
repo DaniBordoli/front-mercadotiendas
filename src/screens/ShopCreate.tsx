@@ -91,11 +91,23 @@ const ShopCreate: React.FC = () => {
                 contactEmail: formData.email,
                 shopPhone: 'N/A',
                 layoutDesign: formData.layoutDesign || '',
-                primaryColor: formData.primaryColor,
-                secondaryColor: formData.secondaryColor,
-                accentColor: formData.accentColor,
                 logoUrl: formData.logoUrl,
-                image: formData.logoFile, 
+                image: formData.logoFile,
+                templateUpdate: {
+                    primaryColor: formData.primaryColor,
+                    secondaryColor: formData.secondaryColor,
+                    accentColor: formData.accentColor,
+                    navbarBackgroundColor: formData.accentColor || formData.primaryColor,
+                    navbarTitleColor: formData.accentColor ? formData.primaryColor : '#FFFFFF',
+                    navbarLinksColor: formData.accentColor ? formData.primaryColor : '#FFFFFF',
+                    navbarIconsColor: formData.accentColor ? formData.primaryColor : '#FFFFFF',
+                    heroBackgroundColor: formData.primaryColor,
+                    buttonBackgroundColor: formData.secondaryColor || '#FFFFFF',
+                    buttonTextColor: formData.secondaryColor ? '#FFFFFF' : formData.primaryColor,
+                    featuredProductsCardButtonColor: formData.secondaryColor || '#FFFFFF',
+                    featuredProductsCardButtonTextColor: formData.secondaryColor ? '#FFFFFF' : formData.primaryColor,
+                    logoUrl: formData.logoUrl
+                }
             };
             await createShop(shopData);
             navigate('/dashboard');

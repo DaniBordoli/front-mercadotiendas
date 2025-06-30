@@ -188,10 +188,13 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
      
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
+        // Todos los usuarios (con y sin tienda) ven el modal de confirmación
         // Guardar el template actual antes de aplicar cambios para poder revertir
-        setPreviousTemplate(currentTemplate);
+        setPreviousTemplate({ ...currentTemplate });
         // Aplicar cambios inmediatamente para vista previa
         onApplyTemplateChanges(aiResponse.templateUpdates);
+        // También actualizar el template local para la vista previa
+        setCurrentTemplate((prev: any) => ({ ...prev, ...aiResponse.templateUpdates }));
         setPendingTemplateUpdate(aiResponse.templateUpdates);
         setShowTemplateModal(true);
       }
@@ -256,6 +259,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     if (previousTemplate) {
       // Revertir los cambios aplicando el template anterior
       onApplyTemplateChanges(previousTemplate);
+      // Revertir también el template local
+      setCurrentTemplate(previousTemplate);
     }
     setShowTemplateModal(false);
     setPendingTemplateUpdate(null);
@@ -269,60 +274,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     setTemplateSaveError(null);
     
     try {
-      // Primero guardar el template
+      // El backend ya maneja automáticamente la sincronización de campos
+      // relevantes del template con el modelo Shop cuando la tienda existe
       await updateShopTemplate(pendingTemplateUpdate);
       
-      // Actualizar la tienda principal si hay cambios en propiedades clave
-      const user = useAuthStore.getState().user;
-      const updateShopInfo = useShopStore.getState().updateShopInfo;
+      // Actualizar el template local
+      setCurrentTemplate((prev: any) => ({ ...prev, ...pendingTemplateUpdate }));
       
-      if (user?.shop?._id && pendingTemplateUpdate) {
-        // Extraer propiedades que deben sincronizarse con el modelo Shop
-        const shopUpdates: any = {};
-        
-        // Mapear propiedades del template a campos del Shop
-        if (pendingTemplateUpdate.title) {
-          shopUpdates.name = pendingTemplateUpdate.title;
-          shopUpdates.brandName = pendingTemplateUpdate.title;
-        }
-        
-        if (pendingTemplateUpdate.shopName) {
-          shopUpdates.name = pendingTemplateUpdate.shopName;
-          shopUpdates.brandName = pendingTemplateUpdate.shopName;
-        }
-        
-        // Sincronizar colores si han cambiado
-        const colorUpdates: any = {};
-        if (pendingTemplateUpdate.primaryColor) {
-          colorUpdates.primaryColor = pendingTemplateUpdate.primaryColor;
-        }
-        if (pendingTemplateUpdate.secondaryColor) {
-          colorUpdates.secondaryColor = pendingTemplateUpdate.secondaryColor;
-        }
-        if (pendingTemplateUpdate.accentColor) {
-          colorUpdates.accentColor = pendingTemplateUpdate.accentColor;
-        }
-        
-        // Si hay cambios de colores, usar updateShopColors para sincronizar
-        if (Object.keys(colorUpdates).length > 0) {
-          try {
-            const updateShopColors = useShopStore.getState().updateShopColors;
-            await updateShopColors(colorUpdates);
-            console.log('[AIChat] Sincronizado colores con tienda principal:', colorUpdates);
-          } catch (colorError) {
-            console.error('[AIChat] Error al sincronizar colores con tienda principal:', colorError);
-          }
-        }
-        
-        // Si hay cambios para la tienda principal, actualizarla
-        if (Object.keys(shopUpdates).length > 0) {
-          try {
-            await updateShopInfo(user.shop._id, shopUpdates);
-            console.log('[AIChat] Sincronizado template con datos de tienda principal:', shopUpdates);
-          } catch (shopError) {
-            console.error('[AIChat] Error al sincronizar template con tienda principal:', shopError);
-            // No fallar todo el proceso si esto falla, ya que el template ya se guardó
-          }
+      // Si hay cambios de nombre de tienda, actualizar el store de Shop
+      const user = useAuthStore.getState().user;
+      const { getShop } = useShopStore.getState();
+      
+      if (user?.shop?._id && (pendingTemplateUpdate.title || pendingTemplateUpdate.shopName || pendingTemplateUpdate.storeName)) {
+        // Recargar los datos de la tienda para obtener los cambios sincronizados
+        try {
+          await getShop();
+        } catch (shopError) {
+          console.error('Error al recargar datos de tienda:', shopError);
         }
       }
       

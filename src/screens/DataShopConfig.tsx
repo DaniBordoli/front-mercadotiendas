@@ -4,12 +4,12 @@ import { colors } from '../design/colors';
 import { DesignButton } from '../components/atoms/DesignButton';
 import LogoUploader from '../components/CreateShopComponents/LogoUploader';
 import { useFirstLayoutStore } from '../stores/firstLayoutStore';
-import { useShopStore } from '../stores/slices/shopStore';
+import { updateShopTemplate } from '../services/api';
 
 const DataShopConfig: React.FC = () => {
     const [selectedTab, setSelectedTab] = React.useState('Diseño');
     const editableVariables = useFirstLayoutStore(state => state.editableVariables);
-    const { updateShopColors } = useShopStore();
+    const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
 
     const tabs = ['Diseño'];
 
@@ -33,12 +33,35 @@ const DataShopConfig: React.FC = () => {
         });
     }, [primaryColor, secondaryColor, accentColor]);
 
-    // Guardar cambios en backend y store
+    // Guardar cambios en templateUpdate
     const handleSave = async () => {
         setSaving(true);
         setError(null);
         try {
-            await updateShopColors({ primaryColor, secondaryColor, accentColor });
+            // Preparar los cambios de colores con toda la estructura necesaria
+            const colorUpdates = {
+                primaryColor,
+                secondaryColor,
+                accentColor,
+                // Aplicar los colores a los elementos correspondientes
+                navbarBackgroundColor: accentColor,
+                navbarTitleColor: primaryColor,
+                navbarLinksColor: primaryColor,
+                navbarIconsColor: primaryColor,
+                heroBackgroundColor: primaryColor,
+                buttonBackgroundColor: secondaryColor,
+                buttonTextColor: '#FFFFFF',
+                button2BackgroundColor: '#FFFFFF',
+                button2TextColor: primaryColor,
+                featuredProductsCardButtonColor: secondaryColor,
+                featuredProductsCardButtonTextColor: '#FFFFFF',
+            };
+
+            // Actualizar el template en el backend
+            await updateShopTemplate(colorUpdates);
+            
+            // Actualizar el store local
+            updateEditableVariables(colorUpdates);
         } catch (e: any) {
             setError(e.message || 'Error al guardar');
         } finally {

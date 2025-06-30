@@ -6,6 +6,8 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
+import { useShopStore } from '../../stores/slices/shopStore';
+import { fetchShopTemplate } from '../../services/api';
 import { FiShoppingCart } from 'react-icons/fi';
 
 const ShopLayout: React.FC = () => {
@@ -16,12 +18,34 @@ const ShopLayout: React.FC = () => {
 
   // Obtener variables globales de estilo
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
+  const shop = useShopStore(state => state.shop);
+  const getShop = useShopStore(state => state.getShop);
   const fetchProducts = require('../../stores').useAuthStore((state: any) => state.fetchProducts);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   
   // Utilizar la store de búsqueda para los productos de respaldo
   const { baseSearchResults } = useSearchStore();
+
+  // Cargar shop y template
+  useEffect(() => {
+    const loadShopAndTemplate = async () => {
+      try {
+        if (!shop) {
+          await getShop();
+        }
+        // Cargar template
+        const data = await fetchShopTemplate();
+        if (data && data.templateUpdate) {
+          setEditableVariables(data.templateUpdate);
+        }
+      } catch (err) {
+        console.error('Error loading shop or template:', err);
+      }
+    };
+    loadShopAndTemplate();
+  }, [shop, getShop, setEditableVariables]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -45,7 +69,10 @@ const ShopLayout: React.FC = () => {
         navbarLinks={editableVariables.navbarLinks}
         navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
-        textColor={editableVariables.textColor}
+        textColor={editableVariables.navbarTitleColor || editableVariables.textColor}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
       />

@@ -305,13 +305,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     updateShopColors: async (data: { primaryColor?: string; secondaryColor?: string; accentColor?: string }) => {
-        const { shop } = get();
-        if (!shop) throw new Error('No shop found');
-        
-        // Actualizar tienda en backend
-        await get().updateShopInfo(shop._id, data);
-        
-        // Sincronizar con firstLayoutStore
+        // Solo actualizar templateUpdate (firstLayoutStore) - los colores de estilado no van más en Shop
         const { useFirstLayoutStore } = await import('../firstLayoutStore');
         const { updateEditableVariables } = useFirstLayoutStore.getState();
         
