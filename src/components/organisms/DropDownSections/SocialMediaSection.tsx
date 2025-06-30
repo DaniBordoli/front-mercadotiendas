@@ -46,14 +46,31 @@ export const SocialMediaSection: React.FC = () => {
     return (
         <div className="border border-gray-300 border-t-0 rounded-b-md p-4">
             {loading && <FullScreenLoader />}
+            
+            {/* Instrucciones para el usuario */}
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
+                <p className="text-sm text-blue-800 font-medium mb-1">📱 Instrucciones para redes sociales:</p>
+                <ul className="text-xs text-blue-700 space-y-1">
+                    <li>• <strong>Instagram/TikTok:</strong> Solo ingresa tu nombre de usuario (ej: miusuario)</li>
+                    <li>• <strong>Facebook/YouTube:</strong> Puedes usar el nombre de usuario o la URL completa</li>
+                    <li>• <strong>WhatsApp:</strong> Ingresa tu número con código de país (ej: +54 9 11 1234-5678)</li>
+                </ul>
+            </div>
+
             <div className="grid grid-cols-1 gap-4">
                 <div>
                     <label className="text-sm font-space mb-2 block">Instagram</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaInstagram className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" value={form.instagram || ''} onChange={handleChange('instagram')} />
+                            <InputDefault 
+                                placeholder="miusuario (sin @)" 
+                                className="w-full border-none outline-none" 
+                                value={form.instagram || ''} 
+                                onChange={handleChange('instagram')} 
+                            />
                         </div>
+                        <small className="text-gray-500 text-xs mt-1">Solo tu nombre de usuario, sin @ ni URL completa</small>
                     </div>
                 </div>
                 <div>
@@ -61,8 +78,14 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaFacebook className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="facebook.com/página" className="w-full border-none outline-none" value={form.facebook || ''} onChange={handleChange('facebook')} />
+                            <InputDefault 
+                                placeholder="mipagina o facebook.com/mipagina" 
+                                className="w-full border-none outline-none" 
+                                value={form.facebook || ''} 
+                                onChange={handleChange('facebook')} 
+                            />
                         </div>
+                        <small className="text-gray-500 text-xs mt-1">Nombre de página o URL completa de Facebook</small>
                     </div>
                 </div>
                 <div>
@@ -70,8 +93,14 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaWhatsapp className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="+54 9 11 1234-5678" className="w-full border-none outline-none" value={form.whatsapp || ''} onChange={handleChange('whatsapp')} />
+                            <InputDefault 
+                                placeholder="+54 9 11 1234-5678" 
+                                className="w-full border-none outline-none" 
+                                value={form.whatsapp || ''} 
+                                onChange={handleChange('whatsapp')} 
+                            />
                         </div>
+                        <small className="text-gray-500 text-xs mt-1">Número completo con código de país (ej: +54 9 11 1234-5678)</small>
                     </div>
                 </div>
                 <div>
@@ -79,8 +108,14 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaTiktok className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="@usuario" className="w-full border-none outline-none" value={form.tiktok || ''} onChange={handleChange('tiktok')} />
+                            <InputDefault 
+                                placeholder="miusuario (sin @)" 
+                                className="w-full border-none outline-none" 
+                                value={form.tiktok || ''} 
+                                onChange={handleChange('tiktok')} 
+                            />
                         </div>
+                        <small className="text-gray-500 text-xs mt-1">Solo tu nombre de usuario, sin @ ni URL completa</small>
                     </div>
                 </div>
                 <div>
@@ -88,8 +123,14 @@ export const SocialMediaSection: React.FC = () => {
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
                             <FaYoutube className="text-gray-500 mr-2" />
-                            <InputDefault placeholder="youtube.com/canal" className="w-full border-none outline-none" value={form.youtube || ''} onChange={handleChange('youtube')} />
+                            <InputDefault 
+                                placeholder="micanal o youtube.com/c/micanal" 
+                                className="w-full border-none outline-none" 
+                                value={form.youtube || ''} 
+                                onChange={handleChange('youtube')} 
+                            />
                         </div>
+                        <small className="text-gray-500 text-xs mt-1">Nombre de canal o URL completa de YouTube</small>
                     </div>
                 </div>
             </div>
@@ -114,6 +155,13 @@ export const SocialMediaSection: React.FC = () => {
             </div>
     
             {error && <div className="text-red-500 mt-2">{error}</div>}
+            {success && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-2">
+                    <p className="text-green-800 text-sm">
+                         <strong>¡Guardado exitosamente!</strong> Tus redes sociales ahora aparecerán como enlaces en el footer de tu tienda.
+                    </p>
+                </div>
+            )}
             <div className="flex flex-col gap-2 mt-6">
      
                 <DesignButton variant="primary" onClick={handleSave} disabled={loading}>Guardar cambios</DesignButton>

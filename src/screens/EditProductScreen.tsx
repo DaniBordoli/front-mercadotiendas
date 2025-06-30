@@ -402,7 +402,7 @@ const EditProductScreen: React.FC = () => {
               <div className="flex gap-3">
                 <DesignButton variant="green"
                 icon={FaEye}
-                onClick={() => navigate(`/producto/${product._id}`)}>
+                onClick={() => navigate(`/first-layout/detail-layout/${product._id}`)}>
                   Ver en tienda
                 </DesignButton>
                 <DesignButton variant="secondary"

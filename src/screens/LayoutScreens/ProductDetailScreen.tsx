@@ -6,6 +6,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
 import { useCartStore } from '../../stores/cartStore';
+import FullScreenLoader from '../../components/molecules/FullScreenLoader';
 
 // Tipos adicionales para la interfaz de Product si es necesario
 declare module '../../stores/searchStore' {
@@ -65,9 +66,7 @@ const ProductDetailScreen: React.FC = () => {
           fontType={editableVariables.fontType}
           logoUrl={editableVariables.logoUrl}
         />
-        <div className="max-w-7xl mx-auto p-8 flex justify-center items-center min-h-[60vh]">
-          <div className="text-lg">Cargando producto...</div>
-        </div>
+        <FullScreenLoader />
         <Footer
           backgroundColor={editableVariables.footerBackgroundColor}
           textColor={editableVariables.footerTextColor}

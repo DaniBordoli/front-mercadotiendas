@@ -9,6 +9,7 @@ import { useSearchStore } from '../../stores/searchStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { fetchShopTemplate } from '../../services/api';
 import { FiShoppingCart } from 'react-icons/fi';
+import FullScreenLoader from '../../components/molecules/FullScreenLoader';
 
 const ShopLayout: React.FC = () => {
   const [price, setPrice] = useState(500);
@@ -157,7 +158,7 @@ const ShopLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
-              <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
+              <FullScreenLoader />
             ) : (
               (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
                 <div

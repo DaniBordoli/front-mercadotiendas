@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp, FaTiktok, FaYoutube } from 'react-icons/fa';
 import { HiLocationMarker } from 'react-icons/hi';
 import { FaPhone } from 'react-icons/fa6';
 import { IoMail } from 'react-icons/io5';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { useAuthStore } from '../../stores';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
+import { useSocialMedia } from '../../hooks/useSocialMedia';
 
 interface FooterProps {
   footerTitle?: string;
@@ -27,6 +28,7 @@ const Footer: React.FC<FooterProps> = ({
   const { shop, getShop, setShop } = useShopStore();
   const { isAuthenticated, user } = useAuthStore();
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  const { getSocialLinks } = useSocialMedia();
 
   useEffect(() => {
     if (user?.shop && !shop) {
@@ -53,6 +55,27 @@ const Footer: React.FC<FooterProps> = ({
   const shopEmail = shop?.contactEmail || "info@shopsmart.com";
   const shopDescription = editableVariables.footerDescription || footerDescription;
 
+  // Obtener links sociales dinámicos
+  const socialLinks = getSocialLinks();
+
+  // Función para renderizar el ícono correcto según la plataforma
+  const renderSocialIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'FaInstagram':
+        return <FaInstagram className="text-xl cursor-pointer hover:text-white" />;
+      case 'FaFacebook':
+        return <FaFacebook className="text-xl cursor-pointer hover:text-white" />;
+      case 'FaWhatsapp':
+        return <FaWhatsapp className="text-xl cursor-pointer hover:text-white" />;
+      case 'FaTiktok':
+        return <FaTiktok className="text-xl cursor-pointer hover:text-white" />;
+      case 'FaYoutube':
+        return <FaYoutube className="text-xl cursor-pointer hover:text-white" />;
+      default:
+        return <FaInstagram className="text-xl cursor-pointer hover:text-white" />;
+    }
+  };
+
   return (
     <footer className="py-12" style={{ backgroundColor, color: textColor }}>
       <div className="container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -61,9 +84,27 @@ const Footer: React.FC<FooterProps> = ({
           <h3 className="text-lg font-bold mb-4" style={{ color: footerTitleColor }}>{displayTitle}</h3>
           <p className="text-sm mb-4">{shopDescription}</p>
           <div className="flex gap-4 text-gray-400">
-            <FaFacebook className="text-xl cursor-pointer hover:text-white" />
-            <FaInstagram className="text-xl cursor-pointer hover:text-white" />
-            <FaTwitter className="text-xl cursor-pointer hover:text-white" />
+            {socialLinks.length > 0 ? (
+              socialLinks.map((link, index) => (
+                <a 
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors duration-200"
+                  title={`Visitar nuestro ${link.platform}`}
+                >
+                  {renderSocialIcon(link.icon)}
+                </a>
+              ))
+            ) : (
+              // Iconos por defecto si no hay links configurados
+              <>
+                <FaFacebook className="text-xl cursor-pointer hover:text-white opacity-50" />
+                <FaInstagram className="text-xl cursor-pointer hover:text-white opacity-50" />
+                <FaTwitter className="text-xl cursor-pointer hover:text-white opacity-50" />
+              </>
+            )}
           </div>
         </div>
 

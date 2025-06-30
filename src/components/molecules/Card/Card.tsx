@@ -3,6 +3,7 @@ import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton';
 import '../../../styles/responsive.css';
 import { useSearchStore } from '../../../stores';
+import FullScreenLoader from '../FullScreenLoader';
 
 interface CardProps {
   imageSrc?: string;
@@ -126,7 +127,7 @@ export const CardList: React.FC = () => {
     <div className="text-center mt-8">
       <div className="flex justify-center flex-wrap">
         {loading ? (
-          <div className="w-full text-center text-gray-400 py-8">Cargando productos...</div>
+          <FullScreenLoader />
         ) : (
           productsToShow.map((card, index) => (
             <Card 

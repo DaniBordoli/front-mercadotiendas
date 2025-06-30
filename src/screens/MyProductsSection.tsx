@@ -6,8 +6,7 @@ import { TbEdit } from "react-icons/tb";
 import DataSideBar from '../components/organisms/DataSideBar/DataSideBar'
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa6';
-import { useAuthStore } from '../stores/slices/authSlice';
-import { fetchCategories, fetchMainCategories } from '../stores/slices/authSlice';
+import { useAuthStore, fetchMainCategories } from '../stores/slices/authSlice';
 import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
@@ -212,7 +211,9 @@ const MyProductsSection: React.FC = () => {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-6 text-gray-400">Cargando productos...</td>
+                    <td colSpan={8} className="text-center py-6">
+                      <FullScreenLoader />
+                    </td>
                   </tr>
                 ) : productos.length === 0 ? (
                   <tr>
