@@ -20,6 +20,7 @@ interface FormData {
     layoutDesign: string;
     primaryColor?: string;
     secondaryColor?: string;
+    accentColor?: string;
     logoUrl?: string;
     logoFile?: File;
 }
@@ -35,9 +36,12 @@ const ShopCreate: React.FC = () => {
         layoutDesign: '',
         primaryColor: '',
         secondaryColor: '',
+        accentColor: '',
         logoUrl: '',
         logoFile: undefined,
     });
+
+    const [subdomainError, setSubdomainError] = React.useState<string | null>(null);
 
     const navigate = useNavigate();
     const { createShop, setShop, loading, error } = useShopStore();
@@ -53,14 +57,30 @@ const ShopCreate: React.FC = () => {
     };
 
     const handleCreateShop = async () => {
+        setSubdomainError(null);
         try {
-            const subdomain = formData.storeName
+            // Generar subdominio válido
+            let subdomain = formData.storeName
                 .toLowerCase()
                 .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos (acentos)
-                .replace(/[^a-z0-9-]+/g, '-')
-                .replace(/^-+|-+$/g, '')
-                .replace(/--+/g, '-');
+                .replace(/[\u0300-\u036f]/g, '') // Elimina diacríticos
+                .replace(/[^a-z0-9-]+/g, '-') // Solo minúsculas, números y guiones
+                .replace(/^-+|-+$/g, '') // Sin guiones al inicio/final
+                .replace(/--+/g, '-'); // Sin guiones dobles
+            // Limitar longitud
+            if (subdomain.length > 30) subdomain = subdomain.slice(0, 30);
+            // Eliminar guiones al final/inicio tras recorte
+            subdomain = subdomain.replace(/^-+|-+$/g, '');
+            // Si es menor a 3, rellenar con letras/números
+            if (subdomain.length < 3) {
+                subdomain = (subdomain + 'tienda').slice(0, 3);
+            }
+            // Validar regex final
+            const subdomainRegex = /^[a-z0-9-]{3,30}$/;
+            if (!subdomainRegex.test(subdomain)) {
+                setSubdomainError('El subdominio generado es inválido. Usa solo minúsculas, números y guiones, entre 3 y 30 caracteres.');
+                return;
+            }
             const shopData = {
                 shopName: formData.storeName,
                 subdomain,
@@ -73,12 +93,11 @@ const ShopCreate: React.FC = () => {
                 layoutDesign: formData.layoutDesign || '',
                 primaryColor: formData.primaryColor,
                 secondaryColor: formData.secondaryColor,
+                accentColor: formData.accentColor,
                 logoUrl: formData.logoUrl,
                 image: formData.logoFile, 
             };
             await createShop(shopData);
-            
-            
             navigate('/dashboard');
         } catch (e) {
             console.error(e);
@@ -142,14 +161,20 @@ const ShopCreate: React.FC = () => {
                         )}
                         {currentStep === 2 && (
                             <ColorBrandForm 
-                                onNext={(data: { primaryColor: string; secondaryColor: string; logoUrl?: string; logoFile?: File }) => 
+                                onNext={(data: { primaryColor: string; secondaryColor: string; accentColor: string; logoUrl?: string; logoFile?: File }) => 
                                     handleNextStep({ 
                                         primaryColor: data.primaryColor,
                                         secondaryColor: data.secondaryColor,
+                                        accentColor: data.accentColor,
                                         logoUrl: data.logoUrl,
                                         logoFile: data.logoFile
                                     })
                                 }
+                                initialColors={{
+                                    primaryColor: formData.primaryColor,
+                                    secondaryColor: formData.secondaryColor,
+                                    accentColor: formData.accentColor,
+                                }}
                             />
                         )}
                         {currentStep === 3 && (
@@ -174,7 +199,10 @@ const ShopCreate: React.FC = () => {
                                 >
                                     {loading ? 'Creando...' : 'Crear Tienda'}
                                 </DesignButton>
-                                {error && (
+                                {subdomainError && (
+                                    <p className="text-red-500 text-sm mt-4">{subdomainError}</p>
+                                )}
+                                {error && !subdomainError && (
                                     <p className="text-red-500 text-sm mt-4">{error}</p>
                                 )}
                             </div>

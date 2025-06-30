@@ -112,12 +112,7 @@ export const SocialMediaSection: React.FC = () => {
                     <InputDefault placeholder="+54 11 1234-5678" className="w-full" value={form.telefonoAdicional || ''} onChange={handleChange('telefonoAdicional')} />
                 </div>
             </div>
-            <div className="flex items-center mt-6">
-                <StatusTags status={success ? 'Active' : 'Inactive'} className="mr-2" />
-                <span className="text-gray-700 font-space">
-                    {success ? 'Cambios guardados correctamente' : 'Todos los enlaces están funcionando correctamente'}
-                </span>
-            </div>
+    
             {error && <div className="text-red-500 mt-2">{error}</div>}
             <div className="flex flex-col gap-2 mt-6">
      

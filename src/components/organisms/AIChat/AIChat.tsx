@@ -291,6 +291,29 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
           shopUpdates.brandName = pendingTemplateUpdate.shopName;
         }
         
+        // Sincronizar colores si han cambiado
+        const colorUpdates: any = {};
+        if (pendingTemplateUpdate.primaryColor) {
+          colorUpdates.primaryColor = pendingTemplateUpdate.primaryColor;
+        }
+        if (pendingTemplateUpdate.secondaryColor) {
+          colorUpdates.secondaryColor = pendingTemplateUpdate.secondaryColor;
+        }
+        if (pendingTemplateUpdate.accentColor) {
+          colorUpdates.accentColor = pendingTemplateUpdate.accentColor;
+        }
+        
+        // Si hay cambios de colores, usar updateShopColors para sincronizar
+        if (Object.keys(colorUpdates).length > 0) {
+          try {
+            const updateShopColors = useShopStore.getState().updateShopColors;
+            await updateShopColors(colorUpdates);
+            console.log('[AIChat] Sincronizado colores con tienda principal:', colorUpdates);
+          } catch (colorError) {
+            console.error('[AIChat] Error al sincronizar colores con tienda principal:', colorError);
+          }
+        }
+        
         // Si hay cambios para la tienda principal, actualizarla
         if (Object.keys(shopUpdates).length > 0) {
           try {

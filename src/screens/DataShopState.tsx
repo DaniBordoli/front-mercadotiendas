@@ -5,6 +5,7 @@ import { FaStore, FaCheckCircle, FaShoppingCart, FaBell } from 'react-icons/fa';
 import { colors } from '../design/colors';
 import { useShopStore } from '../stores/slices/shopStore';
 import { useAuthStore } from '../stores';
+import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const DataShopState: React.FC = () => {
     const { shop, loading, error, updateShopStatus, getShop } = useShopStore();
@@ -59,6 +60,7 @@ const DataShopState: React.FC = () => {
     return (
         <div className="min-h-screen flex">
             <DataSideBar />
+            {loading && <FullScreenLoader />}
             <div className="flex flex-col flex-grow p-10 md:ml-[250px] gap-6">
                 <div>
                     <h1 className="text-2xl font-space font-medium" style={{ color: isActive ? gray800 : colors.primaryRed }}>

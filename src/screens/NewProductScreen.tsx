@@ -12,7 +12,7 @@ import ProductSuccessModal from '../components/organisms/NewProductComponents/Pr
 import { useAuthStore } from '../stores/slices/authSlice';
 import Toast from '../components/atoms/Toast';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
-import { fetchCategories } from '../stores/slices/authSlice';
+import { fetchCategories, fetchMainCategories, fetchSubcategoriesByParent } from '../stores/slices/authSlice';
 
 const steps = [
   { label: 'Información Básica' },
@@ -47,6 +47,8 @@ const NewProductScreen: React.FC = () => {
   const [productImages, setProductImages] = React.useState<(File | string)[]>([]);
   const variantsRef = useRef<{ getVariants: () => { tipo: string; valores: string[] }[] }>(null);
   const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar categoría' } ]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar subcategoría' } ]);
+  const [categoriesData, setCategoriesData] = useState<any[]>([]);
 
   const handleBasicInfoChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | { name: string; value: string }
@@ -54,12 +56,51 @@ const NewProductScreen: React.FC = () => {
     if ('target' in e) {
       const { name, value } = e.target;
       setBasicInfo(prev => ({ ...prev, [name]: value }));
+      
+      // Si cambia la categoría, resetear subcategoría y cargar subcategorías
+      if (name === 'categoria') {
+        setBasicInfo(prev => ({ ...prev, subcategoria: '' }));
+        loadSubcategories(value);
+      }
     } else {
       setBasicInfo(prev => ({ ...prev, [e.name]: e.value }));
+      
+      // Si cambia la categoría, resetear subcategoría y cargar subcategorías
+      if (e.name === 'categoria') {
+        setBasicInfo(prev => ({ ...prev, subcategoria: '' }));
+        loadSubcategories(e.value);
+      }
     }
   };
 
   const createProduct = useAuthStore(state => state.createProduct);
+
+  // Función para cargar subcategorías según la categoría seleccionada
+  const loadSubcategories = async (categoryName: string) => {
+    if (!categoryName) {
+      setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+      return;
+    }
+
+    try {
+      // Encontrar la categoría seleccionada en los datos
+      const selectedCategory = categoriesData.find(cat => cat.name === categoryName);
+      if (!selectedCategory) {
+        setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+        return;
+      }
+
+      // Obtener subcategorías de esta categoría
+      const subcategories = await fetchSubcategoriesByParent(selectedCategory._id);
+      setSubcategoryOptions([
+        { value: '', label: 'Seleccionar subcategoría' },
+        ...subcategories.map((subcat: any) => ({ value: subcat.name, label: subcat.name }))
+      ]);
+    } catch (error) {
+      console.error('Error cargando subcategorías:', error);
+      setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+    }
+  };
 
   const handlePublish = async () => {
     setIsLoading(true);
@@ -117,12 +158,18 @@ const NewProductScreen: React.FC = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const cats = await fetchCategories();
+        // Cargar todas las categorías para referencia interna
+        const allCategories = await fetchCategories();
+        setCategoriesData(allCategories);
+        
+        // Cargar solo categorías principales para el select
+        const mainCategories = await fetchMainCategories();
         setCategoryOptions([
           { value: '', label: 'Seleccionar categoría' },
-          ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))
+          ...mainCategories.map((cat: any) => ({ value: cat.name, label: cat.name }))
         ]);
-      } catch {
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
         setCategoryOptions([{ value: '', label: 'Seleccionar categoría' }]);
       }
     };
@@ -212,6 +259,7 @@ const NewProductScreen: React.FC = () => {
             values={basicInfo}
             onChange={handleBasicInfoChange}
             categoryOptions={categoryOptions}
+            subcategoryOptions={subcategoryOptions}
           />
         )}
         {step === 2 && (

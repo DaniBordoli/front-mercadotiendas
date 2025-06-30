@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { Logo } from '../../atoms/Logo/Logo';
 import { FaUser, FaTachometerAlt, FaShoppingCart, FaCreditCard, FaShoppingBag, FaBox } from 'react-icons/fa';
+import { FaCoins } from 'react-icons/fa6';
 import { GoGraph } from 'react-icons/go';
 import { IoDocumentText, IoChevronDown, IoToggleSharp } from "react-icons/io5";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { colors } from '../../../design/colors';
 import { motion } from 'framer-motion';
-import { FaGear, FaScrewdriverWrench, FaCircleInfo, FaBoxArchive  } from "react-icons/fa6";
+import { FaGear, FaScrewdriverWrench, FaCircleInfo, FaBoxArchive } from "react-icons/fa6";
 import { AiFillDatabase } from "react-icons/ai";
-import { RiRobot2Line } from "react-icons/ri";
+import { RiRobot2Line, RiAdminLine } from "react-icons/ri";
 
 import { FiLogOut } from "react-icons/fi";
 import { useAuthStore } from '../../../stores';
@@ -24,6 +25,7 @@ const DataSideBar: React.FC = () => {
     console.log('User object in DataSideBar:', user);
  
     const [shopDropdownOpen, setShopDropdownOpen] = React.useState(false);
+    const [adminDropdownOpen, setAdminDropdownOpen] = React.useState(false);
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
     React.useEffect(() => {
@@ -56,9 +58,6 @@ const DataSideBar: React.FC = () => {
         // Compras
         { key: 'buy', label: 'Compras', icon: <FaShoppingCart className="text-lg" />, path: '/data-purchase-history' },
         // Resto
-        ...(isAdmin ? [
-            { key: 'category', label: 'Categorias', icon: <FaBoxArchive className="text-lg" />, path: '/data-category' }
-        ] : []),
         { key: 'subscription', label: 'Suscripción', icon: <FaCreditCard className="text-lg" />, path: '/data-subscription' },
         { key: 'billing', label: 'Facturación', icon: <IoDocumentText className="text-lg" />, path: '/data-billing' },
         { key: 'sellManagement', label: 'Gestión de Ventas', icon: <GoGraph className="text-lg" />, path: '/data-sales-management' },
@@ -81,7 +80,13 @@ const DataSideBar: React.FC = () => {
         ] : [])
     ];
 
+    const adminOptions = [
+        { key: 'category', label: 'Categorías', icon: <FaBoxArchive className="text-lg" />, path: '/data-category' },
+        { key: 'currency', label: 'Monedas', icon: <FaCoins className="text-lg" />, path: '/data-currency' }
+    ];
+
     const isShopActive = shopOptions.some(opt => location.pathname === opt.path);
+    const isAdminActive = adminOptions.some(opt => location.pathname === opt.path);
 
     const isDropdownOpen = shopDropdownOpen || isShopActive;
 
@@ -202,6 +207,54 @@ const DataSideBar: React.FC = () => {
                                             onClick={() => {
                                                 navigate(option.path);
                                                 if (shopDropdownOpen) setShopDropdownOpen(false);
+                                            }}
+                                        >
+                                            {option.icon}
+                                            <span className='font-space'>{option.label}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Panel de administración dropdown - Solo para administradores */}
+                    {isAdmin && adminOptions.length > 0 && (
+                        <div className="relative">
+                            <button
+                                className={`relative flex items-center gap-3 p-3 w-full justify-between ${isAdminActive ? 'font-bold' : ''}`}
+                                style={isAdminActive ? { color: colors.primaryRed } : {}}
+                                onClick={() => setAdminDropdownOpen((prev) => !prev)}
+                                type="button"
+                            >
+                                {isAdminActive && (
+                                    <motion.div
+                                        className="absolute inset-0 z-0"
+                                        style={{ backgroundColor: `${colors.primaryRed}1A` }}
+                                        layoutId="activeBackground"
+                                        initial={{ x: '-100%' }}
+                                        animate={{ x: 0 }}
+                                        transition={{ duration: 0.1 }}
+                                    />
+                                )}
+                                <span className="flex items-center gap-3 z-10">
+                                    <RiAdminLine className="text-lg" />
+                                    <span className='font-space'>Panel de administración</span>
+                                </span>
+                                <IoChevronDown className={`transition-transform z-10 ${(adminDropdownOpen || isAdminActive) ? 'rotate-180' : ''}`} />
+                            </button>
+                            {(adminDropdownOpen || isAdminActive) && (
+                                <div className="ml-8 flex flex-col">
+                                    {adminOptions.map(option => (
+                                        <button
+                                            key={option.key}
+                                            className={`flex items-center gap-2 p-2 text-left rounded transition-colors ${
+                                                location.pathname === option.path ? 'font-bold' : ''
+                                            }`}
+                                            style={location.pathname === option.path ? { color: colors.primaryRed } : {}}
+                                            onClick={() => {
+                                                navigate(option.path);
+                                                if (adminDropdownOpen) setAdminDropdownOpen(false);
                                             }}
                                         >
                                             {option.icon}

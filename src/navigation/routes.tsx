@@ -47,6 +47,7 @@ import EditProductScreen from '../screens/EditProductScreen';
 import NewProductScreen from '../screens/NewProductScreen';
 import DataCatalog from '../screens/DataCatalog';
 import PaymentReturn from '../screens/PaymentReturn';
+import DataCurrency from '../screens/DataCurrency';
 
 
 export const publicRoutes = [
@@ -224,6 +225,10 @@ export const publicRoutes = [
   {
     path: '/data-category',
     element: <DataCatalog />
+  },
+   {
+    path: '/data-currency',
+    element: <DataCurrency />
   },
   {
     path: '/payment/return',

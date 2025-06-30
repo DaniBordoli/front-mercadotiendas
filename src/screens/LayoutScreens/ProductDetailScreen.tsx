@@ -285,8 +285,6 @@ const ProductDetailScreen: React.FC = () => {
                   ))}
                   {(!selectedProduct?.features || selectedProduct.features.length === 0) && (
                     <>
-                      <div>{selectedProduct?.brand ? `Marca: ${selectedProduct.brand}` : 'Producto de alta calidad'}</div>
-                      <div>Estado: {selectedProduct?.condition === 'new' ? 'Nuevo' : 'Usado'}</div>
                       {selectedProduct?.hasFreeShipping && <div>Envío gratuito</div>}
                     </>
                   )}

@@ -7,7 +7,7 @@ import DataSideBar from '../components/organisms/DataSideBar/DataSideBar'
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa6';
 import { useAuthStore } from '../stores/slices/authSlice';
-import { fetchCategories } from '../stores/slices/authSlice';
+import { fetchCategories, fetchMainCategories } from '../stores/slices/authSlice';
 import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
@@ -62,7 +62,7 @@ const MyProductsSection: React.FC = () => {
   React.useEffect(() => {
     const loadCategories = async () => {
       try {
-        const cats = await fetchCategories();
+        const cats = await fetchMainCategories();
         setCategoryOptions([
           { value: '', label: 'Todas' },
           ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))

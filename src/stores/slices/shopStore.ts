@@ -17,7 +17,7 @@ interface ShopState {
     isShopActive: () => boolean;
     checkShopAccess: () => { canAccess: boolean; message: string };
     updateShopInstitutional: (data: { description?: string; mission?: string; vision?: string; history?: string; values?: string }) => Promise<void>;
-    updateShopColors: (data: { primaryColor?: string; secondaryColor?: string }) => Promise<void>;
+    updateShopColors: (data: { primaryColor?: string; secondaryColor?: string; accentColor?: string }) => Promise<void>;
 }
 
 export const useShopStore = create<ShopState>((set, get) => ({
@@ -304,26 +304,37 @@ export const useShopStore = create<ShopState>((set, get) => ({
         await get().updateShopInfo(shop._id, data);
     },
 
-    updateShopColors: async (data: { primaryColor?: string; secondaryColor?: string }) => {
+    updateShopColors: async (data: { primaryColor?: string; secondaryColor?: string; accentColor?: string }) => {
         const { shop } = get();
         if (!shop) throw new Error('No shop found');
         
-       
+        // Actualizar tienda en backend
         await get().updateShopInfo(shop._id, data);
         
-       
+        // Sincronizar con firstLayoutStore
         const { useFirstLayoutStore } = await import('../firstLayoutStore');
         const { updateEditableVariables } = useFirstLayoutStore.getState();
         
         const colorUpdates: any = {
             primaryColor: data.primaryColor,
             secondaryColor: data.secondaryColor,
+            accentColor: data.accentColor,
         };
         
-        // NavBar con fondo blanco y título en color principal para mejor contraste
+        // NavBar con fondo acento si existe, sino usar color principal
+        if (data.accentColor) {
+            colorUpdates.navbarBackgroundColor = data.accentColor;
+            colorUpdates.navbarTitleColor = data.primaryColor || '#000000';
+            colorUpdates.navbarLinksColor = data.primaryColor || '#000000';
+            colorUpdates.navbarIconsColor = data.primaryColor || '#000000';
+        } else if (data.primaryColor) {
+            colorUpdates.navbarBackgroundColor = data.primaryColor;
+            colorUpdates.navbarTitleColor = '#FFFFFF';
+            colorUpdates.navbarLinksColor = '#FFFFFF';
+            colorUpdates.navbarIconsColor = '#FFFFFF';
+        }
+        
         if (data.primaryColor) {
-            colorUpdates.navbarBackgroundColor = '#FFFFFF';
-            colorUpdates.navbarTitleColor = data.primaryColor;
             colorUpdates.heroBackgroundColor = data.primaryColor;
         }
         

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { InputDefault } from '../../atoms/InputDefault';
 import { DesignButton } from '../../atoms/DesignButton';
-import { StatusTags } from '../../atoms/StatusTags';
+
 import { useShopStore, useAuthStore } from '../../../stores';
 import FullScreenLoader from '../../molecules/FullScreenLoader';
 
@@ -49,12 +49,6 @@ export const DomainSubdomainSection: React.FC = () => {
                         />
                         <span className="ml-2 text-gray-600 whitespace-nowrap">.mercadotiendas.com</span>
                     </div>
-                </div>
-                <div className="flex items-center mb-6">
-                    <StatusTags status={success ? 'Active' : 'Inactive'} className="mr-2" />
-                    <span className="text-gray-700 font-space">
-                        {success ? 'Subdominio actualizado correctamente' : 'Dominio conectado correctamente'}
-                    </span>
                 </div>
                 {error && <div className="text-red-500 mb-2">{error}</div>}
                 <div className="flex flex-col gap-2">

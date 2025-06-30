@@ -46,6 +46,7 @@ export interface Shop {
   city?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  accentColor?: string;
   
   imageUrl?: string;
   owner: string;
