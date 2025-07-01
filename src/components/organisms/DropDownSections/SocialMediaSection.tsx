@@ -62,12 +62,13 @@ export const SocialMediaSection: React.FC = () => {
                     <label className="text-sm font-space mb-2 block">Instagram</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
-                            <FaInstagram className="text-gray-500 mr-2" />
-                            <InputDefault 
+                            <FaInstagram className="text-gray-500 mr-2 flex-shrink-0" />
+                            <input
+                                type="text"
                                 placeholder="miusuario (sin @)" 
-                                className="w-full border-none outline-none" 
+                                className="w-full border-none outline-none bg-transparent" 
                                 value={form.instagram || ''} 
-                                onChange={handleChange('instagram')} 
+                                onChange={(e) => handleChange('instagram')(e.target.value)}
                             />
                         </div>
                         <small className="text-gray-500 text-xs mt-1">Solo tu nombre de usuario, sin @ ni URL completa</small>
@@ -77,12 +78,13 @@ export const SocialMediaSection: React.FC = () => {
                     <label className="text-sm font-space mb-2 block">Facebook</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
-                            <FaFacebook className="text-gray-500 mr-2" />
-                            <InputDefault 
+                            <FaFacebook className="text-gray-500 mr-2 flex-shrink-0" />
+                            <input
+                                type="text"
                                 placeholder="mipagina o facebook.com/mipagina" 
-                                className="w-full border-none outline-none" 
+                                className="w-full border-none outline-none bg-transparent" 
                                 value={form.facebook || ''} 
-                                onChange={handleChange('facebook')} 
+                                onChange={(e) => handleChange('facebook')(e.target.value)}
                             />
                         </div>
                         <small className="text-gray-500 text-xs mt-1">Nombre de página o URL completa de Facebook</small>
@@ -92,12 +94,13 @@ export const SocialMediaSection: React.FC = () => {
                     <label className="text-sm font-space mb-2 block">WhatsApp</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
-                            <FaWhatsapp className="text-gray-500 mr-2" />
-                            <InputDefault 
+                            <FaWhatsapp className="text-gray-500 mr-2 flex-shrink-0" />
+                            <input
+                                type="text"
                                 placeholder="+54 9 11 1234-5678" 
-                                className="w-full border-none outline-none" 
+                                className="w-full border-none outline-none bg-transparent" 
                                 value={form.whatsapp || ''} 
-                                onChange={handleChange('whatsapp')} 
+                                onChange={(e) => handleChange('whatsapp')(e.target.value)}
                             />
                         </div>
                         <small className="text-gray-500 text-xs mt-1">Número completo con código de país (ej: +54 9 11 1234-5678)</small>
@@ -107,12 +110,13 @@ export const SocialMediaSection: React.FC = () => {
                     <label className="text-sm font-space mb-2 block">TikTok</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
-                            <FaTiktok className="text-gray-500 mr-2" />
-                            <InputDefault 
+                            <FaTiktok className="text-gray-500 mr-2 flex-shrink-0" />
+                            <input
+                                type="text"
                                 placeholder="miusuario (sin @)" 
-                                className="w-full border-none outline-none" 
+                                className="w-full border-none outline-none bg-transparent" 
                                 value={form.tiktok || ''} 
-                                onChange={handleChange('tiktok')} 
+                                onChange={(e) => handleChange('tiktok')(e.target.value)}
                             />
                         </div>
                         <small className="text-gray-500 text-xs mt-1">Solo tu nombre de usuario, sin @ ni URL completa</small>
@@ -122,12 +126,13 @@ export const SocialMediaSection: React.FC = () => {
                     <label className="text-sm font-space mb-2 block">YouTube</label>
                     <div className="flex flex-col border border-gray-300 rounded-md p-2 w-full">
                         <div className="flex items-center w-full">
-                            <FaYoutube className="text-gray-500 mr-2" />
-                            <InputDefault 
+                            <FaYoutube className="text-gray-500 mr-2 flex-shrink-0" />
+                            <input
+                                type="text"
                                 placeholder="micanal o youtube.com/c/micanal" 
-                                className="w-full border-none outline-none" 
+                                className="w-full border-none outline-none bg-transparent" 
                                 value={form.youtube || ''} 
-                                onChange={handleChange('youtube')} 
+                                onChange={(e) => handleChange('youtube')(e.target.value)}
                             />
                         </div>
                         <small className="text-gray-500 text-xs mt-1">Nombre de canal o URL completa de YouTube</small>
