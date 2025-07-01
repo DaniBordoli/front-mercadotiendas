@@ -4,12 +4,14 @@ import { colors } from '../design/colors';
 import { DesignButton } from '../components/atoms/DesignButton';
 import LogoUploader from '../components/CreateShopComponents/LogoUploader';
 import { useFirstLayoutStore } from '../stores/firstLayoutStore';
-import { updateShopTemplate } from '../services/api';
+import { useShopStore } from '../stores/slices/shopStore';
+import { updateShopTemplate, fetchShopTemplate } from '../services/api';
 
 const DataShopConfig: React.FC = () => {
     const [selectedTab, setSelectedTab] = React.useState('Diseño');
     const editableVariables = useFirstLayoutStore(state => state.editableVariables);
     const updateEditableVariables = useFirstLayoutStore(state => state.updateEditableVariables);
+    const { shop, getShop } = useShopStore();
 
     const tabs = ['Diseño'];
 
@@ -23,6 +25,35 @@ const DataShopConfig: React.FC = () => {
     const primaryColorOptions = [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#87CEEB', '#98FB98'];
     const secondaryColorOptions = [colors.accentTeal, '#FF6B6B', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', colors.primaryRed, '#FFB6C1', '#87CEEB', '#98FB98'];
     const accentColorOptions = ['#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F1F5F9', '#E0E7EF', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#FFF3E0'];
+
+    // Cargar datos del shop y template al montar el componente
+    React.useEffect(() => {
+        const loadShopData = async () => {
+            try {
+                if (!shop) {
+                    await getShop();
+                }
+                
+                // Cargar el template para obtener los colores y logo actuales
+                const response = await fetchShopTemplate();
+                if (response?.data?.templateUpdate) {
+                    const template = response.data.templateUpdate;
+                    
+                    // Actualizar colores locales
+                    if (template.primaryColor) setPrimaryColor(template.primaryColor);
+                    if (template.secondaryColor) setSecondaryColor(template.secondaryColor);
+                    if (template.accentColor) setAccentColor(template.accentColor);
+                    
+                    // Actualizar el store
+                    updateEditableVariables(template);
+                }
+            } catch (error) {
+                console.error('Error loading shop data:', error);
+            }
+        };
+        
+        loadShopData();
+    }, [shop, getShop, updateEditableVariables]);
 
     // Actualizar preview localmente
     React.useEffect(() => {
