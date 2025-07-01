@@ -23,14 +23,47 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext, initialColors }
     const [logoUrl, setLogoUrl] = useState(editableVariables.logoUrl || '');
     const [logoFile, setLogoFile] = useState<File | null>(null);
 
-    // Opciones de colores predefinidos
+    // Opciones de colores predefinidos con mejores combinaciones
     const primaryColorOptions = [
         colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#87CEEB', '#98FB98'
     ];
-    const secondaryColorOptions = [
-        colors.accentTeal, '#FF6B6B', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', colors.primaryRed, '#FFB6C1', '#87CEEB', '#98FB98'
-    ];
-    const accentColorOptions = ['#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F1F5F9', '#E0E7EF', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#FFF3E0'];
+
+    // Función para obtener colores secundarios que combinan con el color principal
+    const getSecondaryColorOptions = (selectedPrimary: string) => {
+        const colorCombinations: { [key: string]: string[] } = {
+            [colors.primaryRed]: ['#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#87CEEB', '#FFB6C1', '#98FB98', '#DDA0DD', '#FF6B6B', colors.accentTeal],
+            '#FF6B6B': ['#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#87CEEB', '#98FB98', '#DDA0DD', colors.accentTeal, colors.primaryRed, '#FFB6C1'],
+            '#4ECDC4': [colors.primaryRed, '#FF6B6B', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#45B7D1', '#96CEB4', '#87CEEB', '#98FB98', colors.accentTeal],
+            '#45B7D1': [colors.primaryRed, '#FF6B6B', '#FFEAA7', '#4ECDC4', '#96CEB4', '#FFB6C1', '#87CEEB', '#98FB98', '#DDA0DD', colors.accentTeal],
+            '#96CEB4': [colors.primaryRed, '#FF6B6B', '#FFEAA7', '#DDA0DD', '#45B7D1', '#4ECDC4', '#FFB6C1', '#87CEEB', '#98FB98', colors.accentTeal],
+            '#FFEAA7': [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#DDA0DD', '#87CEEB', '#98FB98', colors.accentTeal, '#FFB6C1'],
+            '#DDA0DD': [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#87CEEB', '#98FB98', colors.accentTeal, '#FFB6C1'],
+            '#FFB6C1': [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#87CEEB', '#98FB98', colors.accentTeal],
+            '#87CEEB': [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#98FB98', colors.accentTeal],
+            '#98FB98': [colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#87CEEB', colors.accentTeal]
+        };
+        return colorCombinations[selectedPrimary] || [colors.accentTeal, '#FF6B6B', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', colors.primaryRed, '#FFB6C1', '#87CEEB', '#98FB98'];
+    };
+
+    // Función para obtener colores de acento que combinan con el color secundario
+    const getAccentColorOptions = (selectedSecondary: string) => {
+        const accentCombinations: { [key: string]: string[] } = {
+            [colors.accentTeal]: ['#E0F7FA', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#4ECDC4': ['#E0F7FA', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#FF6B6B': ['#FFE5E5', '#FFF8E1', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#45B7D1': ['#E3F2FD', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#96CEB4': ['#F0F7E0', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#F1F5F9', '#FFF3E0'],
+            '#FFEAA7': ['#FFF8E1', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#F0F7E0', '#E0F7FA', '#F1F5F9', '#FFF3E0'],
+            '#DDA0DD': ['#F6E9FF', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#FFF8E1', '#F0F7E0', '#E0F7FA', '#F1F5F9', '#FFF3E0'],
+            '#FFB6C1': ['#FFE5E5', '#FFF8E1', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#87CEEB': ['#E3F2FD', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#F0F7E0', '#F1F5F9', '#FFF3E0'],
+            '#98FB98': ['#F0F7E0', '#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#F1F5F9', '#FFF3E0']
+        };
+        return accentCombinations[selectedSecondary] || ['#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F1F5F9', '#E0E7EF', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#FFF3E0'];
+    };
+
+    const secondaryColorOptions = getSecondaryColorOptions(primaryColor);
+    const accentColorOptions = getAccentColorOptions(secondaryColor);
 
     // Aplicar cambios al store cuando cambian los colores
     useEffect(() => {

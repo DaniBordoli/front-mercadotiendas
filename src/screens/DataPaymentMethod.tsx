@@ -36,7 +36,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'mobbex',
             name: 'Mobbex',
-            image: '/payment/mobbex.png',
+            image: 'https://8700267.fs1.hubspotusercontent-na1.net/hubfs/8700267/MicrosoftTeams-image%20(22).png',
             commission: 'Variable',
             accreditation: 'Variable',
             isActive: false
@@ -44,7 +44,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'cash',
             name: 'Efectivo',
-            image: '/payment/cash.png',
+            image: 'https://cdn.creazilla.com/cliparts/64946/cash-clipart-xl.png',
             commission: '0%',
             accreditation: 'Manual',
             isActive: true
@@ -52,7 +52,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'transfer',
             name: 'Depósito/Transferencia',
-            image: '/payment/bank.png',
+            image: 'https://pngimg.com/d/bank_PNG5.png',
             commission: '0%',
             accreditation: 'Manual',
             isActive: false
@@ -60,7 +60,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'agreement',
             name: 'Acordar',
-            image: '/payment/handshake.png',
+            image: 'https://cdn.creazilla.com/cliparts/37017/handshake-hands-clipart-xl.png',
             commission: 'A convenir',
             accreditation: 'A convenir',
             isActive: true

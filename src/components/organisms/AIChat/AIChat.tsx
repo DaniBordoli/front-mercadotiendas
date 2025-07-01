@@ -413,8 +413,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
           <p className="mb-3">¿Quieres aplicar y guardar estos cambios de diseño en tu tienda?</p>
           
           {pendingTemplateUpdate && (
-            <div className="bg-gray-50 p-3 rounded-lg mb-3">
-              <h4 className="font-semibold mb-2 text-gray-700">Cambios a aplicar:</h4>
+            <div className="bg-gray-50 p-3 rounded-lg mb-3 max-h-64 overflow-y-auto">
+              <h4 className="font-semibold mb-2 text-gray-700 bg-gray-50 pb-1">Cambios a aplicar:</h4>
               <ul className="space-y-1 text-sm">
                 {Object.entries(pendingTemplateUpdate).map(([key, value]) => {
                   // Mapear claves técnicas a nombres amigables

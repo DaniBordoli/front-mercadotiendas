@@ -92,14 +92,14 @@ const ProductDetailScreen: React.FC = () => {
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
-      />      <section className="bg-gray-100 py-2">
+      />      <section className="py-2" style={{ backgroundColor: editableVariables.heroBackgroundColor || '#f8f9fa' }}>
         <div className="max-w-7xl mx-auto px-12">
-          <div className="flex items-center space-x-2 text-gray-500 text-sm">
-            <span>Home</span>
-            <FaChevronRight className="text-gray-400" size={12} />
-            <span>Shop</span>
-            <FaChevronRight className="text-gray-400" size={12} />
-            <span className="text-blue-500 font-semibold">{selectedProduct?.name || "Producto"}</span>
+          <div className="flex items-center space-x-2 text-sm">
+            <span style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>Home</span>
+            <FaChevronRight style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }} size={12} />
+            <span style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>Shop</span>
+            <FaChevronRight style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }} size={12} />
+            <span className="font-semibold" style={{ color: editableVariables.primaryColor || '#007bff' }}>{selectedProduct?.name || "Producto"}</span>
           </div>
         </div>
       </section>
@@ -141,12 +141,12 @@ const ProductDetailScreen: React.FC = () => {
                 <FaRegStar key={i} className="text-yellow-400 mr-1" />
               )
             )}
-            <span className="ml-2 text-sm text-gray-500">({productReviews?.length || 0} Reseñas)</span>
+            <span className="ml-2 text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>({productReviews?.length || 0} Reseñas)</span>
           </div>
 
-          <div className="text-2xl font-bold text-gray-900 mb-4">${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
+          <div className="text-2xl font-bold mb-4" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#333' }}>${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
 
-          <p className="text-gray-600 mb-4">
+          <p className="mb-4" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>
             {selectedProduct?.descripcion || selectedProduct?.description || "No hay descripción disponible para este producto."}
           </p>
 
@@ -182,7 +182,7 @@ const ProductDetailScreen: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-sm text-gray-500">
+              <div className="text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>
                 Este producto no tiene variantes disponibles.
               </div>
             )}
@@ -230,13 +230,13 @@ const ProductDetailScreen: React.FC = () => {
             >
               <FaHeart size={22} />
             </button>
-          </div>          <div className="mt-6 space-y-2 text-sm text-gray-600">
-            <div className="flex items-center gap-2">
-              <FaTruck className="text-lg text-gray-700" />
+          </div>          <div className="mt-6 space-y-2 text-sm">
+            <div className="flex items-center gap-2" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>
+              <FaTruck className="text-lg" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }} />
               {selectedProduct?.hasFreeShipping ? 'Envío gratuito' : 'Envío disponible'}
             </div>
-            <div className="flex items-center gap-2">
-              <FaUndo className="text-lg text-gray-700" />
+            <div className="flex items-center gap-2" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>
+              <FaUndo className="text-lg" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }} />
               Política de devolución: 30 días
             </div>
           </div>

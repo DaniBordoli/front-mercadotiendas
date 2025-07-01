@@ -31,6 +31,13 @@ const defaultEditableVariables: FirstLayoutEditableVariables = {
   primaryColor: '#FF4F41',
   secondaryColor: '#4ECDC4',
   accentColor: '#F8F8F8',
+  // Colores de texto específicos para páginas
+  productPageTextColor: '#333333',
+  aboutUsTextColor: '#333333',
+  contactTextColor: '#333333',
+  // Colores para footer
+  footerTextColor: '#FFFFFF',
+  footerTitleColor: '#FFFFFF',
 };
 
 export const useFirstLayoutStore = create<FirstLayoutStore>((set, get) => ({
