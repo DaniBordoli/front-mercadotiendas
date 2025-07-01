@@ -11,6 +11,7 @@ interface Product {
   price?: string | number;
   productImages?: string[];
   image?: string;
+  estado?: string;
 }
 
 interface FeaturedProductsProps {
@@ -44,9 +45,14 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     { id: 3, title: 'Producto 3', price: '$69.99', image: cardImage },
     { id: 4, title: 'Producto 4', price: '$79.99', image: cardImage },
   ];
-  const showProducts = products && products.length > 0 ? products : defaultProducts;
-
   
+  // Filter out inactive products
+  const activeProducts = products && products.length > 0 
+    ? products.filter(product => !product.estado || product.estado === 'Activo')
+    : defaultProducts;
+  
+  const showProducts = activeProducts;
+
   const isRealProduct = (p: any): p is Product => {
     return (
       typeof p === 'object' &&

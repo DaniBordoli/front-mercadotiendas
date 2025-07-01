@@ -41,7 +41,11 @@ const FirstLayout: React.FC = () => {
       try {
         setLoadingProducts(true);
         const prods = await fetchProducts();
-        setFeaturedProducts(prods);
+        // Filter out inactive products
+        const activeProds = prods.filter((product: any) => 
+          !product.estado || product.estado === 'Activo'
+        );
+        setFeaturedProducts(activeProds);
       } catch (err) {
         setFeaturedProducts([]);
       } finally {
