@@ -42,6 +42,10 @@ const LogoUploader: React.FC<LogoUploaderProps> = ({
       if (response.data && response.data.logoUrl) {
         const logoUrl = response.data.logoUrl;
         
+        // Actualizar el template del backend con el nuevo logo
+        const { updateShopTemplate } = await import('../../services/api');
+        await updateShopTemplate({ logoUrl });
+        
         // Actualizar el store de firstLayout para que se refleje inmediatamente
         updateEditableVariables({ logoUrl });
         

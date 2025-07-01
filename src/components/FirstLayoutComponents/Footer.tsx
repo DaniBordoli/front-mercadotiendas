@@ -58,32 +58,36 @@ const Footer: React.FC<FooterProps> = ({
   // Obtener links sociales dinámicos
   const socialLinks = getSocialLinks();
 
+  // Usar colores dinámicos de la IA o valores por defecto
+  const dynamicTextColor = editableVariables.footerTextColor || textColor;
+  const dynamicTitleColor = editableVariables.footerTitleColor || footerTitleColor;
+
   // Función para renderizar el ícono correcto según la plataforma
   const renderSocialIcon = (iconName: string) => {
     switch (iconName) {
       case 'FaInstagram':
-        return <FaInstagram className="text-xl cursor-pointer hover:text-white" />;
+        return <FaInstagram className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
       case 'FaFacebook':
-        return <FaFacebook className="text-xl cursor-pointer hover:text-white" />;
+        return <FaFacebook className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
       case 'FaWhatsapp':
-        return <FaWhatsapp className="text-xl cursor-pointer hover:text-white" />;
+        return <FaWhatsapp className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
       case 'FaTiktok':
-        return <FaTiktok className="text-xl cursor-pointer hover:text-white" />;
+        return <FaTiktok className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
       case 'FaYoutube':
-        return <FaYoutube className="text-xl cursor-pointer hover:text-white" />;
+        return <FaYoutube className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
       default:
-        return <FaInstagram className="text-xl cursor-pointer hover:text-white" />;
+        return <FaInstagram className="text-xl cursor-pointer hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }} />;
     }
   };
 
   return (
-    <footer className="py-12" style={{ backgroundColor, color: textColor }}>
+    <footer className="py-12" style={{ backgroundColor, color: dynamicTextColor }}>
       <div className="container mx-auto px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
       
         <div>
-          <h3 className="text-lg font-bold mb-4" style={{ color: footerTitleColor }}>{displayTitle}</h3>
-          <p className="text-sm mb-4">{shopDescription}</p>
-          <div className="flex gap-4 text-gray-400">
+          <h3 className="text-lg font-bold mb-4" style={{ color: dynamicTitleColor }}>{displayTitle}</h3>
+          <p className="text-sm mb-4" style={{ color: dynamicTextColor }}>{shopDescription}</p>
+          <div className="flex gap-4">
             {socialLinks.length > 0 ? (
               socialLinks.map((link, index) => (
                 <a 
@@ -91,7 +95,7 @@ const Footer: React.FC<FooterProps> = ({
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors duration-200"
+                  className="hover:opacity-75 transition-opacity duration-200"
                   title={`Visitar nuestro ${link.platform}`}
                 >
                   {renderSocialIcon(link.icon)}
@@ -100,9 +104,9 @@ const Footer: React.FC<FooterProps> = ({
             ) : (
               // Iconos por defecto si no hay links configurados
               <>
-                <FaFacebook className="text-xl cursor-pointer hover:text-white opacity-50" />
-                <FaInstagram className="text-xl cursor-pointer hover:text-white opacity-50" />
-                <FaTwitter className="text-xl cursor-pointer hover:text-white opacity-50" />
+                <FaFacebook className="text-xl cursor-pointer hover:opacity-75 transition-opacity opacity-50" style={{ color: dynamicTextColor }} />
+                <FaInstagram className="text-xl cursor-pointer hover:opacity-75 transition-opacity opacity-50" style={{ color: dynamicTextColor }} />
+                <FaTwitter className="text-xl cursor-pointer hover:opacity-75 transition-opacity opacity-50" style={{ color: dynamicTextColor }} />
               </>
             )}
           </div>
@@ -110,11 +114,12 @@ const Footer: React.FC<FooterProps> = ({
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Enlaces rápidos</h3>
-          <ul className="space-y-2 text-sm text-gray-400">
+          <h3 className="text-lg font-bold mb-4" style={{ color: dynamicTitleColor }}>Enlaces rápidos</h3>
+          <ul className="space-y-2 text-sm">
             <li>
               <span
-                className="hover:text-white cursor-pointer"
+                className="hover:opacity-75 cursor-pointer transition-opacity"
+                style={{ color: dynamicTextColor }}
                 onClick={() => navigate('/first-layout/aboutus-layout')}
               >
                 Sobre nosotros
@@ -122,47 +127,49 @@ const Footer: React.FC<FooterProps> = ({
             </li>
             <li>
               <span
-                className="hover:text-white cursor-pointer"
+                className="hover:opacity-75 cursor-pointer transition-opacity"
+                style={{ color: dynamicTextColor }}
                 onClick={() => navigate('/first-layout/contact-layout')}
               >
                 Contacto
               </span>
             </li>
-            <li><a href="#blog" className="hover:text-white">Blog</a></li>
-            <li><a href="#faqs" className="hover:text-white">Preguntas frecuentes</a></li>
+            <li><a href="#blog" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Blog</a></li>
+            <li><a href="#faqs" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Preguntas frecuentes</a></li>
           </ul>
         </div>
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Servicio al cliente</h3>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li><a href="#shipping" className="hover:text-white">Política de envíos</a></li>
-            <li><a href="#returns" className="hover:text-white">Devoluciones y cambios</a></li>
-            <li><a href="#size-guide" className="hover:text-white">Guía de tallas</a></li>
-            <li><a href="#terms" className="hover:text-white">Términos y condiciones</a></li>
+          <h3 className="text-lg font-bold mb-4" style={{ color: dynamicTitleColor }}>Servicio al cliente</h3>
+          <ul className="space-y-2 text-sm">
+            <li><a href="#shipping" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Política de envíos</a></li>
+            <li><a href="#returns" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Devoluciones y cambios</a></li>
+            <li><a href="#size-guide" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Guía de tallas</a></li>
+            <li><a href="#terms" className="hover:opacity-75 transition-opacity" style={{ color: dynamicTextColor }}>Términos y condiciones</a></li>
           </ul>
         </div>
 
       
         <div>
-          <h3 className="text-lg font-bold mb-4">Información de contacto</h3>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li className="flex items-center gap-2">
-              <HiLocationMarker className="text-xl" /> {shopAddress}
+          <h3 className="text-lg font-bold mb-4" style={{ color: dynamicTitleColor }}>Información de contacto</h3>
+          <ul className="space-y-2 text-sm">
+            <li className="flex items-center gap-2" style={{ color: dynamicTextColor }}>
+              <HiLocationMarker className="text-xl" style={{ color: dynamicTextColor }} /> {shopAddress}
             </li>
-            <li className="flex items-center gap-2">
-              <FaPhone className="text-xl" /> {shopPhone}
+            <li className="flex items-center gap-2" style={{ color: dynamicTextColor }}>
+              <FaPhone className="text-xl" style={{ color: dynamicTextColor }} /> {shopPhone}
             </li>
-            <li className="flex items-center gap-2">
-              <IoMail className="text-xl" /> {shopEmail}
+            <li className="flex items-center gap-2" style={{ color: dynamicTextColor }}>
+              <IoMail className="text-xl" style={{ color: dynamicTextColor }} /> {shopEmail}
             </li>
           </ul>
         </div>
       </div>
-      <hr className="border-t border-gray-800 my-8 mx-auto w-10/12" />        <div className="mt-8 text-center text-sm text-gray-400">
-          © 2025 {displayTitle}. Todos los derechos reservados.
-        </div>
+      <hr className="border-t my-8 mx-auto w-10/12" style={{ borderColor: dynamicTextColor, opacity: 0.3 }} />
+      <div className="mt-8 text-center text-sm" style={{ color: dynamicTextColor }}>
+        © 2025 {displayTitle}. Todos los derechos reservados.
+      </div>
     </footer>
   );
 };

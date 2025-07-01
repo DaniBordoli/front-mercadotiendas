@@ -24,6 +24,9 @@ const AboutUsScreen: React.FC = () => {
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
         navbarTitle={editableVariables.navbarTitle}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}
@@ -31,10 +34,10 @@ const AboutUsScreen: React.FC = () => {
       />
       <main className="flex-1">
       
-        <section className="bg-gray-50">
+        <section style={{ backgroundColor: editableVariables.heroBackgroundColor || '#f8f9fa' }}>
           <div className="max-w-5xl mx-auto text-center py-14">
-            <h1 className="text-3xl font-bold mb-4">Acerca de Nosotros</h1>
-            <p className="text-lg text-gray-500">
+            <h1 className="text-3xl font-bold mb-4" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#333' }}>Acerca de Nosotros</h1>
+            <p className="text-lg" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#666' }}>
               {institutional?.description || "Conoce nuestra misión, visión y valores"}
             </p>
           </div>
@@ -48,18 +51,18 @@ const AboutUsScreen: React.FC = () => {
               className="rounded-xl w-full md:w-[520px] h-[400px] object-cover shadow-md"
             />
             <div className="flex-1 flex flex-col items-center justify-center">
-              <h2 className="text-2xl font-bold mb-6 text-center">Nuestra Misión</h2>
-              <p className="text-base text-gray-600 mb-8 text-center">
+              <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#333' }}>Nuestra Misión</h2>
+              <p className="text-base mb-8 text-center" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#666' }}>
                 {institutional?.mission || "Brindar a nuestros clientes productos de la más alta calidad, ofreciendo experiencias de compra excepcionales. Nos esforzamos por mantenernos al día con las últimas tendencias y ofrecer una colección curada que satisfaga las necesidades de nuestra clientela consciente de la moda."}
               </p>
               <div className="flex gap-8 justify-center">
                 <InfoCard
-                  icon={<FaUsers className="text-3xl text-blue-600 mb-0" />}
+                  icon={<FaUsers className="text-3xl mb-0" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
                   title="Clientes"
                   value="100,000+"
                 />
                 <InfoCard
-                  icon={<FaGlobe className="text-3xl text-blue-600 mb-0" />}
+                  icon={<FaGlobe className="text-3xl mb-0" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
                   title="Países Atendidos"
                   value="50+"
                 />
@@ -72,34 +75,34 @@ const AboutUsScreen: React.FC = () => {
         {institutional?.history && (
           <section className="bg-white py-14">
             <div className="max-w-4xl mx-auto text-center px-4">
-              <h2 className="text-2xl font-bold mb-6">Nuestra Historia</h2>
-              <p className="text-base text-gray-600 leading-relaxed">
+              <h2 className="text-2xl font-bold mb-6" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#333' }}>Nuestra Historia</h2>
+              <p className="text-base leading-relaxed" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#666' }}>
                 {institutional.history}
               </p>
             </div>
           </section>
         )}
       
-        <section className="bg-gray-50 py-14">
+        <section style={{ backgroundColor: editableVariables.heroBackgroundColor || '#f8f9fa' }} className="py-14">
           <div className="max-w-4xl mx-auto text-center mb-10 px-4">
-            <h2 className="text-2xl font-bold mb-3">Nuestra Visión</h2>
-            <p className="text-base text-gray-600">
+            <h2 className="text-2xl font-bold mb-3" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#333' }}>Nuestra Visión</h2>
+            <p className="text-base" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#666' }}>
               {institutional?.vision || "Convertirnos en el destino de moda más confiable e innovador del mundo, estableciendo nuevos estándares en moda sostenible y satisfacción del cliente."}
             </p>
           </div>
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-4">
             <ValueCard
-              icon={<FaLeaf className="text-2xl mb-3" style={{ color: "#8b5cf6" }} />}
+              icon={<FaLeaf className="text-2xl mb-3" style={{ color: editableVariables.primaryColor || "#8b5cf6" }} />}
               title="Sostenibilidad"
               description="Comprometidos a reducir nuestro impacto ambiental a través de prácticas sostenibles y materiales ecológicos."
             />
             <ValueCard
-              icon={<FaStar className="text-2xl mb-3" style={{ color: "#8b5cf6" }} />}
+              icon={<FaStar className="text-2xl mb-3" style={{ color: editableVariables.primaryColor || "#8b5cf6" }} />}
               title="Calidad"
               description="Entregando productos premium que cumplen con los más altos estándares de calidad y artesanía."
             />
             <ValueCard
-              icon={<FaHeart className="text-2xl mb-3" style={{ color: "#8b5cf6" }} />}
+              icon={<FaHeart className="text-2xl mb-3" style={{ color: editableVariables.primaryColor || "#8b5cf6" }} />}
               title="Enfoque en el Cliente"
               description="Poniendo a nuestros clientes primero y creando experiencias de compra memorables."
             />
@@ -108,34 +111,34 @@ const AboutUsScreen: React.FC = () => {
        
         <section className="bg-white py-14">
           <div className="max-w-6xl mx-auto text-center mb-10 px-4">
-            <h2 className="text-2xl font-bold mb-3">Nuestros Valores Fundamentales</h2>
+            <h2 className="text-2xl font-bold mb-3" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#333' }}>Nuestros Valores Fundamentales</h2>
             {institutional?.values && (
-              <p className="text-base text-gray-600 mb-6">
+              <p className="text-base mb-6" style={{ color: editableVariables.aboutUsTextColor || editableVariables.textColor || '#666' }}>
                 {institutional.values}
               </p>
             )}
           </div>
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
             <ValueCard
-              icon={<FaHandshake className="text-2xl text-blue-600 mt-1" />}
+              icon={<FaHandshake className="text-2xl mt-1" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
               title="Integridad"
               description="Conducimos nuestros negocios con los más altos estándares de honestidad y responsabilidad."
               horizontal
             />
             <ValueCard
-              icon={<FaLightbulb className="text-2xl text-blue-600 mt-1" />}
+              icon={<FaLightbulb className="text-2xl mt-1" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
               title="Innovación"
               description="Continuamente buscamos nuevas formas de mejorar y perfeccionar nuestros productos y servicios."
               horizontal
             />
             <ValueCard
-              icon={<FaUsers className="text-2xl text-blue-600 mt-1" />}
+              icon={<FaUsers className="text-2xl mt-1" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
               title="Trabajo en Equipo"
               description="Creemos en el poder de la colaboración y el respeto mutuo."
               horizontal
             />
             <ValueCard
-              icon={<FiTarget className="text-2xl text-blue-600 mt-1" />}
+              icon={<FiTarget className="text-2xl mt-1" style={{ color: editableVariables.primaryColor || '#007bff' }} />}
               title="Excelencia"
               description="Nos esforzamos por la excelencia en todo lo que hacemos."
               horizontal
