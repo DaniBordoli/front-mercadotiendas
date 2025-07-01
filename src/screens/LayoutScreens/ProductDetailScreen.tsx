@@ -272,7 +272,7 @@ const ProductDetailScreen: React.FC = () => {
           <div>            {tab === 'description' && (
               <>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: editableVariables.textColor }}>Descripción del Producto</h3>
-                <p className="mb-4" style={{ color: editableVariables.secondaryColor }}>
+                <p className="mb-4" style={{ color: editableVariables.textColor }}>
                   {selectedProduct?.descripcion || selectedProduct?.description || 
                     `Experimenta el máximo rendimiento con la "${selectedProduct?.name}".
                      ${selectedProduct?.condition === 'new' ? 'Totalmente nuevo y listo para usar.' : 'En excelente estado, comprobado para asegurar su rendimiento.'}`

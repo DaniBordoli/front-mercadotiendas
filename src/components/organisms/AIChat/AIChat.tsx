@@ -38,12 +38,24 @@ const primaryColor = '#FF4F41';
 const hoverColor = '#E04437'; // Slightly darker version for hover
 
 export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialVariables, onChatComplete }) => {
+  const user = useAuthStore(state => state.user);
+  const hasShop = user?.shop;
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
+  // Mensaje inicial adaptado según si tiene tienda o no
+  const getInitialMessage = () => {
+    if (hasShop) {
+      return "¡Hola! Tu tienda está lista. Puedo ayudarte a personalizar colores, textos y otros aspectos de tu tienda. ¿Qué te gustaría modificar?";
+    }
+    return TEMPLATE_QUESTIONS[0];
+  };
+
   const [isOpen, setIsOpen] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'initial-question-0',
-      text: TEMPLATE_QUESTIONS[0],
+      text: getInitialMessage(),
       sender: 'ai',
       timestamp: new Date(),
     },
@@ -81,19 +93,36 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
  
   useEffect(() => {
     setCurrentTemplate(initialVariables || {});
-    setMessages([
-      {
-        id: 'initial-question-0',
-        text: TEMPLATE_QUESTIONS[0],
-        sender: 'ai',
-        timestamp: new Date(),
-      },
-    ]);
-    setCurrentQuestionIndex(0);
-    setPendingShopData(null);
-    pendingShopDataRef.current = null;
-    setInput('');
-  }, [initialVariables]);
+    
+    // Solo resetear mensajes en la primera inicialización o si cambia el estado de tienda de forma significativa
+    if (!hasInitialized) {
+      setHasInitialized(true);
+      if (!hasShop) {
+        setMessages([
+          {
+            id: 'initial-question-0',
+            text: TEMPLATE_QUESTIONS[0],
+            sender: 'ai',
+            timestamp: new Date(),
+          },
+        ]);
+        setCurrentQuestionIndex(0);
+      } else {
+        // Si tiene tienda desde el inicio, mostrar mensaje de personalización
+        setMessages([
+          {
+            id: 'shop-exists-initial',
+            text: "¡Hola! Tu tienda está lista. Puedo ayudarte a personalizar colores, textos y otros aspectos de tu tienda. ¿Qué te gustaría modificar?",
+            sender: 'ai',
+            timestamp: new Date(),
+          },
+        ]);
+      }
+      setPendingShopData(null);
+      pendingShopDataRef.current = null;
+      setInput('');
+    }
+  }, [initialVariables, hasShop, hasInitialized]);
 
   // Toggle chat open/closed
   const toggleChat = () => {
@@ -166,13 +195,32 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         console.log('[AIChat] Backend indica crear tienda, llamando a createShop con:', aiResponse.shopData);
         try {
           await createShop(aiResponse.shopData);
+          
+          // Agregar mensaje de éxito y continuidad en lugar de resetear
+          const successMessage: Message = {
+            id: Date.now().toString() + '-shop-created',
+            text: "¡Excelente! Tu tienda ha sido creada exitosamente. Ahora puedo ayudarte a personalizar colores, textos y otros aspectos. ¿Qué te gustaría modificar?",
+            sender: 'ai',
+            timestamp: new Date(),
+          };
+          
+          setMessages(prevMessages => [...prevMessages, successMessage]);
+          
           if (onChatComplete) onChatComplete({ success: true });
         } catch (e) {
           console.error('[AIChat] Error al crear tienda:', e);
+          const errorMessage: Message = {
+            id: Date.now().toString() + '-shop-error',
+            text: "Hubo un error al crear tu tienda. Por favor, intenta nuevamente.",
+            sender: 'ai',
+            timestamp: new Date(),
+          };
+          setMessages(prevMessages => [...prevMessages, errorMessage]);
           if (onChatComplete) onChatComplete({ success: false, error: e });
         }
         setPendingShopData(null);
         pendingShopDataRef.current = null;
+        return; // Salir temprano para evitar agregar más mensajes
       }
       // Add AI's conversational reply (solo si no está vacío)
       let messagesToAddAfterReply: Message[] = [];
@@ -416,7 +464,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
             <div className="bg-gray-50 p-3 rounded-lg mb-3 max-h-64 overflow-y-auto">
               <h4 className="font-semibold mb-2 text-gray-700 bg-gray-50 pb-1">Cambios a aplicar:</h4>
               <ul className="space-y-1 text-sm">
-                {Object.entries(pendingTemplateUpdate).map(([key, value]) => {
+                {(() => {
                   // Mapear claves técnicas a nombres amigables
                   const friendlyNames: { [key: string]: string } = {
                     navbarTitle: 'Título del navbar',
@@ -445,58 +493,89 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                     buttonBackgroundColor: 'Color de fondo de botones',
                     buttonTextColor: 'Color de texto de botones',
                     fontType: 'Tipo de fuente',
-                    logoUrl: 'Logo de la tienda'
+                    logoUrl: 'Logo de la tienda',
+                    shopName: 'Nombre de la tienda',
+                    title: 'Nombre de la tienda',
+                    storeName: 'Nombre de la tienda',
+                    storeDescription: 'Descripción de la tienda',
+                    storeSlogan: 'Eslogan de la tienda'
                   };
                   
-                  const friendlyName = friendlyNames[key] || key;
-                  const displayValue = typeof value === 'string' && value.startsWith('#') 
-                    ? (
-                        <span className="flex items-center gap-2">
-                          <div 
-                            className="relative"
-                            onMouseEnter={() => setHoveredColorKey(key)}
-                            onMouseLeave={() => setHoveredColorKey(null)}
-                          >
-                            <span 
-                              className="w-4 h-4 rounded border border-gray-300 inline-block cursor-pointer"
-                              style={{ backgroundColor: value }}
-                            ></span>
-                            {hoveredColorKey === key && (
-                              <button
-                                className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
-                                onClick={() => handleRemoveTemplateChange(key)}
-                                title="Eliminar este cambio"
-                              >
-                                ×
-                              </button>
-                            )}
-                          </div>
-                          {value}
-                        </span>
-                      )
-                    : String(value).length > 50 
-                      ? String(value).substring(0, 50) + '...'
-                      : String(value);
-                  
-                  return (
-                    <li key={key} className="flex justify-between items-center group hover:bg-gray-100 px-2 py-1 rounded">
-                      <span className="text-gray-600">{friendlyName}:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-800">{displayValue}</span>
-                        {/* Botón X para cambios no-color */}
-                        {!(typeof value === 'string' && value.startsWith('#')) && (
-                          <button
-                            className="opacity-0 group-hover:opacity-100 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all duration-200"
-                            onClick={() => handleRemoveTemplateChange(key)}
-                            title="Eliminar este cambio"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
+                  // Filtrar campos duplicados - solo mostrar uno por tipo
+                  const filteredEntries = Object.entries(pendingTemplateUpdate).filter(([key]) => {
+                    // Si hay shopName, title y storeName, solo mostrar shopName
+                    if (key === 'title' || key === 'storeName') {
+                      return !pendingTemplateUpdate.shopName;
+                    }
+                    return true;
+                  });
+
+                  return filteredEntries.map(([key, value]) => {
+                    const friendlyName = friendlyNames[key] || key;
+                    
+                    // Limitar la longitud del texto para evitar overflow
+                    const getDisplayValue = (value: any) => {
+                      if (typeof value === 'string' && value.startsWith('#')) {
+                        // Color picker con valor hex
+                        return (
+                          <span className="flex items-center gap-2">
+                            <div 
+                              className="relative"
+                              onMouseEnter={() => setHoveredColorKey(key)}
+                              onMouseLeave={() => setHoveredColorKey(null)}
+                            >
+                              <span 
+                                className="w-4 h-4 rounded border border-gray-300 inline-block cursor-pointer"
+                                style={{ backgroundColor: value }}
+                              ></span>
+                              {hoveredColorKey === key && (
+                                <button
+                                  className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                  onClick={() => handleRemoveTemplateChange(key)}
+                                  title="Eliminar este cambio"
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500">{value}</span>
+                          </span>
+                        );
+                      }
+                      
+                      const stringValue = String(value);
+                      if (stringValue.length > 40) {
+                        return (
+                          <span title={stringValue} className="cursor-help">
+                            {stringValue.substring(0, 40)}...
+                          </span>
+                        );
+                      }
+                      return stringValue;
+                    };
+                    
+                    return (
+                      <li key={key} className="flex justify-between items-start gap-2 group hover:bg-gray-100 px-2 py-2 rounded">
+                        <span className="text-gray-600 text-sm font-medium min-w-0 flex-shrink-0">{friendlyName}:</span>
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="font-medium text-gray-800 text-sm break-words min-w-0 flex-1 text-right">
+                            {getDisplayValue(value)}
+                          </span>
+                          {/* Botón X para cambios no-color */}
+                          {!(typeof value === 'string' && value.startsWith('#')) && (
+                            <button
+                              className="opacity-0 group-hover:opacity-100 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all duration-200 flex-shrink-0"
+                              onClick={() => handleRemoveTemplateChange(key)}
+                              title="Eliminar este cambio"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
           )}
