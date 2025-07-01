@@ -22,7 +22,7 @@ const ShopLayout: React.FC = () => {
   const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const shop = useShopStore(state => state.shop);
   const getShop = useShopStore(state => state.getShop);
-  const fetchProducts = require('../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const fetchActiveProducts = require('../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   
@@ -52,7 +52,7 @@ const ShopLayout: React.FC = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchProducts();
+        const prods = await fetchActiveProducts();
         setProducts(prods);
       } catch (err) {
         // Si falla la carga de productos, usar los productos simulados del searchStore
@@ -62,7 +62,7 @@ const ShopLayout: React.FC = () => {
       }
     };
     loadProducts();
-  }, [fetchProducts, baseSearchResults]);
+  }, [fetchActiveProducts, baseSearchResults]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>

@@ -34,6 +34,11 @@ const ProductSelectionForm: React.FC<ProductSelectionFormProps> = ({ onNext }) =
                     label: category.name
                 }));
 
+                setCategoryOptions([
+                    { value: '', label: 'Selecciona una categoría' },
+                    ...formattedOptions
+                ]);
+
             } catch (error) {
                 console.error('Error loading categories:', error);
                 setCategoryOptions([

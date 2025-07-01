@@ -89,7 +89,7 @@ const cardData = [
 ];
 
 export const CardList: React.FC = () => {
-  const fetchProducts = require('../../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const fetchActiveProducts = require('../../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
   const [loading, setLoading] = React.useState(false);
   const [products, setProducts] = React.useState<any[]>([]);
 
@@ -97,7 +97,7 @@ export const CardList: React.FC = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchProducts();
+        const prods = await fetchActiveProducts();
         setProducts(prods);
       } catch (err) {
         setProducts([]);
@@ -106,7 +106,7 @@ export const CardList: React.FC = () => {
       }
     };
     loadProducts();
-  }, [fetchProducts]);
+  }, [fetchActiveProducts]);
 
   const handleCardClick = (index: number) => {
     console.log(`Card ${index + 1} clicked`);

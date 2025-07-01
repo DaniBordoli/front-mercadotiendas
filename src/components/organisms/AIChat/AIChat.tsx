@@ -57,6 +57,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<any>(null);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [templateSaveError, setTemplateSaveError] = useState<string | null>(null);
+  const [hoveredColorKey, setHoveredColorKey] = useState<string | null>(null);
   const pendingShopDataRef = useRef<any>(null); 
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -305,6 +306,30 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     }
   };
 
+  // Función para remover un cambio específico del template pendiente
+  const handleRemoveTemplateChange = (keyToRemove: string) => {
+    if (!pendingTemplateUpdate) return;
+    
+    // Crear una copia del template pendiente sin la clave especificada
+    const updatedTemplate = { ...pendingTemplateUpdate };
+    delete updatedTemplate[keyToRemove];
+    
+    // Si el template actualizado está vacío, cerrar el modal
+    if (Object.keys(updatedTemplate).length === 0) {
+      handleCancelTemplateUpdate();
+      return;
+    }
+    
+    // Actualizar el template pendiente
+    setPendingTemplateUpdate(updatedTemplate);
+    
+    // Revertir ese cambio específico en la vista previa aplicando el valor anterior
+    if (previousTemplate && previousTemplate[keyToRemove] !== undefined) {
+      const revertChange = { [keyToRemove]: previousTemplate[keyToRemove] };
+      onApplyTemplateChanges(revertChange);
+    }
+  };
+
   return (
     <>
       {/* Floating chat button */}
@@ -427,10 +452,25 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                   const displayValue = typeof value === 'string' && value.startsWith('#') 
                     ? (
                         <span className="flex items-center gap-2">
-                          <span 
-                            className="w-4 h-4 rounded border border-gray-300 inline-block"
-                            style={{ backgroundColor: value }}
-                          ></span>
+                          <div 
+                            className="relative"
+                            onMouseEnter={() => setHoveredColorKey(key)}
+                            onMouseLeave={() => setHoveredColorKey(null)}
+                          >
+                            <span 
+                              className="w-4 h-4 rounded border border-gray-300 inline-block cursor-pointer"
+                              style={{ backgroundColor: value }}
+                            ></span>
+                            {hoveredColorKey === key && (
+                              <button
+                                className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                onClick={() => handleRemoveTemplateChange(key)}
+                                title="Eliminar este cambio"
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                           {value}
                         </span>
                       )
@@ -439,9 +479,21 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                       : String(value);
                   
                   return (
-                    <li key={key} className="flex justify-between items-center">
+                    <li key={key} className="flex justify-between items-center group hover:bg-gray-100 px-2 py-1 rounded">
                       <span className="text-gray-600">{friendlyName}:</span>
-                      <span className="font-medium text-gray-800">{displayValue}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-800">{displayValue}</span>
+                        {/* Botón X para cambios no-color */}
+                        {!(typeof value === 'string' && value.startsWith('#')) && (
+                          <button
+                            className="opacity-0 group-hover:opacity-100 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all duration-200"
+                            onClick={() => handleRemoveTemplateChange(key)}
+                            title="Eliminar este cambio"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     </li>
                   );
                 })}

@@ -18,6 +18,7 @@ export interface Product {
   storeName?: string; 
   brand?: string; 
   condition: 'new' | 'used'; 
+  estado?: string; // 'Activo' | 'Inactivo'
   hasFreeShipping?: boolean; 
   isFeatured?: boolean; 
   variantes?: { tipo: string; valores: string[] }[];
@@ -84,6 +85,7 @@ const mockProducts: Product[] = [
     storeName: 'Tienda Oficial GamerTech',
     brand: 'GamerTech',
     condition: 'new',
+    estado: 'Activo',
     hasFreeShipping: true,
     isFeatured: true,
     variantes: [
@@ -107,6 +109,7 @@ const mockProducts: Product[] = [
     storeName: 'PC Componentes',
     brand: 'Genérica',
     condition: 'used',
+    estado: 'Inactivo', // Producto inactivo
     hasFreeShipping: true,
     isFeatured: false,
     variantes: [
@@ -130,6 +133,7 @@ const mockProducts: Product[] = [
     storeName: 'Accesorios Pro',
     brand: 'ProKeys',
     condition: 'new',
+    estado: 'Activo',
     hasFreeShipping: false,
     isFeatured: false,
     variantes: [
@@ -149,10 +153,11 @@ const mockProducts: Product[] = [
       'https://http2.mlstatic.com/D_NQ_NP_617031-MLA82418699651_022025-O.webp',
       'https://http2.mlstatic.com/D_NQ_NP_724709-MLA82135893928_022025-O.webp',
     ],
-    rating: 4.1, // Rating añadido
+    rating: 4.1,
     storeName: 'Tienda Oficial Displays',
     brand: 'DisplaysHub',
     condition: 'new',
+    estado: 'Activo',
     hasFreeShipping: true,
     isFeatured: true,
     variantes: [
@@ -161,7 +166,6 @@ const mockProducts: Product[] = [
     ],
     descripcion: 'Monitor curvo ultrawide para una experiencia inmersiva. Ideal para juegos y productividad.',
   },
-  // Añadir más productos mock para probar paginación y filtros
   {
     id: 'prod5',
     name: 'Mouse Inalámbrico Ergonómico',
@@ -171,6 +175,7 @@ const mockProducts: Product[] = [
     storeName: 'PC Componentes',
     brand: 'Logi',
     condition: 'new',
+    estado: 'Inactivo', // Producto inactivo
     hasFreeShipping: false,
     isFeatured: false,
     variantes: [
@@ -188,6 +193,7 @@ const mockProducts: Product[] = [
     storeName: 'ReacondicionadosYa',
     brand: 'Apple',
     condition: 'used',
+    estado: 'Activo',
     hasFreeShipping: true,
     isFeatured: false,
     variantes: [
@@ -278,6 +284,7 @@ function mapBackendProductToProduct(backendProduct: any): Product {
     storeName: backendProduct.storeName,
     brand: backendProduct.brand,
     condition: backendProduct.estado === 'nuevo' || backendProduct.estado === 'new' ? 'new' : 'used',
+    estado: backendProduct.estado, // Mapear el estado directamente
     hasFreeShipping: backendProduct.hasFreeShipping,
     isFeatured: backendProduct.isFeatured,
     variantes: backendProduct.variantes,
@@ -288,11 +295,16 @@ function mapBackendProductToProduct(backendProduct: any): Product {
 
 // --- Helper para combinar productos del backend y mocks sin duplicados ---
 function mergeProductsWithMocks(backendProducts: any[]): Product[] {
-  const mappedBackend = backendProducts.map(mapBackendProductToProduct);
+  // Filtrar solo productos activos del backend
+  const activeBackendProducts = backendProducts.filter(product => 
+    product.estado === 'Activo' || !product.estado
+  );
+  const mappedBackend = activeBackendProducts.map(mapBackendProductToProduct);
   const all = [...mappedBackend];
-  // Agregar los mocks solo si no existe un producto con el mismo id
+  
+  // Agregar los mocks solo si no existe un producto con el mismo id y solo productos activos
   for (const mock of mockProducts) {
-    if (!all.some(p => p.id === mock.id)) {
+    if (!all.some(p => p.id === mock.id) && (mock.estado === 'Activo' || !mock.estado)) {
       all.push(mock);
     }
   }
@@ -463,9 +475,10 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       // --- Obtener productos reales del backend (todos) y combinarlos con los mocks ---
       const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
       const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
-      // 1. Filtrar por término
+      // 1. Filtrar por término y solo productos activos
       const termFilteredResults = allProducts.filter(p =>
-        p.name.toLowerCase().includes(term.toLowerCase())
+        p.name.toLowerCase().includes(term.toLowerCase()) &&
+        (p.estado === 'Activo' || !p.estado) // Incluir productos sin estado definido para retrocompatibilidad
       );
       // 2. Calcular metadatos
       const totalResults = termFilteredResults.length;
@@ -494,7 +507,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       console.error('Fallo al obtener productos reales, usando mocks:', error);
       setTimeout(() => {
         const termFilteredResults = mockProducts.filter(p =>
-          p.name.toLowerCase().includes(term.toLowerCase())
+          p.name.toLowerCase().includes(term.toLowerCase()) &&
+          (p.estado === 'Activo' || !p.estado) // Solo productos activos
         );
         const totalResults = termFilteredResults.length;
         const availableFilters = calculateAvailableFilters(termFilteredResults);
@@ -593,7 +607,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       // Si falla el fetch, usar mocks como fallback
       console.error('Fallo al obtener productos reales, usando mocks:', error);
       setTimeout(() => {
-        const foundMock = mockProducts.find(p => p.id === productId);
+        const foundMock = mockProducts.find(p => 
+          p.id === productId && (p.estado === 'Activo' || !p.estado)
+        );
         if (foundMock) {
           set({ selectedProduct: { ...foundMock }, isLoadingProduct: false });
           get().fetchReviewsByProductId(productId);

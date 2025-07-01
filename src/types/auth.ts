@@ -108,6 +108,7 @@ export type AuthStore = AuthState & {
     } | FormData
   ) => Promise<any>;
   fetchProducts: () => Promise<any[]>;
+  fetchActiveProducts: () => Promise<any[]>;
   /**
    * Obtiene todos los productos de todas las tiendas (para búsqueda global).
    */

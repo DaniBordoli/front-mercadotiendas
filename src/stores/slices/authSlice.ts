@@ -763,7 +763,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   /**
-   * Obtiene la lista de productos del usuario autenticado.
+   * Obtiene la lista de productos del usuario autenticado (todos, incluye inactivos).
+   * Usado para el panel de administración.
    */
   fetchProducts: async (): Promise<any[]> => {
     const token = getStorageItem('token');
@@ -782,6 +783,32 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!response.ok) {
       console.error('Error backend fetchProducts:', responseData);
       throw new Error(responseData.message || 'Error al obtener los productos');
+    }
+   
+    return responseData.data || [];
+  },
+
+  /**
+   * Obtiene solo los productos activos del usuario autenticado.
+   * Usado para mostrar productos en la tienda.
+   */
+  fetchActiveProducts: async (): Promise<any[]> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/active`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchActiveProducts:', responseData);
+      throw new Error(responseData.message || 'Error al obtener los productos activos');
     }
    
     return responseData.data || [];
