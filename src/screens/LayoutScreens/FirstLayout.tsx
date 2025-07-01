@@ -41,7 +41,11 @@ const FirstLayout: React.FC = () => {
       try {
         setLoadingProducts(true);
         const prods = await fetchProducts();
-        setFeaturedProducts(prods);
+        // Filter out inactive products
+        const activeProds = prods.filter((product: any) => 
+          !product.estado || product.estado === 'Activo'
+        );
+        setFeaturedProducts(activeProds);
       } catch (err) {
         setFeaturedProducts([]);
       } finally {
@@ -69,22 +73,19 @@ const FirstLayout: React.FC = () => {
     const getTemplate = async () => {
       try {
         const response = await fetchShopTemplate();
-        console.log('Template response:', response); // Para debug
+        console.log('Template response:', response);
         if (response && response.data && response.data.templateUpdate) {
           const templateData = response.data.templateUpdate;
           
-          // Si el shop tiene un imageUrl y no hay logoUrl en el template, usar el imageUrl del shop
           if (shop?.imageUrl && !templateData.logoUrl) {
             templateData.logoUrl = shop.imageUrl;
           }
           
-          // Solo cargar el template - los colores ya están en templateUpdate
+          console.log('Loading template data:', templateData);
           setEditableVariables(templateData);
-          
-          // Preparar las variables iniciales para el AI Chat
           setAiChatInitialVars(templateData);
         } else {
-          // Si no hay template, usar el logo del shop si existe
+          console.log('No template found, using defaults with shop logo');
           const initialVars = shop?.imageUrl ? { logoUrl: shop.imageUrl } : {};
           setAiChatInitialVars(initialVars);
           if (shop?.imageUrl) {
@@ -93,7 +94,6 @@ const FirstLayout: React.FC = () => {
         }
       } catch (err) {
         console.error('Error loading template:', err);
-        // En caso de error, usar el logo del shop si existe
         if (shop?.imageUrl) {
           updateEditableVariables({ logoUrl: shop.imageUrl });
           setAiChatInitialVars({ logoUrl: shop.imageUrl });
@@ -101,11 +101,10 @@ const FirstLayout: React.FC = () => {
       }
     };
     
-    // Solo cargar el template si ya tenemos el shop cargado
     if (shop) {
       getTemplate();
     }
-  }, [shop, setEditableVariables]);
+  }, [shop, setEditableVariables, updateEditableVariables]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);

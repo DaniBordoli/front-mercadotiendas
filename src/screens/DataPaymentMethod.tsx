@@ -44,7 +44,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'cash',
             name: 'Efectivo',
-            image: 'https://cdn.creazilla.com/cliparts/64946/cash-clipart-xl.png',
+            image: 'https://png.pngtree.com/png-vector/20191018/ourmid/pngtree-stack-of-money-icon-cartoon-style-png-image_1818237.jpg',
             commission: '0%',
             accreditation: 'Manual',
             isActive: true
@@ -60,7 +60,7 @@ const DataPaymentMethod: React.FC = () => {
         {
             id: 'agreement',
             name: 'Acordar',
-            image: 'https://cdn.creazilla.com/cliparts/37017/handshake-hands-clipart-xl.png',
+            image: 'https://www.pngmart.com/files/15/Vector-Business-Handshake-PNG-Photos.png',
             commission: 'A convenir',
             accreditation: 'A convenir',
             isActive: true

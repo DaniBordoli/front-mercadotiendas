@@ -53,10 +53,17 @@ const ShopLayout: React.FC = () => {
       setLoading(true);
       try {
         const prods = await fetchActiveProducts();
-        setProducts(prods);
+        // Filter out inactive products
+        const activeProds = prods.filter((product: any) => 
+          !product.estado || product.estado === 'Activo'
+        );
+        setProducts(activeProds);
       } catch (err) {
-        // Si falla la carga de productos, usar los productos simulados del searchStore
-        setProducts(baseSearchResults.length > 0 ? baseSearchResults : []);
+        // Filter out inactive products from search store backup
+        const activeBackupProducts = baseSearchResults.filter(product =>
+          !product.estado || product.estado === 'Activo'
+        );
+        setProducts(activeBackupProducts);
       } finally {
         setLoading(false);
       }

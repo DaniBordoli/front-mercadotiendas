@@ -112,30 +112,27 @@ export const useShopStore = create<ShopState>((set, get) => ({
         try {
             console.log("Sending data to backend for shop creation:", data);
             
-           
             let body;
             let headers: any = {
                 'Authorization': `Bearer ${token}`
             };
 
             if (data.image) {
-              
                 const formData = new FormData();
                 
-               
                 Object.keys(data).forEach(key => {
                     if (key !== 'image' && data[key] !== undefined) {
-                        formData.append(key, String(data[key]));
+                        if (key === 'templateUpdate' && typeof data[key] === 'object') {
+                            formData.append(key, JSON.stringify(data[key]));
+                        } else {
+                            formData.append(key, String(data[key]));
+                        }
                     }
                 });
                 
-           
                 formData.append('image', data.image);
-                
                 body = formData;
-             
             } else {
-               
                 headers['Content-Type'] = 'application/json';
                 body = JSON.stringify(data);
             }
@@ -160,7 +157,6 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
             const newShop = result.data.shop as Shop;
 
-            // Update user state in authStore and local storage
             const authStore = useAuthStore.getState();
             if (authStore.user) {
                 const updatedUser = { ...authStore.user, shop: newShop };
