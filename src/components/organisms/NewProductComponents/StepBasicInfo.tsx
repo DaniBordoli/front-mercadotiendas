@@ -2,11 +2,6 @@ import React from 'react';
 import { DesignButton } from '../../atoms/DesignButton/DesignButton';
 import { SelectDefault } from '../../atoms/SelectDefault/SelectDefault';
 
-const subcategoriaOptions = [
-  { value: '', label: 'Seleccionar subcategoría' },
-  { value: 'Relojes', label: 'Relojes' },
-  { value: 'Zapatillas', label: 'Zapatillas' },
-];
 const estadoOptions = [
   { value: 'Activo', label: 'Activo' },
   { value: 'Inactivo', label: 'Inactivo' },
@@ -30,9 +25,10 @@ interface StepBasicInfoProps {
       | { name: string; value: string }
   ) => void;
   categoryOptions: { value: string; label: string }[];
+  subcategoryOptions: { value: string; label: string }[];
 }
 
-const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange, categoryOptions }) => {
+const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange, categoryOptions, subcategoryOptions }) => {
   // Validar campos obligatorios
   const isNextDisabled =
     !values.nombre.trim() ||
@@ -117,6 +113,13 @@ const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange,
               min="0"
             />
           </div>
+        </div>
+
+        {/* Divisor */}
+        <hr className="border-gray-300 my-6" />
+
+        {/* Categorías en la misma línea */}
+        <div className="grid grid-cols-2 gap-6 mb-4">
           <div>
             <label className="block text-xs font-space text-gray-500 mb-1">Categoría *</label>
             <SelectDefault
@@ -128,7 +131,7 @@ const StepBasicInfo: React.FC<StepBasicInfoProps> = ({ onNext, values, onChange,
           <div>
             <label className="block text-xs font-space text-gray-500 mb-1">Subcategoría</label>
             <SelectDefault
-              options={subcategoriaOptions}
+              options={subcategoryOptions}
               value={values.subcategoria}
               onChange={val => onChange({ name: 'subcategoria', value: val })}
             />

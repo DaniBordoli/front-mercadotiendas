@@ -1,21 +1,23 @@
 import React, { useState } from 'react';
 import { InputDefault } from '../atoms/InputDefault';
-import { SelectDefault } from '../atoms/SelectDefault';
-import { FaRobot } from 'react-icons/fa';
 import { DesignButton } from '../atoms/DesignButton';
 
 interface MainFormProps {
-    onNext: (data: { storeName: string; email: string }) => void;
+    onNext: (data: { storeName: string; email: string; address: string; shopPhone: string }) => void;
 }
 
 const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
     const [formData, setFormData] = useState({
         storeName: '',
         email: '',
+        address: '',
+        shopPhone: '',
     });
     const [errors, setErrors] = useState({
         storeName: false,
         email: false,
+        address: false,
+        shopPhone: false,
     });
 
     const handleInputChange = (field: string, value: string) => {
@@ -27,6 +29,8 @@ const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
         const newErrors = {
             storeName: !formData.storeName.trim(),
             email: !formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email),
+            address: !formData.address.trim(),
+            shopPhone: !formData.shopPhone.trim(),
         };
         setErrors(newErrors);
         return !Object.values(newErrors).some((error) => error);
@@ -66,49 +70,29 @@ const MainForm: React.FC<MainFormProps> = ({ onNext }) => {
                 {errors.email && <p className="text-red-500 text-sm mt-1">Introduce un correo válido.</p>}
             </div>
 
-            <div className="flex bg-gray-100 p-4 rounded-md mt-6 flex-col">
-                <div className="flex items-center mb-6">
-                    <div 
-                        className="flex items-center justify-center w-12 h-12 rounded-full" 
-                        style={{ backgroundColor: '#FF0000' }}
-                    >
-                        <FaRobot className='text-white' size={24} />
-                    </div>
-                    <div className="ml-4">
-                        <p className="text-lg font-space font-medium">Asistente IA</p>
-                        <p className="text-sm font-space text-gray-400">Te ayudaré a configurar tu tienda</p>
-                    </div>
-                </div>
-
-                <div className="bg-white p-4 rounded-md w-full mb-4">
-                    <label className="block text-sm font-space text-gray-800 mb-2">
-                        ¿Qué tipo de producto venderás?
-                    </label>
-                    <SelectDefault 
-                        options={[
-                            { value: 'ropa', label: 'Ropa' },
-                            { value: 'electronica', label: 'Electrónica' },
-                            { value: 'hogar', label: 'Hogar' },
-                        ]}
-                        placeholder="Selecciona una categoría"
-                        className="w-full"
-                    />
-                </div>
-
-                <div className="bg-white p-4 rounded-md w-full">
-                    <label className="block text-sm font-space text-gray-800 mb-2">
-                        ¿Cuál es tu público objetivo?
-                    </label>
-                    <SelectDefault 
-                        options={[
-                            { value: 'adultos', label: 'Adultos' },
-                            { value: 'niños', label: 'Niños' },
-                            { value: 'adolescentes', label: 'Adolescentes' },
-                        ]}
-                        placeholder="Selecciona tu audiencia"
-                        className="w-full"
-                    />
-                </div>
+            <div className="mb-4">
+                <label className="block text-sm font-space text-gray-800 mb-2">
+                    Dirección
+                </label>
+                <InputDefault 
+                    placeholder="Ej: Av. Principal 123, Ciudad" 
+                    className={`w-full ${errors.address ? 'border-red-500' : ''}`}
+                    value={formData.address}
+                    onChange={(value) => handleInputChange('address', value)}
+                />
+                {errors.address && <p className="text-red-500 text-sm mt-1">Este campo es obligatorio.</p>}
+            </div>
+            <div className="mb-4">
+                <label className="block text-sm font-space text-gray-800 mb-2">
+                    Número de Teléfono
+                </label>
+                <InputDefault 
+                    placeholder="Ej: +1 234 567 8900" 
+                    className={`w-full ${errors.shopPhone ? 'border-red-500' : ''}`}
+                    value={formData.shopPhone}
+                    onChange={(value) => handleInputChange('shopPhone', value)}
+                />
+                {errors.shopPhone && <p className="text-red-500 text-sm mt-1">Este campo es obligatorio.</p>}
             </div>
 
             <div className="mt-6 w-full">

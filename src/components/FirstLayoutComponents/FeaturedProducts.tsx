@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 interface Product {
   _id?: string;
@@ -35,6 +36,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   titleColor = "#000",
   products,
 }) => {
+  const navigate = useNavigate();
+  
   const defaultProducts = [
     { id: 1, title: 'Producto 1', price: '$49.99', image: cardImage },
     { id: 2, title: 'Producto 2', price: '$59.99', image: cardImage },
@@ -66,7 +69,16 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               const productTitle = product.nombre || product.title || 'Producto';
               const productPrice = product.precio || product.price || '-';
               return (
-                <div key={product._id || product.id || idx} className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col">
+                <div 
+                  key={product._id || product.id || idx} 
+                  className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                  onClick={() => {
+                    const productId = product._id || product.id;
+                    if (productId) {
+                      navigate(`/first-layout/detail-layout/${productId}`);
+                    }
+                  }}
+                >
                   <img src={imageSrc} alt={productTitle} className="w-full h-[220px] object-cover" />
                   <div className="flex-1 flex flex-col justify-between p-4 bg-white">
                     <div>
@@ -79,6 +91,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                         backgroundColor: cardButtonColor,
                         color: cardButtonTextColor,
                       }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evitar que se active el click del contenedor
+                        // Aquí puedes agregar la lógica del carrito si es necesario
+                      }}
                     >
                       {cardButtonText}
                       <span className="ml-2"><FiShoppingCart size={20} color={cardButtonTextColor} /></span>
@@ -88,7 +104,14 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               );
             } else {
               return (
-                <div key={product.id || idx} className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col">
+                <div 
+                  key={product.id || idx} 
+                  className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-200"
+                  onClick={() => {
+                    // Para productos dummy, redirigir a la vista de detalle genérica
+                    navigate('/first-layout/detail-layout');
+                  }}
+                >
                   <img src={product.image || cardImage} alt={product.title} className="w-full h-[220px] object-cover" />
                   <div className="flex-1 flex flex-col justify-between p-4 bg-white">
                     <div>
@@ -100,6 +123,10 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                       style={{
                         backgroundColor: cardButtonColor,
                         color: cardButtonTextColor,
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Evitar que se active el click del contenedor
+                        // Aquí puedes agregar la lógica del carrito si es necesario
                       }}
                     >
                       {cardButtonText}

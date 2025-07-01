@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
+import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores';
-import { updateUserProfile, fetchCountries } from '../stores/slices/authSlice';
+import { updateUserProfile } from '../stores/slices/authSlice';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
 
 const GoogleComplete = () => {
@@ -17,7 +18,6 @@ const GoogleComplete = () => {
         country: ''
     });
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-    const [countries, setCountries] = useState<{ name: string; code: string }[]>([]);
 
     useEffect(() => {
         if (user) {
@@ -29,15 +29,6 @@ const GoogleComplete = () => {
             });
         }
     }, [user]);
-
-    useEffect(() => {
-        fetchCountries()
-            .then((data) => setCountries(data.length > 0 ? data : [{ name: 'Argentina', code: 'AR' }]))
-            .catch((error) => {
-                console.error('Error fetching countries:', error);
-                setCountries([{ name: 'Argentina', code: 'AR' }]);
-            });
-    }, []);
 
     const validateForm = (values: Record<string, string>): Record<string, string> => {
         const errors: Record<string, string> = {};
@@ -124,22 +115,19 @@ const GoogleComplete = () => {
                                     <label className="block mb-2 font-space text-darkGray">
                                         País
                                     </label>
-                                    <select
-                                        className="w-full border border-gray-300 rounded-md p-2"
+                                    <SelectDefault
+                                        options={[
+                                            { value: 'Argentina', label: 'Argentina' }
+                                        ]}
                                         value={values.country}
-                                        onChange={(e) => {
+                                        onChange={(value: string) => {
                                             clearError();
                                             setValidationErrors((prev) => ({ ...prev, country: '' }));
-                                            setValues((prev) => ({ ...prev, country: e.target.value }));
+                                            setValues((prev) => ({ ...prev, country: value }));
                                         }}
-                                    >
-                                        <option value="">Selecciona tu país</option>
-                                        {countries.map((country, index) => (
-                                            <option key={index} value={country.name}>
-                                                {country.name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        placeholder="Selecciona tu país"
+                                        className="w-full"
+                                    />
                                     {validationErrors.country && (
                                         <span className="text-red-500 text-sm">{validationErrors.country}</span>
                                     )}

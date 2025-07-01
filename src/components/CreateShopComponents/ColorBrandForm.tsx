@@ -6,97 +6,74 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { FirstLayoutEditableVariables } from '../organisms/CustomizableMenu/types';
 
 interface ColorBrandFormProps {
-    onNext: (data: { primaryColor: string; secondaryColor: string; logoUrl?: string; logoFile?: File }) => void;
+    onNext: (data: { primaryColor: string; secondaryColor: string; accentColor: string; logoUrl?: string; logoFile?: File }) => void;
+    initialColors?: {
+        primaryColor?: string;
+        secondaryColor?: string;
+        accentColor?: string;
+    };
 }
 
-const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
+const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext, initialColors }) => {
     const { editableVariables, updateEditableVariables } = useFirstLayoutStore();
-    
     // Estados locales para los colores seleccionados
-    const [primaryColor, setPrimaryColor] = useState(editableVariables.primaryColor || colors.primaryRed);
-    const [secondaryColor, setSecondaryColor] = useState(editableVariables.secondaryColor || colors.accentTeal);
+    const [primaryColor, setPrimaryColor] = useState(initialColors?.primaryColor || editableVariables.primaryColor || colors.primaryRed);
+    const [secondaryColor, setSecondaryColor] = useState(initialColors?.secondaryColor || editableVariables.secondaryColor || colors.accentTeal);
+    const [accentColor, setAccentColor] = useState(initialColors?.accentColor || editableVariables.accentColor || '#F8F8F8');
     const [logoUrl, setLogoUrl] = useState(editableVariables.logoUrl || '');
     const [logoFile, setLogoFile] = useState<File | null>(null);
 
     // Opciones de colores predefinidos
     const primaryColorOptions = [
-        colors.primaryRed,    // #FF4F41
-        '#FF6B6B',           // Rojo coral
-        '#4ECDC4',           // Teal
-        '#45B7D1',           // Azul cielo  
-        '#96CEB4',           // Verde menta
-        '#FFEAA7',           // Amarillo suave
-        '#DDA0DD',           // Lila
-        '#FFB6C1',           // Rosa claro
-        '#87CEEB',           // Azul cielo claro
-        '#98FB98'            // Verde claro
+        colors.primaryRed, '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FFB6C1', '#87CEEB', '#98FB98'
     ];
-
     const secondaryColorOptions = [
-        colors.accentTeal,    // #4ECDC4
-        '#FF6B6B',           // Rojo coral
-        '#45B7D1',           // Azul cielo
-        '#96CEB4',           // Verde menta
-        '#FFEAA7',           // Amarillo suave
-        '#DDA0DD',           // Lila
-        colors.primaryRed,    // Rojo principal
-        '#FFB6C1',           // Rosa claro
-        '#87CEEB',           // Azul cielo claro
-        '#98FB98'            // Verde claro
+        colors.accentTeal, '#FF6B6B', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', colors.primaryRed, '#FFB6C1', '#87CEEB', '#98FB98'
     ];
+    const accentColorOptions = ['#F8F8F8', '#E5E5E7', '#F3F4F6', '#F9FAFB', '#F1F5F9', '#E0E7EF', '#F6E9FF', '#FFF8E1', '#E0F7FA', '#FFF3E0'];
 
     // Aplicar cambios al store cuando cambian los colores
     useEffect(() => {
         const updatedVariables: Partial<FirstLayoutEditableVariables> = {
             primaryColor,
             secondaryColor,
+            accentColor,
             logoUrl,
-          
-            navbarBackgroundColor: '#FFFFFF', 
+            navbarBackgroundColor: accentColor, // Usar color acento para navbar
             navbarTitleColor: primaryColor, 
-            
             heroBackgroundColor: primaryColor,
-           
             buttonBackgroundColor: secondaryColor,
             buttonTextColor: '#FFFFFF',
             button2BackgroundColor: '#FFFFFF',
             button2TextColor: primaryColor,
-          
             featuredProductsCardButtonColor: secondaryColor,
             featuredProductsCardButtonTextColor: '#FFFFFF',
         };
-
         updateEditableVariables(updatedVariables);
-    }, [primaryColor, secondaryColor, logoUrl, updateEditableVariables]);
+    }, [primaryColor, secondaryColor, accentColor, logoUrl, updateEditableVariables]);
 
     const handleContinue = () => {
         onNext({ 
             primaryColor, 
             secondaryColor, 
+            accentColor,
             logoUrl,
             logoFile: logoFile || undefined
         });
     };
 
-   
     const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
-
-        // Validaciones
         if (!file.type.startsWith('image/')) {
             alert('Por favor selecciona una imagen válida');
             return;
         }
-
         if (file.size > 10 * 1024 * 1024) { // 10MB
             alert('La imagen debe ser menor a 10MB');
             return;
         }
-
         setLogoFile(file);
-        
-     
         const tempUrl = URL.createObjectURL(file);
         setLogoUrl(tempUrl);
     };
@@ -111,7 +88,6 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
             <label className="block text-sm font-space font-medium text-gray-600 mb-3">
                 {label}
             </label>
-            {/* Color seleccionado actual */}
             <div className="mb-4">
                 <div
                     className="h-10 w-full rounded-md border-2 border-gray-200 cursor-pointer transition-all duration-200 hover:border-gray-300"
@@ -119,17 +95,12 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                     title={`Color seleccionado: ${selectedColor}`}
                 />
             </div>
-            {/* Grid de opciones de colores con espaciado mejorado */}
             <div className="grid grid-cols-5 gap-2">
                 {colorOptions.map((color) => (
                     <div
                         key={color}
-                        className="w-8 h-8 rounded-full cursor-pointer border-2 transition-all duration-200 hover:scale-105 hover:shadow-md"
-                        style={{
-                            backgroundColor: color,
-                            borderColor: selectedColor === color ? '#000000' : '#E5E5E7',
-                            borderWidth: selectedColor === color ? '2px' : '1px',
-                        }}
+                        className={`w-8 h-8 rounded-full cursor-pointer border-2 transition-all duration-200 hover:scale-105 hover:shadow-md ${selectedColor === color ? 'border-black' : 'border-gray-200'}`}
+                        style={{ backgroundColor: color }}
                         onClick={() => onColorSelect(color)}
                         title={color}
                     />
@@ -140,17 +111,11 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
 
     return (
         <div className="w-full max-w-5xl mx-auto">
-            {/* Contenedor principal con diseño similar a DataShopConfig */}
             <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
                 <h2 className="text-lg font-space font-medium text-gray-800 mb-6">Colores y Marca</h2>
-                
-                {/* Layout dividido en dos columnas como DataShopConfig */}
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-                    
-                    {/* Columna izquierda - Selección de colores */}
                     <div className="flex-1">
                         <h3 className="text-base font-space font-medium text-gray-800 mb-4">Selección de Colores</h3>
-                        
                         <div className="space-y-6">
                             <ColorPicker
                                 label="Color Principal"
@@ -158,21 +123,22 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                 colorOptions={primaryColorOptions}
                                 onColorSelect={setPrimaryColor}
                             />
-                            
                             <ColorPicker
                                 label="Color Secundario"
                                 selectedColor={secondaryColor}
                                 colorOptions={secondaryColorOptions}
                                 onColorSelect={setSecondaryColor}
                             />
+                            <ColorPicker
+                                label="Color Acento"
+                                selectedColor={accentColor}
+                                colorOptions={accentColorOptions}
+                                onColorSelect={setAccentColor}
+                            />
                         </div>
                     </div>
-
-                    {/* Columna derecha - Logo y vista previa */}
                     <div className="flex-1">
                         <h3 className="text-base font-space font-medium text-gray-800 mb-4">Marca y Vista Previa</h3>
-                        
-                        {/* Logo uploader simple para creación */}
                         <div className="mb-6">
                             <label className="block text-sm font-space font-medium text-gray-600 mb-3">
                                 Logo de Tienda
@@ -207,8 +173,6 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                 </label>
                             </div>
                         </div>
-
-                        {/* Vista previa con contraste mejorado */}
                         <div className="p-4 bg-gray-50 rounded-lg">
                             <h4 className="text-sm font-space font-medium text-gray-600 mb-3">Vista Previa</h4>
                             <div className="flex gap-4 mb-4">
@@ -226,10 +190,15 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                     />
                                     <span className="text-xs text-gray-500">Secundario (Botones)</span>
                                 </div>
+                                <div className="flex-1">
+                                    <div 
+                                        className="h-10 rounded-md mb-2"
+                                        style={{ backgroundColor: accentColor }}
+                                    />
+                                    <span className="text-xs text-gray-500">Acento (Navbar, fondos)</span>
+                                </div>
                             </div>
-                            
-                            {/* Simulación del navbar con fondo blanco */}
-                            <div className="w-full rounded-md overflow-hidden mb-2 border border-gray-200" style={{ backgroundColor: '#FFFFFF' }}>
+                            <div className="w-full rounded-md overflow-hidden mb-2 border border-gray-200" style={{ backgroundColor: accentColor }}>
                                 <div className="p-3 flex justify-between items-center">
                                     <div className="flex items-center gap-2">
                                         <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
@@ -244,9 +213,7 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                                     </div>
                                 </div>
                             </div>
-                            <span className="text-xs text-gray-500 mb-3 block">NavBar con fondo blanco y texto en color principal</span>
-                            
-                            {/* Simulación del hero section con contraste */}
+                            <span className="text-xs text-gray-500 mb-3 block">NavBar con fondo acento y texto en color principal</span>
                             <div className="w-full rounded-md overflow-hidden mb-3" style={{ backgroundColor: primaryColor }}>
                                 <div className="p-4">
                                     <div className="flex gap-2">
@@ -265,8 +232,6 @@ const ColorBrandForm: React.FC<ColorBrandFormProps> = ({ onNext }) => {
                         </div>
                     </div>
                 </div>
-
-                {/* Botón de continuar */}
                 <div className="flex justify-end mt-8">
                     <DesignButton 
                         variant="primary" 

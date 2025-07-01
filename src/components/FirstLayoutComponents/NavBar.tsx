@@ -19,12 +19,8 @@ interface NavBarProps {
 }
 
 const NavBar: React.FC<NavBarProps> = ({
-  navbarLinks = [
-    { label: 'Inicio', href: '/first-layout' },
-    { label: 'Tienda', href: '/first-layout/shop-layout' },
-    { label: 'Contacto', href: '/first-layout/contact-layout' },
-  ],
-  navbarTitle = 'ShopSmarttt',
+  navbarLinks,
+  navbarTitle = 'ShopSmart',
   navbarTitleColor,
   navbarLinksColor,
   navbarIconsColor,
@@ -43,6 +39,16 @@ const NavBar: React.FC<NavBarProps> = ({
 
   // Usar el logo del store si está disponible, sino usar el prop logoUrl
   const currentLogoUrl = editableVariables.logoUrl || logoUrl;
+
+  // Asegurar que siempre tengamos links por defecto
+  const defaultLinks = [
+    { label: 'Inicio', href: '/first-layout' },
+    { label: 'Tienda', href: '/first-layout/shop-layout' },
+    { label: 'Contacto', href: '/first-layout/contact-layout' },
+     { label: 'Acerca de', href: '/first-layout/aboutus-layout' },
+  ];
+  
+  const currentNavbarLinks = navbarLinks && navbarLinks.length > 0 ? navbarLinks : defaultLinks;
 
   useEffect(() => {
     if (user?.shop && !shop) {
@@ -80,7 +86,7 @@ const NavBar: React.FC<NavBarProps> = ({
               alt="Logo" 
               className="h-8 w-8 object-contain"
               onError={(e) => {
-                // Fallback al logo por defecto si hay error cargando el logo personalizado
+                
                 e.currentTarget.src = '/logo.png';
               }}
             />
@@ -93,11 +99,14 @@ const NavBar: React.FC<NavBarProps> = ({
           </div>
         </div>
         <div className="flex gap-4">
-          {navbarLinks.map((link, idx) => (
+          {currentNavbarLinks.map((link, idx) => (
             <a
               key={idx}
-              className="hover:text-blue-500 cursor-pointer"
-              style={{ color: navbarLinksColor || textColor, fontFamily: fontType }}
+              className="hover:text-blue-500 cursor-pointer font-medium transition-colors duration-200"
+              style={{ 
+                color: navbarLinksColor || textColor || '#374151', // Fallback a un gris oscuro
+                fontFamily: fontType 
+              }}
               onClick={() => link.href.startsWith('/') ? navigate(link.href.startsWith('/first-layout') ? link.href : `/first-layout${link.href}`) : undefined}
               href={link.href.startsWith('/') ? undefined : link.href}
             >
@@ -106,9 +115,16 @@ const NavBar: React.FC<NavBarProps> = ({
           ))}
         </div>
         <div className="flex gap-4">
-          <FaUser onClick={() => navigate('/data-profile')} className="text-xl cursor-pointer" style={{ color: navbarIconsColor || textColor }} />
-          <div className="relative cursor-pointer" onClick={() => navigate('/cart-list')}>
-            <FaShoppingCart className="text-xl" style={{ color: navbarIconsColor || textColor }} />
+          <FaUser 
+            onClick={() => navigate('/data-profile')} 
+            className="text-xl cursor-pointer hover:opacity-75 transition-opacity" 
+            style={{ color: navbarIconsColor || textColor || '#374151' }} 
+          />
+          <div className="relative cursor-pointer hover:opacity-75 transition-opacity" onClick={() => navigate('/cart-list')}>
+            <FaShoppingCart 
+              className="text-xl" 
+              style={{ color: navbarIconsColor || textColor || '#374151' }} 
+            />
             {cartCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
                 style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>

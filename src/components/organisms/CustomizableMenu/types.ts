@@ -65,6 +65,7 @@ export interface FirstLayoutEditableVariables extends EditableVariables {
     featuredProductsCardButtonText?: string;
     featuredProductsCardButtonColor?: string;
     featuredProductsCardButtonTextColor?: string;
+    accentColor?: string;
 }
 
 export interface CustomizableMenuProps {

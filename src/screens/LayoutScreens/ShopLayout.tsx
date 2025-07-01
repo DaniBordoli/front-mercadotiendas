@@ -6,7 +6,10 @@ import Footer from '../../components/FirstLayoutComponents/Footer';
 import { useNavigate } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
+import { useShopStore } from '../../stores/slices/shopStore';
+import { fetchShopTemplate } from '../../services/api';
 import { FiShoppingCart } from 'react-icons/fi';
+import FullScreenLoader from '../../components/molecules/FullScreenLoader';
 
 const ShopLayout: React.FC = () => {
   const [price, setPrice] = useState(500);
@@ -16,18 +19,40 @@ const ShopLayout: React.FC = () => {
 
   // Obtener variables globales de estilo
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
-  const fetchProducts = require('../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
+  const shop = useShopStore(state => state.shop);
+  const getShop = useShopStore(state => state.getShop);
+  const fetchActiveProducts = require('../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   
   // Utilizar la store de búsqueda para los productos de respaldo
   const { baseSearchResults } = useSearchStore();
 
+  // Cargar shop y template
+  useEffect(() => {
+    const loadShopAndTemplate = async () => {
+      try {
+        if (!shop) {
+          await getShop();
+        }
+        // Cargar template
+        const response = await fetchShopTemplate();
+        if (response && response.data && response.data.templateUpdate) {
+          setEditableVariables(response.data.templateUpdate);
+        }
+      } catch (err) {
+        console.error('Error loading shop or template:', err);
+      }
+    };
+    loadShopAndTemplate();
+  }, [shop, getShop, setEditableVariables]);
+
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchProducts();
+        const prods = await fetchActiveProducts();
         setProducts(prods);
       } catch (err) {
         // Si falla la carga de productos, usar los productos simulados del searchStore
@@ -37,7 +62,7 @@ const ShopLayout: React.FC = () => {
       }
     };
     loadProducts();
-  }, [fetchProducts, baseSearchResults]);
+  }, [fetchActiveProducts, baseSearchResults]);
 
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
@@ -45,7 +70,10 @@ const ShopLayout: React.FC = () => {
         navbarLinks={editableVariables.navbarLinks}
         navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
-        textColor={editableVariables.textColor}
+        textColor={editableVariables.navbarTitleColor || editableVariables.textColor}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
       />
@@ -130,7 +158,7 @@ const ShopLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
-              <div className="w-full text-center text-gray-400 py-8 col-span-3">Cargando productos...</div>
+              <FullScreenLoader />
             ) : (
               (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
                 <div

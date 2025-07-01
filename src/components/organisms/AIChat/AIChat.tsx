@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaPaperPlane, FaRobot, FaTimes } from 'react-icons/fa';
+import { FaPaperPlane, FaRobot, FaMinus } from 'react-icons/fa';
 import { ChatMessage } from '../../molecules/ChatMessage/ChatMessage';
 import { ChatButton } from '../../molecules/ChatButton/ChatButton';
 import { sendChatMessageToAI } from '../../../services/api';
@@ -57,6 +57,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   const [pendingTemplateUpdate, setPendingTemplateUpdate] = useState<any>(null);
   const [savingTemplate, setSavingTemplate] = useState(false);
   const [templateSaveError, setTemplateSaveError] = useState<string | null>(null);
+  const [hoveredColorKey, setHoveredColorKey] = useState<string | null>(null);
   const pendingShopDataRef = useRef<any>(null); 
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -188,10 +189,13 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
      
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
+        // Todos los usuarios (con y sin tienda) ven el modal de confirmación
         // Guardar el template actual antes de aplicar cambios para poder revertir
-        setPreviousTemplate(currentTemplate);
+        setPreviousTemplate({ ...currentTemplate });
         // Aplicar cambios inmediatamente para vista previa
         onApplyTemplateChanges(aiResponse.templateUpdates);
+        // También actualizar el template local para la vista previa
+        setCurrentTemplate((prev: any) => ({ ...prev, ...aiResponse.templateUpdates }));
         setPendingTemplateUpdate(aiResponse.templateUpdates);
         setShowTemplateModal(true);
       }
@@ -256,6 +260,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     if (previousTemplate) {
       // Revertir los cambios aplicando el template anterior
       onApplyTemplateChanges(previousTemplate);
+      // Revertir también el template local
+      setCurrentTemplate(previousTemplate);
     }
     setShowTemplateModal(false);
     setPendingTemplateUpdate(null);
@@ -269,37 +275,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     setTemplateSaveError(null);
     
     try {
-      // Primero guardar el template
+      // El backend ya maneja automáticamente la sincronización de campos
+      // relevantes del template con el modelo Shop cuando la tienda existe
       await updateShopTemplate(pendingTemplateUpdate);
       
-      // Actualizar la tienda principal si hay cambios en propiedades clave
-      const user = useAuthStore.getState().user;
-      const updateShopInfo = useShopStore.getState().updateShopInfo;
+      // Actualizar el template local
+      setCurrentTemplate((prev: any) => ({ ...prev, ...pendingTemplateUpdate }));
       
-      if (user?.shop?._id && pendingTemplateUpdate) {
-        // Extraer propiedades que deben sincronizarse con el modelo Shop
-        const shopUpdates: any = {};
-        
-        // Mapear propiedades del template a campos del Shop
-        if (pendingTemplateUpdate.title) {
-          shopUpdates.name = pendingTemplateUpdate.title;
-          shopUpdates.brandName = pendingTemplateUpdate.title;
-        }
-        
-        if (pendingTemplateUpdate.shopName) {
-          shopUpdates.name = pendingTemplateUpdate.shopName;
-          shopUpdates.brandName = pendingTemplateUpdate.shopName;
-        }
-        
-        // Si hay cambios para la tienda principal, actualizarla
-        if (Object.keys(shopUpdates).length > 0) {
-          try {
-            await updateShopInfo(user.shop._id, shopUpdates);
-            console.log('[AIChat] Sincronizado template con datos de tienda principal:', shopUpdates);
-          } catch (shopError) {
-            console.error('[AIChat] Error al sincronizar template con tienda principal:', shopError);
-            // No fallar todo el proceso si esto falla, ya que el template ya se guardó
-          }
+      // Si hay cambios de nombre de tienda, actualizar el store de Shop
+      const user = useAuthStore.getState().user;
+      const { getShop } = useShopStore.getState();
+      
+      if (user?.shop?._id && (pendingTemplateUpdate.title || pendingTemplateUpdate.shopName || pendingTemplateUpdate.storeName)) {
+        // Recargar los datos de la tienda para obtener los cambios sincronizados
+        try {
+          await getShop();
+        } catch (shopError) {
+          console.error('Error al recargar datos de tienda:', shopError);
         }
       }
       
@@ -311,6 +303,30 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       setTemplateSaveError('Error al guardar los cambios.');
     } finally {
       setSavingTemplate(false);
+    }
+  };
+
+  // Función para remover un cambio específico del template pendiente
+  const handleRemoveTemplateChange = (keyToRemove: string) => {
+    if (!pendingTemplateUpdate) return;
+    
+    // Crear una copia del template pendiente sin la clave especificada
+    const updatedTemplate = { ...pendingTemplateUpdate };
+    delete updatedTemplate[keyToRemove];
+    
+    // Si el template actualizado está vacío, cerrar el modal
+    if (Object.keys(updatedTemplate).length === 0) {
+      handleCancelTemplateUpdate();
+      return;
+    }
+    
+    // Actualizar el template pendiente
+    setPendingTemplateUpdate(updatedTemplate);
+    
+    // Revertir ese cambio específico en la vista previa aplicando el valor anterior
+    if (previousTemplate && previousTemplate[keyToRemove] !== undefined) {
+      const revertChange = { [keyToRemove]: previousTemplate[keyToRemove] };
+      onApplyTemplateChanges(revertChange);
     }
   };
 
@@ -338,7 +354,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
               aria-label="Minimizar chat"
               type="button"
             >
-              <FaTimes className="text-white text-lg" />
+              <FaMinus className="text-white text-lg" />
             </button>
           </div>
         </div>
@@ -436,10 +452,25 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                   const displayValue = typeof value === 'string' && value.startsWith('#') 
                     ? (
                         <span className="flex items-center gap-2">
-                          <span 
-                            className="w-4 h-4 rounded border border-gray-300 inline-block"
-                            style={{ backgroundColor: value }}
-                          ></span>
+                          <div 
+                            className="relative"
+                            onMouseEnter={() => setHoveredColorKey(key)}
+                            onMouseLeave={() => setHoveredColorKey(null)}
+                          >
+                            <span 
+                              className="w-4 h-4 rounded border border-gray-300 inline-block cursor-pointer"
+                              style={{ backgroundColor: value }}
+                            ></span>
+                            {hoveredColorKey === key && (
+                              <button
+                                className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                                onClick={() => handleRemoveTemplateChange(key)}
+                                title="Eliminar este cambio"
+                              >
+                                ×
+                              </button>
+                            )}
+                          </div>
                           {value}
                         </span>
                       )
@@ -448,9 +479,21 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                       : String(value);
                   
                   return (
-                    <li key={key} className="flex justify-between items-center">
+                    <li key={key} className="flex justify-between items-center group hover:bg-gray-100 px-2 py-1 rounded">
                       <span className="text-gray-600">{friendlyName}:</span>
-                      <span className="font-medium text-gray-800">{displayValue}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-gray-800">{displayValue}</span>
+                        {/* Botón X para cambios no-color */}
+                        {!(typeof value === 'string' && value.startsWith('#')) && (
+                          <button
+                            className="opacity-0 group-hover:opacity-100 w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-all duration-200"
+                            onClick={() => handleRemoveTemplateChange(key)}
+                            title="Eliminar este cambio"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
                     </li>
                   );
                 })}

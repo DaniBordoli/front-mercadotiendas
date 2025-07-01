@@ -52,51 +52,6 @@ const FirstLayout: React.FC = () => {
   }, [fetchProducts]);
 
   useEffect(() => {
-    const getTemplate = async () => {
-      try {
-        const data = await fetchShopTemplate();
-        if (data && data.templateUpdate) {
-          setEditableVariables(data.templateUpdate);
-          
-          // Después de cargar el template, aplicar inmediatamente los colores del shop si existen
-          if (shop && (shop.primaryColor || shop.secondaryColor)) {
-            const colorUpdates: Partial<FirstLayoutEditableVariables> = {};
-            
-            if (shop.primaryColor) {
-              colorUpdates.primaryColor = shop.primaryColor;
-              colorUpdates.navbarBackgroundColor = shop.primaryColor;
-              colorUpdates.navbarTitleColor = '#FFFFFF';
-              colorUpdates.heroBackgroundColor = shop.primaryColor;
-            }
-            
-            if (shop.secondaryColor) {
-              colorUpdates.secondaryColor = shop.secondaryColor;
-              colorUpdates.buttonBackgroundColor = shop.secondaryColor;
-              colorUpdates.buttonTextColor = '#FFFFFF';
-              colorUpdates.featuredProductsCardButtonColor = shop.secondaryColor;
-              colorUpdates.featuredProductsCardButtonTextColor = '#FFFFFF';
-            }
-            
-            // Si solo hay color principal, usar blanco para los botones
-            if (shop.primaryColor && !shop.secondaryColor) {
-              colorUpdates.buttonBackgroundColor = '#FFFFFF';
-              colorUpdates.buttonTextColor = shop.primaryColor;
-              colorUpdates.featuredProductsCardButtonColor = '#FFFFFF';
-              colorUpdates.featuredProductsCardButtonTextColor = shop.primaryColor;
-            }
-            
-            updateEditableVariables(colorUpdates);
-          }
-        }
-      } catch (err) {
-       
-      }
-    };
-    getTemplate();
-  }, [setEditableVariables, shop, updateEditableVariables]);
-
-  // Cargar datos del shop y aplicar colores
-  useEffect(() => {
     const loadShopData = async () => {
       try {
         if (!shop) {
@@ -108,6 +63,27 @@ const FirstLayout: React.FC = () => {
     };
     loadShopData();
   }, [shop, getShop]);
+
+  // Cargar template después de que el shop esté cargado
+  useEffect(() => {
+    const getTemplate = async () => {
+      try {
+        const response = await fetchShopTemplate();
+        console.log('Template response:', response); // Para debug
+        if (response && response.data && response.data.templateUpdate) {
+          // Solo cargar el template - los colores ya están en templateUpdate
+          setEditableVariables(response.data.templateUpdate);
+        }
+      } catch (err) {
+        console.error('Error loading template:', err);
+      }
+    };
+    
+    // Solo cargar el template si ya tenemos el shop cargado
+    if (shop) {
+      getTemplate();
+    }
+  }, [shop, setEditableVariables]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);
@@ -127,6 +103,9 @@ const FirstLayout: React.FC = () => {
         navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.navbarTitleColor || editableVariables.textColor}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
       />

@@ -6,13 +6,30 @@ import ContactInfoCard from '../../components/LayoutComponents/ContactInfoCard';
 import FAQCard from '../../components/LayoutComponents/FAQCard';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
+import { fetchShopTemplate } from '../../services/api';
 
 const ContactScreen: React.FC = () => {
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const { shop, getShop } = useShopStore();
+  
   React.useEffect(() => {
-    if (!shop) getShop();
-  }, [shop, getShop]);
+    const loadShopAndTemplate = async () => {
+      try {
+        if (!shop) {
+          await getShop();
+        }
+        // Cargar template
+        const response = await fetchShopTemplate();
+        if (response && response.data && response.data.templateUpdate) {
+          setEditableVariables(response.data.templateUpdate);
+        }
+      } catch (err) {
+        console.error('Error loading shop or template:', err);
+      }
+    };
+    loadShopAndTemplate();
+  }, [shop, getShop, setEditableVariables]);
 
   // Datos dinámicos de la tienda
   const shopAddress = shop?.address || "123 Calle de la Moda, Nueva York, NY 10001";
@@ -25,7 +42,10 @@ const ContactScreen: React.FC = () => {
         navbarLinks={editableVariables.navbarLinks}
         navbarTitle={editableVariables.navbarTitle}
         backgroundColor={editableVariables.navbarBackgroundColor}
-        textColor={editableVariables.textColor}
+        textColor={editableVariables.navbarTitleColor || editableVariables.textColor}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         fontType={editableVariables.fontType}
         logoUrl={editableVariables.logoUrl}
       />

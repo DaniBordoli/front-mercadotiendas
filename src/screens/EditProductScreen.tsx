@@ -8,7 +8,7 @@ import { FaEye, FaPowerOff, FaRegFolderOpen, FaRegTrashCan, FaRegImages, FaArrow
 import { colors } from '../design/colors';
 import { RiPencilFill } from 'react-icons/ri';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuthStore, addProductImages, deleteProductImage, fetchCategories } from '../stores/slices/authSlice';
+import { useAuthStore, addProductImages, deleteProductImage, fetchCategories, fetchMainCategories, fetchSubcategoriesByParent } from '../stores/slices/authSlice';
 import ProductDeleteModal from '../components/organisms/NewProductComponents/ProductDeleteModal';
 import Toast from '../components/atoms/Toast';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
@@ -40,6 +40,8 @@ const EditProductScreen: React.FC = () => {
   });
   const [showLoader, setShowLoader] = React.useState(false);
   const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar' } ]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState<{ value: string; label: string }[]>([ { value: '', label: 'Seleccionar subcategoría' } ]);
+  const [categoriesData, setCategoriesData] = useState<any[]>([]);
 
   React.useEffect(() => {
     const loadProduct = async () => {
@@ -88,17 +90,57 @@ const EditProductScreen: React.FC = () => {
   React.useEffect(() => {
     const loadCategories = async () => {
       try {
-        const cats = await fetchCategories();
+        // Cargar todas las categorías para referencia interna
+        const allCategories = await fetchCategories();
+        setCategoriesData(allCategories);
+        
+        // Cargar solo categorías principales para el select
+        const mainCategories = await fetchMainCategories();
         setCategoryOptions([
           { value: '', label: 'Seleccionar' },
-          ...cats.map((cat: any) => ({ value: cat.name, label: cat.name }))
+          ...mainCategories.map((cat: any) => ({ value: cat.name, label: cat.name }))
         ]);
-      } catch {
+      } catch (error) {
+        console.error('Error cargando categorías:', error);
         setCategoryOptions([{ value: '', label: 'Seleccionar' }]);
       }
     };
     loadCategories();
   }, []);
+
+  // Función para cargar subcategorías según la categoría seleccionada
+  const loadSubcategories = async (categoryName: string) => {
+    if (!categoryName) {
+      setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+      return;
+    }
+
+    try {
+      // Encontrar la categoría seleccionada en los datos
+      const selectedCategory = categoriesData.find(cat => cat.name === categoryName);
+      if (!selectedCategory) {
+        setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+        return;
+      }
+
+      // Obtener subcategorías de esta categoría
+      const subcategories = await fetchSubcategoriesByParent(selectedCategory._id);
+      setSubcategoryOptions([
+        { value: '', label: 'Seleccionar subcategoría' },
+        ...subcategories.map((subcat: any) => ({ value: subcat.name, label: subcat.name }))
+      ]);
+    } catch (error) {
+      console.error('Error cargando subcategorías:', error);
+      setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
+    }
+  };
+
+  // Cargar subcategorías cuando el producto se carga y tiene una categoría
+  React.useEffect(() => {
+    if (product?.categoria && categoriesData.length > 0) {
+      loadSubcategories(product.categoria);
+    }
+  }, [product?.categoria, categoriesData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -107,6 +149,12 @@ const EditProductScreen: React.FC = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     setProduct((prev: any) => ({ ...prev, [name]: value }));
+    
+    // Si cambia la categoría, resetear subcategoría y cargar subcategorías
+    if (name === 'categoria') {
+      setProduct((prev: any) => ({ ...prev, subcategoria: '' }));
+      loadSubcategories(value);
+    }
   };
 
   const handleAddVariant = () => {
@@ -354,7 +402,7 @@ const EditProductScreen: React.FC = () => {
               <div className="flex gap-3">
                 <DesignButton variant="green"
                 icon={FaEye}
-                onClick={() => navigate(`/producto/${product._id}`)}>
+                onClick={() => navigate(`/first-layout/detail-layout/${product._id}`)}>
                   Ver en tienda
                 </DesignButton>
                 <DesignButton variant="secondary"

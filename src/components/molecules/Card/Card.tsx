@@ -3,6 +3,7 @@ import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton';
 import '../../../styles/responsive.css';
 import { useSearchStore } from '../../../stores';
+import FullScreenLoader from '../FullScreenLoader';
 
 interface CardProps {
   imageSrc?: string;
@@ -88,7 +89,7 @@ const cardData = [
 ];
 
 export const CardList: React.FC = () => {
-  const fetchProducts = require('../../../stores').useAuthStore((state: any) => state.fetchProducts);
+  const fetchActiveProducts = require('../../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
   const [loading, setLoading] = React.useState(false);
   const [products, setProducts] = React.useState<any[]>([]);
 
@@ -96,7 +97,7 @@ export const CardList: React.FC = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchProducts();
+        const prods = await fetchActiveProducts();
         setProducts(prods);
       } catch (err) {
         setProducts([]);
@@ -105,7 +106,7 @@ export const CardList: React.FC = () => {
       }
     };
     loadProducts();
-  }, [fetchProducts]);
+  }, [fetchActiveProducts]);
 
   const handleCardClick = (index: number) => {
     console.log(`Card ${index + 1} clicked`);
@@ -126,7 +127,7 @@ export const CardList: React.FC = () => {
     <div className="text-center mt-8">
       <div className="flex justify-center flex-wrap">
         {loading ? (
-          <div className="w-full text-center text-gray-400 py-8">Cargando productos...</div>
+          <FullScreenLoader />
         ) : (
           productsToShow.map((card, index) => (
             <Card 

@@ -763,7 +763,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   /**
-   * Obtiene la lista de productos del usuario autenticado.
+   * Obtiene la lista de productos del usuario autenticado (todos, incluye inactivos).
+   * Usado para el panel de administración.
    */
   fetchProducts: async (): Promise<any[]> => {
     const token = getStorageItem('token');
@@ -782,6 +783,32 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!response.ok) {
       console.error('Error backend fetchProducts:', responseData);
       throw new Error(responseData.message || 'Error al obtener los productos');
+    }
+   
+    return responseData.data || [];
+  },
+
+  /**
+   * Obtiene solo los productos activos del usuario autenticado.
+   * Usado para mostrar productos en la tienda.
+   */
+  fetchActiveProducts: async (): Promise<any[]> => {
+    const token = getStorageItem('token');
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+    const apiUrl = `${API_URL}/products/active`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchActiveProducts:', responseData);
+      throw new Error(responseData.message || 'Error al obtener los productos activos');
     }
    
     return responseData.data || [];
@@ -1111,4 +1138,157 @@ export const updateShopSocial = async (shopId: string, socialData: ShopSocial): 
   const data = await response.json();
   if (!response.ok) throw new Error(data.message || 'Error al actualizar redes sociales');
   return data;
+};
+
+// --- CURRENCY ENDPOINTS ---
+export interface Currency {
+  id: string;
+  name: string;
+  symbol: string;
+  code: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const fetchCurrencies = async (): Promise<Currency[]> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/currencies`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al obtener monedas');
+  }
+  
+  return data.data;
+};
+
+export const createCurrency = async (currencyData: {
+  name: string;
+  symbol: string;
+  code: string;
+}): Promise<Currency> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/currencies`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(currencyData),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al crear moneda');
+  }
+  
+  return data.data;
+};
+
+export const updateCurrency = async (
+  id: string,
+  currencyData: { name?: string; symbol?: string; code?: string }
+): Promise<Currency> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/currencies/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(currencyData),
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al actualizar moneda');
+  }
+  
+  return data.data;
+};
+
+export const deleteCurrency = async (id: string): Promise<void> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/currencies/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al eliminar moneda');
+  }
+};
+
+// --- CATEGORY HELPER FUNCTIONS ---
+export const fetchMainCategories = async (): Promise<any[]> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/categories`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al obtener categorías');
+  }
+  
+  // Filtrar solo categorías principales (sin parent)
+  return data.data.filter((category: any) => !category.parent);
+};
+
+export const fetchSubcategoriesByParent = async (parentId: string): Promise<any[]> => {
+  const token = getStorageItem('token');
+  if (!token) {
+    throw new Error('No token provided');
+  }
+  
+  const response = await fetch(`${API_URL}/categories`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Error al obtener categorías');
+  }
+  
+  // Filtrar solo subcategorías que pertenecen al parent especificado
+  return data.data.filter((category: any) => category.parent === parentId);
 };

@@ -20,6 +20,7 @@ import DataSalesManagement from '../screens/DataSalesManagement';
 import DataDashboard from '../screens/DataDashboard';
 import DataPurchaseHistory from '../screens/DataPurchaseHistory';
 import DataBilling from '../screens/DataBilling';
+import DataPaymentMethod from '../screens/DataPaymentMethod';
 import DataSubscription from '../screens/DataSubscription';
 import DataShopState from '../screens/DataShopState';
 import DataCreateShop from '../screens/DataCreateShop';
@@ -47,6 +48,7 @@ import EditProductScreen from '../screens/EditProductScreen';
 import NewProductScreen from '../screens/NewProductScreen';
 import DataCatalog from '../screens/DataCatalog';
 import PaymentReturn from '../screens/PaymentReturn';
+import DataCurrency from '../screens/DataCurrency';
 
 
 export const publicRoutes = [
@@ -125,6 +127,10 @@ export const publicRoutes = [
   {
     path: '/data-billing',
     element: <DataBilling />
+  },
+  {
+    path: '/data-payment-method',
+    element: <DataPaymentMethod />
   },
   {
     path: '/data-subscription',
@@ -224,6 +230,10 @@ export const publicRoutes = [
   {
     path: '/data-category',
     element: <DataCatalog />
+  },
+   {
+    path: '/data-currency',
+    element: <DataCurrency />
   },
   {
     path: '/payment/return',
