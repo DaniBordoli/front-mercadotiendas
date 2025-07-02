@@ -237,30 +237,21 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
      
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
-        // Todos los usuarios (con y sin tienda) ven el modal de confirmación
-        // Guardar el template actual antes de aplicar cambios para poder revertir
+        // Guardar el template actual antes de aplicar vista previa
         setPreviousTemplate({ ...currentTemplate });
+        setPendingTemplateUpdate(aiResponse.templateUpdates);
+        
         // Aplicar cambios inmediatamente para vista previa
         onApplyTemplateChanges(aiResponse.templateUpdates);
-        // También actualizar el template local para la vista previa
         setCurrentTemplate((prev: any) => ({ ...prev, ...aiResponse.templateUpdates }));
-        setPendingTemplateUpdate(aiResponse.templateUpdates);
+        
         setShowTemplateModal(true);
       }
 
     
       if (aiResponse.isFinalStep && aiResponse.shopData) {
         onChatComplete(aiResponse.shopData);
-       
-        if (!aiResponse.reply.includes('Hemos configurado')) {
-          const concludingMessage: Message = {
-            id: Date.now().toString() + '-ai-final',
-            text: '¡Genial! Hemos configurado los aspectos básicos. Revisa el resumen para confirmar.',
-            sender: 'ai',
-            timestamp: new Date(),
-          };
-          messagesToAddAfterReply.push(concludingMessage);
-        }
+        // No agregar mensaje adicional - el backend ya envía el resumen completo con confirmación
       } else {
         // Only ask the next question if the chat is NOT complete
         const nextQuestionIndex = currentQuestionIndex + 1;
@@ -305,12 +296,12 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
   };
   // Función para cancelar cambios de template
   const handleCancelTemplateUpdate = () => {
+    // Revertir todos los cambios aplicando el template anterior
     if (previousTemplate) {
-      // Revertir los cambios aplicando el template anterior
       onApplyTemplateChanges(previousTemplate);
-      // Revertir también el template local
       setCurrentTemplate(previousTemplate);
     }
+    
     setShowTemplateModal(false);
     setPendingTemplateUpdate(null);
     setPreviousTemplate(null);
@@ -323,19 +314,17 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
     setTemplateSaveError(null);
     
     try {
-      // El backend ya maneja automáticamente la sincronización de campos
-      // relevantes del template con el modelo Shop cuando la tienda existe
+      // Guardar en el backend
       await updateShopTemplate(pendingTemplateUpdate);
       
-      // Actualizar el template local
+      // Los cambios ya están aplicados visualmente, solo confirmar permanentemente
+      // Actualizar solo el template local para mantener consistencia
       setCurrentTemplate((prev: any) => ({ ...prev, ...pendingTemplateUpdate }));
       
-      // Si hay cambios de nombre de tienda, actualizar el store de Shop
       const user = useAuthStore.getState().user;
       const { getShop } = useShopStore.getState();
       
       if (user?.shop?._id && (pendingTemplateUpdate.title || pendingTemplateUpdate.shopName || pendingTemplateUpdate.storeName)) {
-        // Recargar los datos de la tienda para obtener los cambios sincronizados
         try {
           await getShop();
         } catch (shopError) {
@@ -343,12 +332,17 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         }
       }
       
-      onApplyTemplateChanges(pendingTemplateUpdate);
       setShowTemplateModal(false);
       setPendingTemplateUpdate(null);
-      setPreviousTemplate(null); // Limpiar el template anterior ya que se confirmaron los cambios
+      setPreviousTemplate(null);
     } catch (err: any) {
       setTemplateSaveError('Error al guardar los cambios.');
+      
+      // Si hay error al guardar, revertir los cambios visuales
+      if (previousTemplate) {
+        onApplyTemplateChanges(previousTemplate);
+        setCurrentTemplate(previousTemplate);
+      }
     } finally {
       setSavingTemplate(false);
     }
@@ -356,26 +350,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
 
   // Función para remover un cambio específico del template pendiente
   const handleRemoveTemplateChange = (keyToRemove: string) => {
-    if (!pendingTemplateUpdate) return;
+    if (!pendingTemplateUpdate || !previousTemplate) return;
     
-    // Crear una copia del template pendiente sin la clave especificada
     const updatedTemplate = { ...pendingTemplateUpdate };
     delete updatedTemplate[keyToRemove];
     
-    // Si el template actualizado está vacío, cerrar el modal
     if (Object.keys(updatedTemplate).length === 0) {
       handleCancelTemplateUpdate();
       return;
     }
     
-    // Actualizar el template pendiente
     setPendingTemplateUpdate(updatedTemplate);
     
-    // Revertir ese cambio específico en la vista previa aplicando el valor anterior
-    if (previousTemplate && previousTemplate[keyToRemove] !== undefined) {
-      const revertChange = { [keyToRemove]: previousTemplate[keyToRemove] };
-      onApplyTemplateChanges(revertChange);
-    }
+    // Aplicar los cambios actualizados al preview (excluir el cambio removido)
+    // Combinar el template anterior con los cambios restantes
+    const previewTemplate = { ...previousTemplate, ...updatedTemplate };
+    onApplyTemplateChanges(previewTemplate);
+    setCurrentTemplate(previewTemplate);
   };
 
   return (
@@ -467,31 +458,56 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                 {(() => {
                   // Mapear claves técnicas a nombres amigables
                   const friendlyNames: { [key: string]: string } = {
-                    navbarTitle: 'Título del navbar',
-                    navbarTitleColor: 'Color del título del navbar',
-                    navbarLinksColor: 'Color de los enlaces del navbar',
-                    navbarIconsColor: 'Color de los iconos del navbar',
-                    navbarBackgroundColor: 'Color de fondo del navbar',
-                    heroTitle: 'Título principal',
+                    // Navegación superior
+                    navbarTitle: 'Texto del menú superior',
+                    navbarTitleColor: 'Color del texto del menú',
+                    navbarLinksColor: 'Color de los enlaces del menú',
+                    navbarIconsColor: 'Color de los iconos del menú',
+                    navbarBackgroundColor: 'Color de fondo del menú',
+                    
+                    // Sección principal (hero)
+                    heroTitle: 'Título principal de la página',
                     heroTitleColor: 'Color del título principal',
                     heroDescription: 'Descripción principal',
-                    heroBackgroundColor: 'Color de fondo del hero',
-                    categoryTitle: 'Título de categorías',
+                    heroBackgroundColor: 'Color de fondo de la sección principal',
+                    
+                    // Secciones de contenido
+                    categoryTitle: 'Título de la sección de categorías',
                     categoryTitleColor: 'Color del título de categorías',
                     featuredProductsTitle: 'Título de productos destacados',
-                    featuredProductsTitleColor: 'Color del título de productos',
-                    purpleSectionTitle: 'Título de sección especial',
-                    purpleSectionTitleColor: 'Color del título de sección especial',
-                    newsletterTitle: 'Título del newsletter',
-                    newsletterTitleColor: 'Color del título del newsletter',
-                    footerTitle: 'Título del footer',
-                    footerTitleColor: 'Color del título del footer',
-                    footerBackgroundColor: 'Color de fondo del footer',
-                    mainBackgroundColor: 'Color de fondo principal',
-                    primaryColor: 'Color primario',
+                    featuredProductsTitleColor: 'Color del título de productos destacados',
+                    purpleSectionTitle: 'Título de sección promocional',
+                    purpleSectionTitleColor: 'Color del título promocional',
+                    newsletterTitle: 'Título del boletín de noticias',
+                    newsletterTitleColor: 'Color del título del boletín',
+                    
+                    // Pie de página
+                    footerTitle: 'Título del pie de página',
+                    footerTitleColor: 'Color del texto del pie de página',
+                    footerBackgroundColor: 'Color de fondo del pie de página',
+                    footerTextColor: 'Color del texto del pie de página',
+                    
+                    // Colores generales
+                    mainBackgroundColor: 'Color de fondo general',
+                    primaryColor: 'Color principal',
                     secondaryColor: 'Color secundario',
-                    buttonBackgroundColor: 'Color de fondo de botones',
-                    buttonTextColor: 'Color de texto de botones',
+                    accentColor: 'Color de acento',
+                    textColor: 'Color del texto general',
+                    
+                    // Botones
+                    buttonBackgroundColor: 'Color de fondo de botones principales',
+                    buttonTextColor: 'Color del texto de botones principales',
+                    button2BackgroundColor: 'Color de fondo de botones secundarios',
+                    button2TextColor: 'Color del texto de botones secundarios',
+                    featuredProductsCardButtonColor: 'Color de botones de productos',
+                    featuredProductsCardButtonTextColor: 'Color del texto de botones de productos',
+                    
+                    // Páginas específicas
+                    productPageTextColor: 'Color del texto en páginas de productos',
+                    aboutUsTextColor: 'Color del texto en "Acerca de nosotros"',
+                    contactTextColor: 'Color del texto en la página de contacto',
+                    
+                    // Información de la tienda
                     fontType: 'Tipo de fuente',
                     logoUrl: 'Logo de la tienda',
                     shopName: 'Nombre de la tienda',
@@ -499,6 +515,7 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
                     storeName: 'Nombre de la tienda',
                     storeDescription: 'Descripción de la tienda',
                     storeSlogan: 'Eslogan de la tienda'
+                    // NOTA: navbarLinks NO está incluido porque los enlaces son fijos
                   };
                   
                   // Filtrar campos duplicados - solo mostrar uno por tipo

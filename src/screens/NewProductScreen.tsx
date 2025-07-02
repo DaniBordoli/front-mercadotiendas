@@ -144,10 +144,25 @@ const NewProductScreen: React.FC = () => {
         productImages: result.data?.productImages || [],
       });
       setShowModal(true);
-    } catch (err) {
+    } catch (err: any) {
+      console.log('Error completo:', err);
+      let errorMessage = 'Error al crear el producto';
+      
+      // El mensaje del backend viene en err.message
+      if (err.message) {
+        // Si el mensaje contiene información sobre SKU duplicado
+        if (err.message.includes('SKU') || err.message.includes('sku')) {
+          errorMessage = err.message;
+        } else if (err.message.includes('duplicate') || err.message.includes('duplicado')) {
+          errorMessage = 'Ya existe un producto con esta información. Por favor, verifica los datos.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setToast({
         show: true,
-        message: 'Error al crear el producto',
+        message: errorMessage,
         type: 'error',
       });
     } finally {

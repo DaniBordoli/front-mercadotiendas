@@ -293,7 +293,7 @@ const DataSideBar: React.FC = () => {
                                 )}
                                 <span className="flex items-center gap-3 z-10">
                                     <RiAdminLine className="text-lg" />
-                                    <span className='font-space'>Panel de administración</span>
+                                    <span className='font-space'>Administración</span>
                                 </span>
                                 <IoChevronDown className={`transition-transform z-10 ${(adminDropdownOpen || isAdminActive) ? 'rotate-180' : ''}`} />
                             </button>

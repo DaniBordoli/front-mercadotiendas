@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
+import { useSearchStore } from '../../stores/searchStore';
 
 interface Product {
   _id?: string;
@@ -38,6 +39,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
 }) => {
   const navigate = useNavigate();
+  const { fetchProductById } = useSearchStore();
+  const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   
   const defaultProducts = [
     { id: 1, title: 'Producto 1', price: '$49.99', image: cardImage },
@@ -60,6 +63,33 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     );
   };
 
+  // Función para manejar la navegación a detalle con precarga
+  const handleProductClick = async (product: Product) => {
+    const productId = product._id || product.id;
+    if (!productId) {
+      navigate('/first-layout/detail-layout');
+      return;
+    }
+
+    try {
+      setLoadingProductId(String(productId));
+      // Precargar el producto antes de navegar
+      await fetchProductById(String(productId));
+      // Una vez cargado, navegar al detalle
+      navigate(`/first-layout/detail-layout/${productId}`);
+      // Scroll al tope de la página
+      window.scrollTo(0, 0);
+    } catch (error) {
+      console.error('Error al precargar producto:', error);
+      // Si hay error, navegar de todas formas
+      navigate(`/first-layout/detail-layout/${productId}`);
+      // Scroll al tope incluso si hay error
+      window.scrollTo(0, 0);
+    } finally {
+      setLoadingProductId(null);
+    }
+  };
+
   return (
     <div className="py-12" style={{ backgroundColor }}>
       <h2 className="text-2xl font-bold text-center mb-8" style={{ color: featuredProductsTitleColor }}>{featuredProductsTitle}</h2>
@@ -77,14 +107,20 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
               return (
                 <div 
                   key={product._id || product.id || idx} 
-                  className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-200"
-                  onClick={() => {
-                    const productId = product._id || product.id;
-                    if (productId) {
-                      navigate(`/first-layout/detail-layout/${productId}`);
-                    }
-                  }}
+                  className="bg-white rounded-lg my-8 shadow-md overflow-hidden w-[290px] mx-auto flex flex-col cursor-pointer hover:shadow-lg transition-shadow duration-200 relative"
+                  onClick={() => handleProductClick(product)}
                 >
+                  {/* Overlay de carga */}
+                  {loadingProductId === String(product._id || product.id) && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 rounded-lg">
+                      <div className="bg-white rounded-full p-3">
+                        <svg className="animate-spin h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                   <img src={imageSrc} alt={productTitle} className="w-full h-[220px] object-cover" />
                   <div className="flex-1 flex flex-col justify-between p-4 bg-white">
                     <div>
@@ -116,6 +152,8 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                   onClick={() => {
                     // Para productos dummy, redirigir a la vista de detalle genérica
                     navigate('/first-layout/detail-layout');
+                    // Scroll al tope de la página
+                    window.scrollTo(0, 0);
                   }}
                 >
                   <img src={product.image || cardImage} alt={product.title} className="w-full h-[220px] object-cover" />

@@ -391,8 +391,9 @@ export const Navbar: React.FC = () => {
           </div>
         )}
       </nav>
-      {/* Desktop Menu Below Navbar */}
-      <div className="hidden md:flex w-full justify-center mt-[70px]">
+      
+      {/* Desktop Menu Below Navbar - Posición fija independiente */}
+      <div className="hidden md:flex w-full justify-center bg-white border-b border-gray-100 py-3" style={{ position: 'fixed', top: '55px', left: '0', zIndex: 40 }}>
         <div className="flex gap-8 text-gray-600 text-sm justify-center">
           <a href="#" className="hover:text-red-500 transition-colors">Gestión de ventas</a>
           <div 
@@ -426,7 +427,9 @@ export const Navbar: React.FC = () => {
           <a href="#" className="hover:text-red-500 transition-colors">Ofertas</a>
         </div>
       </div>
-      <div className="hidden md:block w-full mt-4" /> 
+      
+      {/* Espaciador para compensar el menú fijo */}
+      <div className="hidden md:block w-full h-[110px]" /> 
       {/* Mobile Navbar */}
       <nav className="navbar-mobile fixed top-0 left-0 w-full z-50">
         <div className="navbar-mobile-logo" onClick={() => navigate('/dashboard')}>

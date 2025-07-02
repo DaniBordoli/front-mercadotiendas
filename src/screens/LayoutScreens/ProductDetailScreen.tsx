@@ -23,7 +23,7 @@ const ProductDetailScreen: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
-  const [tab, setTab] = useState<'description' | 'specs' | 'reviews'>('description');
+  const [tab, setTab] = useState<'description' | 'reviews'>('description');
   const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   
@@ -42,17 +42,16 @@ const ProductDetailScreen: React.FC = () => {
   useEffect(() => {
     if (id) {
       console.log(`[ProductDetailScreen] Cargando producto con ID: ${id}`);
-      fetchProductById(id);
+      
+      // Solo cargar si no está ya cargado o si es diferente al actual
+      if (!selectedProduct || selectedProduct.id !== id) {
+        fetchProductById(id);
+      }
+      
       setSelectedImage(0);
       setQuantity(1);
     }
-    
-    // Limpiar el producto seleccionado al desmontar
-    return () => {
-      console.log("[ProductDetailScreen] Limpiando producto seleccionado");
-      clearSelectedProduct();
-    };
-  }, [id, fetchProductById, clearSelectedProduct]);
+  }, [id, fetchProductById, clearSelectedProduct]); // Removido selectedProduct de las dependencias
   
   // Mostrar pantalla de carga si el producto está cargando
   if (isLoadingProduct) {
@@ -67,6 +66,42 @@ const ProductDetailScreen: React.FC = () => {
           logoUrl={editableVariables.logoUrl}
         />
         <FullScreenLoader />
+        <Footer
+          backgroundColor={editableVariables.footerBackgroundColor}
+          textColor={editableVariables.footerTextColor}
+          footerDescription={editableVariables.footerDescription}
+        />
+      </div>
+    );
+  }
+
+  // Si no está cargando y no hay producto, mostrar mensaje de error
+  if (!isLoadingProduct && !selectedProduct && id) {
+    return (
+      <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
+        <NavBar
+          navbarLinks={editableVariables.navbarLinks}
+          navbarTitle={editableVariables.navbarTitle}
+          backgroundColor={editableVariables.navbarBackgroundColor}
+          textColor={editableVariables.textColor}
+          fontType={editableVariables.fontType}
+          logoUrl={editableVariables.logoUrl}
+        />
+        <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+          <h2 className="text-2xl font-bold mb-4" style={{ color: editableVariables.textColor }}>
+            Producto no encontrado
+          </h2>
+          <p className="mb-6" style={{ color: editableVariables.textColor }}>
+            No pudimos encontrar el producto que buscas.
+          </p>
+          <button
+            onClick={() => navigate('/first-layout')}
+            className="px-6 py-3 rounded text-white font-semibold"
+            style={{ backgroundColor: editableVariables.primaryColor }}
+          >
+            Volver a la tienda
+          </button>
+        </div>
         <Footer
           backgroundColor={editableVariables.footerBackgroundColor}
           textColor={editableVariables.footerTextColor}
@@ -145,6 +180,31 @@ const ProductDetailScreen: React.FC = () => {
           </div>
 
           <div className="text-2xl font-bold mb-4" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#333' }}>${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
+
+          <div className="mb-4 p-4 rounded-lg border border-gray-200" style={{ backgroundColor: editableVariables.accentColor || '#f8f9fa' }}>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="flex flex-col">
+                <span className="font-medium" style={{ color: editableVariables.textColor, opacity: 0.7 }}>Estado:</span>
+                <span style={{ color: editableVariables.textColor }} className="font-semibold">
+                  {selectedProduct?.condition === 'new' ? 'Nuevo' : 'Usado'}
+                </span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-medium" style={{ color: editableVariables.textColor, opacity: 0.7 }}>Marca:</span>
+                <span style={{ color: editableVariables.textColor }} className="font-semibold">
+                  {selectedProduct?.brand || 'No especificada'}
+                </span>
+              </div>
+              {selectedProduct?.shop?.name && (
+                <div className="flex flex-col col-span-2">
+                  <span className="font-medium" style={{ color: editableVariables.textColor, opacity: 0.7 }}>Vendedor:</span>
+                  <span style={{ color: editableVariables.textColor }} className="font-semibold">
+                    {selectedProduct.shop.name}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
 
           <p className="mb-4" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>
             {selectedProduct?.descripcion || selectedProduct?.description || "No hay descripción disponible para este producto."}
@@ -248,22 +308,15 @@ const ProductDetailScreen: React.FC = () => {
           <div className="flex border-b mb-6">            <button
               className="px-4 py-2 text-sm font-medium border-b-2"
               type="button"
-              style={{ color: tab === 'description' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'description' ? editableVariables.primaryColor : 'transparent' }}
+              style={{ color: tab === 'description' ? editableVariables.textColor : editableVariables.textColor, borderColor: tab === 'description' ? editableVariables.textColor : 'transparent' }}
               onClick={() => setTab('description')}
             >
               Descripción
             </button>
             <button
-              className="px-4 py-2 text-sm font-medium border-b-2"
-              type="button"
-              style={{ color: tab === 'specs' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'specs' ? editableVariables.primaryColor : 'transparent' }}
-              onClick={() => setTab('specs')}
-            >
-              Especificaciones
-            </button><button
                 className="px-4 py-2 text-sm font-medium border-b-2"
                 type="button"
-                style={{ color: tab === 'reviews' ? editableVariables.primaryColor : editableVariables.textColor, borderColor: tab === 'reviews' ? editableVariables.primaryColor : 'transparent' }}
+                style={{ color: tab === 'reviews' ? editableVariables.textColor : editableVariables.textColor, borderColor: tab === 'reviews' ? editableVariables.textColor : 'transparent' }}
                 onClick={() => setTab('reviews')}
               >
                 Reviews ({productReviews?.length || 0})
@@ -289,26 +342,6 @@ const ProductDetailScreen: React.FC = () => {
                   )}
                 </div>
               </>
-            )}            {tab === 'specs' && (
-              <div style={{ color: editableVariables.textColor }}>
-                <h3 className="text-lg font-semibold mb-2">Especificaciones</h3>
-                <ul className="list-disc pl-6">
-                  <li>Marca: {selectedProduct?.brand || 'No especificada'}</li>
-                  <li>Estado: {selectedProduct?.condition === 'new' ? 'Nuevo' : 'Usado'}</li>
-                  {selectedProduct?.variantes && selectedProduct.variantes.length > 0 && (
-                    <>
-                      {selectedProduct.variantes.map((variante, index) => (
-                        <li key={index}>
-                          {variante.tipo}: {variante.valores.join(', ')}
-                        </li>
-                      ))}
-                    </>
-                  )}
-                  {selectedProduct?.shop?.name && (
-                    <li>Vendedor: {selectedProduct.shop.name}</li>
-                  )}
-                </ul>
-              </div>
             )}            {tab === 'reviews' && (
               <div style={{ color: editableVariables.textColor }}>
                 <h3 className="text-lg font-semibold mb-2">Reviews ({productReviews?.length || 0})</h3>

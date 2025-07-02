@@ -9,6 +9,7 @@ interface FirstLayoutStore {
 
 // Valores por defecto mínimos para el template
 const defaultEditableVariables: FirstLayoutEditableVariables = {
+  // Enlaces de navegación FIJOS - no modificables por IA
   navbarLinks: [
     { label: 'Inicio', href: '/first-layout' },
     { label: 'Tienda', href: '/first-layout/shop-layout' },
@@ -43,17 +44,40 @@ const defaultEditableVariables: FirstLayoutEditableVariables = {
 export const useFirstLayoutStore = create<FirstLayoutStore>((set, get) => ({
   editableVariables: defaultEditableVariables,
   setEditableVariables: (vars) => {
-    // Reemplazar completamente las variables con las del template
-    set({ editableVariables: vars });
+    // Preservar siempre los enlaces fijos de navegación
+    const preservedNavbarLinks = [
+      { label: 'Inicio', href: '/first-layout' },
+      { label: 'Tienda', href: '/first-layout/shop-layout' },
+      { label: 'Contacto', href: '/first-layout/contact-layout' },
+      { label: 'Acerca de', href: '/first-layout/aboutus-layout' },
+    ];
+    
+    // Reemplazar completamente las variables con las del template, pero preservar navbarLinks
+    set({ 
+      editableVariables: {
+        ...vars,
+        navbarLinks: preservedNavbarLinks // Siempre usar los enlaces fijos
+      }
+    });
   },
   updateEditableVariables: (changes) => {
     set((state) => {
+      // Si hay cambios en navbarLinks, ignorarlos
+      const { navbarLinks, ...allowedChanges } = changes;
+      
       const updated = {
         ...state.editableVariables,
-        ...changes,
+        ...allowedChanges, // Solo aplicar cambios permitidos
         filterOptions: changes.filterOptions
           ? { ...state.editableVariables.filterOptions, ...changes.filterOptions }
           : state.editableVariables.filterOptions,
+        // Siempre preservar los enlaces fijos
+        navbarLinks: [
+          { label: 'Inicio', href: '/first-layout' },
+          { label: 'Tienda', href: '/first-layout/shop-layout' },
+          { label: 'Contacto', href: '/first-layout/contact-layout' },
+          { label: 'Acerca de', href: '/first-layout/aboutus-layout' },
+        ]
       };
       return { editableVariables: updated };
     });
