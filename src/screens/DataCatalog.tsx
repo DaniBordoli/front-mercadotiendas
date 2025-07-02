@@ -6,7 +6,7 @@ import { updateCategory, fetchCategories, createCategory, deleteCategory } from 
 import { getStorageItem } from '../utils/storage';
 
 // Máximo de categorías principales y subcategorías
-const MAX_CATEGORIES = 4;
+const MAX_CATEGORIES = 12;
 
 function buildCategoryTree(categories: any[]) {
   const map: Record<string, any> = {};

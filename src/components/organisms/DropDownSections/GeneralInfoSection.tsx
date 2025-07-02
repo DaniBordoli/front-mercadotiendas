@@ -5,6 +5,7 @@ import { SelectDefault } from '../../atoms/SelectDefault';
 import { DesignButton } from '../../atoms/DesignButton';
 import { useAuthStore, useShopStore } from '../../../stores'; 
 import FullScreenLoader from '../../molecules/FullScreenLoader'; 
+import { fetchCurrencies } from '../../../stores/slices/authSlice'; 
 
 export const GeneralInfoSection: React.FC = () => {
     const [formData, setFormData] = useState({
@@ -19,6 +20,8 @@ export const GeneralInfoSection: React.FC = () => {
         preferredCurrency: '',
         languageMain: '',
     });
+
+    const [currencies, setCurrencies] = useState<{value: string, label: string}[]>([]);
 
     const { user } = useAuthStore(); // Obtener el usuario autenticado
     const updateShopInfo = useShopStore(state => state.updateShopInfo);
@@ -41,6 +44,24 @@ export const GeneralInfoSection: React.FC = () => {
             });
         }
     }, [user?.shop]);
+
+    useEffect(() => {
+        const loadCurrencies = async () => {
+            try {
+                const currenciesData = await fetchCurrencies();
+                const formattedCurrencies = currenciesData.map((currency: any) => ({
+                    value: currency.code,
+                    label: currency.name
+                }));
+                setCurrencies(formattedCurrencies);
+            } catch (error) {
+                setCurrencies([
+                    { value: 'ARS', label: 'Peso Argentino' },
+                ]);
+            }
+        };
+        loadCurrencies();
+    }, []);
 
     const handleInputChange = (name: string, value: string) => {
         setFormData(prev => ({
@@ -156,12 +177,7 @@ export const GeneralInfoSection: React.FC = () => {
                     <SelectDefault
                         placeholder="Seleccionar moneda"
                         className="w-full"
-                        options={[
-                            { value: 'ARS', label: 'Peso Argentino' },
-                            { value: 'USD', label: 'Dólar' },
-                            { value: 'EUR', label: 'Euro' },
-                            { value: 'BRL', label: 'Real Brasileño' },
-                        ]}
+                        options={currencies}
                         value={formData.preferredCurrency}
                         onChange={value => handleInputChange('preferredCurrency', value)}
                     />

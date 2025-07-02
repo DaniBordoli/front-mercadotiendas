@@ -27,7 +27,8 @@ const ShopLayout: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
   
   // Utilizar la store de búsqueda para los productos de respaldo
-  const { baseSearchResults } = useSearchStore();
+  const { baseSearchResults, fetchProductById } = useSearchStore();
+  const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
 
   // Cargar shop y template
   useEffect(() => {
@@ -71,6 +72,29 @@ const ShopLayout: React.FC = () => {
     loadProducts();
   }, [fetchActiveProducts, baseSearchResults]);
 
+  // Función para manejar la navegación a detalle con precarga
+  const handleProductClick = async (product: any) => {
+    const productId = product?.id || product?._id;
+    if (!productId) {
+      navigate('/first-layout/detail-layout');
+      return;
+    }
+
+    try {
+      setLoadingProductId(productId);
+      // Precargar el producto antes de navegar
+      await fetchProductById(productId);
+      // Una vez cargado, navegar al detalle
+      navigate(`/first-layout/detail-layout/${productId}`);
+    } catch (error) {
+      console.error('Error al precargar producto:', error);
+      // Si hay error, navegar de todas formas
+      navigate(`/first-layout/detail-layout/${productId}`);
+    } finally {
+      setLoadingProductId(null);
+    }
+  };
+
   return (
     <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
@@ -94,29 +118,29 @@ const ShopLayout: React.FC = () => {
           </div>
         </div>
       </section>
-      <div className="max-w-7xl mx-auto flex mt-8">
-        <aside className="w-64 px-4 rounded-lg" style={{ backgroundColor: editableVariables.navbarBackgroundColor }}>
-          <div>
+      <div className="max-w-7xl mx-auto flex mt-8 mb-16 px-4">
+        <aside className="w-64 px-6 py-6 rounded-lg shadow-sm border border-gray-200 h-fit" style={{ backgroundColor: editableVariables.navbarBackgroundColor }}>
+          <div className="mb-6">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">Categorias</h2>
-            <div className="flex flex-col gap-2 mb-6">
-              <label className="flex items-center text-gray-600">
-                <input type="checkbox" className="mr-2" />
+            <div className="flex flex-col gap-3 mb-6">
+              <label className="flex items-center text-gray-600 hover:text-gray-800 cursor-pointer">
+                <input type="checkbox" className="mr-3 rounded" />
                Moda para Mujeres
               </label>
-              <label className="flex items-center text-gray-600">
-                <input type="checkbox" className="mr-2" />
+              <label className="flex items-center text-gray-600 hover:text-gray-800 cursor-pointer">
+                <input type="checkbox" className="mr-3 rounded" />
                 Colección para Hombres
               </label>
-              <label className="flex items-center text-gray-600">
-                <input type="checkbox" className="mr-2" />
+              <label className="flex items-center text-gray-600 hover:text-gray-800 cursor-pointer">
+                <input type="checkbox" className="mr-3 rounded" />
                 Accesorios
               </label>
             </div>
           </div>
-          <hr className="my-4" />
-          <div>
+          <hr className="my-6 border-gray-200" />
+          <div className="mb-6">
             <h2 className="text-sm font-semibold text-gray-700 mb-4">Rango de Precio</h2>
-            <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+            <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
               <span>$0</span>
               <span>$1000</span>
             </div>
@@ -126,22 +150,22 @@ const ShopLayout: React.FC = () => {
               max={1000}
               value={price}
               onChange={e => setPrice(Number(e.target.value))}
-              className="w-full accent-blue-500"
+              className="w-full accent-blue-500 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
             />
-            <div className="text-xs text-gray-600 mt-1">Seleccionado: ${price}</div>
+            <div className="text-sm text-gray-700 mt-2 font-medium">Seleccionado: ${price}</div>
           </div>
-          <hr className="my-4" />
+          <hr className="my-6 border-gray-200" />
           <div>
             <h2 className="text-sm font-semibold text-gray-700 mb-4">Talla</h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {['XS', 'S', 'M', 'L', 'XL'].map(size => (
                 <button
                   key={size}
                   onClick={() => setSelectedSize(size)}
-                  className={`px-3 py-1 rounded border text-xs font-medium ${
+                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${
                     selectedSize === size
-                      ? 'bg-blue-500 text-white border-blue-500'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
                   }`}
                 >
                   {size}
@@ -166,17 +190,25 @@ const ShopLayout: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {loading ? (
               <FullScreenLoader />
-            ) : (
-              (products && products.length > 0 ? products : [...Array(6)]).map((prod, idx) => (
+            ) : products && products.length > 0 ? (
+              products.map((prod, idx) => (
                 <div
                   key={prod?.id || prod?._id || idx}
-                  className="bg-white rounded-lg overflow-hidden shadow my-8 w-full flex flex-col cursor-pointer hover:shadow-lg transition"
-                  onClick={() => {
-                    const productId = prod?.id || prod?._id;
-                    navigate(productId ? `/first-layout/detail-layout/${productId}` : '/first-layout/detail-layout');
-                  }}
+                  className="bg-white rounded-lg overflow-hidden shadow my-8 w-full flex flex-col cursor-pointer hover:shadow-lg transition relative"
+                  onClick={() => handleProductClick(prod)}
                   style={{ backgroundColor: '#fff' }}
                 >
+                  {/* Overlay de carga */}
+                  {loadingProductId === (prod?.id || prod?._id) && (
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10 rounded-lg">
+                      <div className="bg-white rounded-full p-3">
+                        <svg className="animate-spin h-6 w-6 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                   <img
                     src={prod?.imageUrls?.[0] || prod?.productImages?.[0] || "https://via.placeholder.com/300x400?text=No+Image"}
                     alt={prod?.name || prod?.nombre || `Producto ${idx + 1}`}
@@ -202,23 +234,35 @@ const ShopLayout: React.FC = () => {
                   </div>
                 </div>
               ))
+            ) : (
+              <div className="col-span-full text-center py-20">
+                <div className="max-w-md mx-auto">
+                  <div className="bg-gray-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
+                    <FiShoppingCart className="text-gray-400 text-3xl" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">No hay productos activos</h3>
+                  <p className="text-gray-500">Actualmente no tienes productos disponibles en tu tienda.</p>
+                </div>
+              </div>
             )}
           </div>
-          <div className="flex justify-center mt-10 mb-16">
-            <nav className="inline-flex items-center space-x-2">
-              <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
-                <span className="sr-only">Anterior</span>
-                <FaChevronLeft />
-              </button>
-              <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-blue-600 text-white font-semibold">1</button>
-              <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">2</button>
-              <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">3</button>
-              <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
-                <span className="sr-only">Siguiente</span>
-                <FaChevronRight />
-              </button>
-            </nav>
-          </div>
+          {products && products.length > 0 && (
+            <div className="flex justify-center mt-10">
+              <nav className="inline-flex items-center space-x-2">
+                <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
+                  <span className="sr-only">Anterior</span>
+                  <FaChevronLeft />
+                </button>
+                <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-blue-600 text-white font-semibold">1</button>
+                <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">2</button>
+                <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-700 hover:bg-gray-100">3</button>
+                <button className="w-10 h-10 flex items-center justify-center border rounded-lg bg-white text-gray-500 hover:bg-gray-100">
+                  <span className="sr-only">Siguiente</span>
+                  <FaChevronRight />
+                </button>
+              </nav>
+            </div>
+          )}
         </main>
       </div>
       <Footer

@@ -22,6 +22,7 @@ export interface Product {
   hasFreeShipping?: boolean; 
   isFeatured?: boolean; 
   variantes?: { tipo: string; valores: string[] }[];
+  categoria?: string; // Categoría del producto
   shop?: {
     name: string;
     _id?: string;
@@ -86,6 +87,7 @@ const mockProducts: Product[] = [
     brand: 'GamerTech',
     condition: 'new',
     estado: 'Activo',
+    categoria: 'Laptop',
     hasFreeShipping: true,
     isFeatured: true,
     variantes: [
@@ -110,6 +112,7 @@ const mockProducts: Product[] = [
     brand: 'Genérica',
     condition: 'used',
     estado: 'Inactivo', // Producto inactivo
+    categoria: 'Laptop',
     hasFreeShipping: true,
     isFeatured: false,
     variantes: [
@@ -134,6 +137,7 @@ const mockProducts: Product[] = [
     brand: 'ProKeys',
     condition: 'new',
     estado: 'Activo',
+    categoria: 'Accesorios',
     hasFreeShipping: false,
     isFeatured: false,
     variantes: [
@@ -158,6 +162,7 @@ const mockProducts: Product[] = [
     brand: 'DisplaysHub',
     condition: 'new',
     estado: 'Activo',
+    categoria: 'Monitores',
     hasFreeShipping: true,
     isFeatured: true,
     variantes: [
@@ -176,6 +181,7 @@ const mockProducts: Product[] = [
     brand: 'Logi',
     condition: 'new',
     estado: 'Inactivo', // Producto inactivo
+    categoria: 'Accesorios',
     hasFreeShipping: false,
     isFeatured: false,
     variantes: [
@@ -288,6 +294,7 @@ function mapBackendProductToProduct(backendProduct: any): Product {
     hasFreeShipping: backendProduct.hasFreeShipping,
     isFeatured: backendProduct.isFeatured,
     variantes: backendProduct.variantes,
+    categoria: backendProduct.categoria, // Mapear la categoría
     shop: backendProduct.shop ? { name: backendProduct.shop.name, _id: backendProduct.shop._id } : undefined,
     descripcion: backendProduct.descripcion || backendProduct.description, // <-- Mapeo de descripción
   };
@@ -352,6 +359,7 @@ interface SearchState {
   
   // Búsqueda y Paginación (Simulada)
   fetchSearchResults: (options?: { term?: string; page?: number; keepFilters?: boolean }) => void; // Ya no es async
+  fetchResultsByCategory: (categoryName: string, options?: { page?: number; keepFilters?: boolean }) => void; // Nueva función
   goToPage: (pageNumber: number) => void;
   _updateDisplayedResults: () => void; // Helper interno
 
@@ -528,6 +536,96 @@ export const useSearchStore = create<SearchState>((set, get) => ({
             sortOrder: 'relevance'
           };
         }
+        set(newStatePartial);
+        get()._updateDisplayedResults();
+      }, 300);
+    }
+  },
+
+  fetchResultsByCategory: async (categoryName: string, options = {}) => {
+    const {
+      page = 1,
+      keepFilters = false
+    } = options;
+
+    if (!categoryName.trim()) {
+      set({
+        searchTerm: '', baseSearchResults: [], searchResults: [], totalResults: 0,
+        currentPage: 1, totalPages: 1, availableFilters: null,
+        selectedBrands: [], selectedCondition: null, priceRange: { min: null, max: null },
+        isLoadingResults: false
+      });
+      return;
+    }
+
+    set({ isLoadingResults: true, searchTerm: categoryName });
+
+    try {
+      const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
+      const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
+      
+      // Filtrar por categoría específica y solo productos activos
+      const categoryFilteredResults = allProducts.filter(p => {
+        const productCategory = p.categoria || (p as any).category;
+        return productCategory && 
+               productCategory.toLowerCase() === categoryName.toLowerCase() &&
+               (p.estado === 'Activo' || !p.estado);
+      });
+
+      const totalResults = categoryFilteredResults.length;
+      const availableFilters = calculateAvailableFilters(categoryFilteredResults);
+      
+      let newStatePartial: Partial<SearchState> = {
+        baseSearchResults: categoryFilteredResults,
+        totalResults: totalResults,
+        availableFilters: availableFilters,
+        currentPage: page,
+        isLoadingResults: false,
+      };
+      
+      if (!keepFilters) {
+        newStatePartial = {
+          ...newStatePartial,
+          selectedBrands: [],
+          selectedCondition: null,
+          priceRange: { min: null, max: null },
+          sortOrder: 'relevance'
+        };
+      }
+      
+      set(newStatePartial);
+      get()._updateDisplayedResults();
+    } catch (error) {
+      console.error('Error al obtener productos por categoría:', error);
+      setTimeout(() => {
+        const categoryFilteredResults = mockProducts.filter(p => {
+          const productCategory = p.categoria || (p as any).category;
+          return productCategory && 
+                 productCategory.toLowerCase() === categoryName.toLowerCase() &&
+                 (p.estado === 'Activo' || !p.estado);
+        });
+        
+        const totalResults = categoryFilteredResults.length;
+        const availableFilters = calculateAvailableFilters(categoryFilteredResults);
+        
+        let newStatePartial: Partial<SearchState> = {
+          baseSearchResults: categoryFilteredResults,
+          totalResults: totalResults,
+          availableFilters: availableFilters,
+          currentPage: page,
+          isLoadingResults: false,
+        };
+        
+        if (!keepFilters) {
+          newStatePartial = {
+            ...newStatePartial,
+            selectedBrands: [],
+            selectedCondition: null,
+            priceRange: { min: null, max: null },
+            sortOrder: 'relevance'
+          };
+        }
+        
         set(newStatePartial);
         get()._updateDisplayedResults();
       }, 300);

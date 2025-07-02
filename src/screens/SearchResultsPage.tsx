@@ -18,6 +18,7 @@ const SearchResultsPage: React.FC = () => {
     searchResults,
     isLoadingResults,
     fetchSearchResults,
+    fetchResultsByCategory,
     sortOrder, // Obtener estado de ordenamiento
     setSortOrder, // Obtener acción de ordenamiento
     // Obtener estado y acciones de filtros
@@ -40,21 +41,24 @@ const SearchResultsPage: React.FC = () => {
   const [localMinPrice, setLocalMinPrice] = useState<string>(priceRange.min?.toString() || '');
   const [localMaxPrice, setLocalMaxPrice] = useState<string>(priceRange.max?.toString() || '');
 
-  // Obtener el query de la URL
+  // Obtener el query y category de la URL
   const queryParams = new URLSearchParams(location.search);
   const query = queryParams.get('q') || '';
+  const category = queryParams.get('category') || '';
 
   useEffect(() => {
-    if (query) {
+    if (category) {
+      console.log(`[Page] Buscando resultados para categoría: ${category}`);
+      fetchResultsByCategory(category);
+    } else if (query) {
       console.log(`[Page] Buscando resultados para: ${query}`);
       fetchSearchResults({ term: query });
     } else {
       // Opcional: Redirigir si no hay query?
       // navigate('/dashboard');
     }
-    // Dependencia de 'query' para re-buscar si cambia la URL
-    // y fetchSearchResults para evitar warnings de lint (aunque la función sea estable)
-  }, [query, fetchSearchResults]);
+    // Dependencia de 'query' y 'category' para re-buscar si cambia la URL
+  }, [query, category, fetchSearchResults, fetchResultsByCategory]);
 
   // Sincronizar estado local de precio si el global cambia (ej. al limpiar filtros o cambiar filtros disponibles)
   useEffect(() => {
@@ -216,7 +220,9 @@ const SearchResultsPage: React.FC = () => {
           {/* Encabezado de Resultados */}
           <div className="mb-4 flex justify-between items-center"> {/* Usar flex para alinear */} 
             <div>
-              <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1C1C1E' }}>{query}</h1>
+              <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1C1C1E' }}>
+                {category ? `Categoría: ${category}` : query}
+              </h1>
               <p className="text-sm" style={{ color: '#666666' }}>{totalResults} resultados</p>
             </div>
              {/* Dropdown de Ordenamiento */}
@@ -255,8 +261,12 @@ const SearchResultsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="bg-white p-6 rounded shadow-sm" style={{ borderColor: '#E6E6E7' }}>
-                   <p className="text-base" style={{ color: '#1C1C1E' }}>No se encontraron resultados para "{query}".</p>
-                   <p className="text-sm mt-2" style={{ color: '#666666' }}>Intenta con otras palabras o revisa la ortografía.</p>
+                   <p className="text-base" style={{ color: '#1C1C1E' }}>
+                     No se encontraron resultados para {category ? `la categoría "${category}"` : `"${query}"`}.
+                   </p>
+                   <p className="text-sm mt-2" style={{ color: '#666666' }}>
+                     {category ? 'No hay productos disponibles en esta categoría.' : 'Intenta con otras palabras o revisa la ortografía.'}
+                   </p>
                 </div>
               )}
               {/* Añadir componente de paginación */}
