@@ -10,18 +10,19 @@ import { FaRegUserCircle } from "react-icons/fa";
 import { RiRobot2Line } from "react-icons/ri";
 import { FaRegCircleQuestion } from "react-icons/fa6";
 import { BsShop } from "react-icons/bs";
-// Importar el icono de lupa
 import { FaSearch } from "react-icons/fa";
 import { InputDefault } from '../../atoms/InputDefault/InputDefault';
 import { useCartStore } from '../../../stores/cartStore';
 import Toast from '../../atoms/Toast';
 import { useShopStore } from '../../../stores/slices/shopStore';
+import { fetchMainCategories } from '../../../stores/slices/authSlice';
 import './NavbarMobile.css';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const [toast, setToast] = useState({
     show: false,
     message: '',
@@ -40,6 +41,7 @@ export const Navbar: React.FC = () => {
     suggestions,
     fetchSuggestions,
     fetchSearchResults,
+    fetchResultsByCategory,
     clearSuggestions,
     setSearchTerm,
   } = useSearchStore();
@@ -94,8 +96,8 @@ export const Navbar: React.FC = () => {
     setSearchTerm(categoryTerm);
     clearSuggestions();
     setShowSuggestions(false);
-    fetchSearchResults({ term: categoryTerm });
-    navigate(`/search?q=${encodeURIComponent(categoryTerm)}`);
+    fetchResultsByCategory(categoryTerm);
+    navigate(`/search?category=${encodeURIComponent(categoryTerm)}`);
     setIsCategoryMenuOpen(false);
   };
 
@@ -205,6 +207,25 @@ export const Navbar: React.FC = () => {
     };
   }, [token, forceLoadProfile, getShopInfo]);
   
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesData = await fetchMainCategories();
+        const formattedCategories = categoriesData.map((category: any) => ({
+          value: category.id || category._id,
+          label: category.name
+        }));
+        setCategories([
+          { value: 'laptop', label: 'Laptop' },
+          ...formattedCategories
+        ]);
+      } catch (error) {
+        setCategories([{ value: 'laptop', label: 'Laptop' }]);
+      }
+    };
+    
+    loadCategories();
+  }, []);
 
   const isUserReady = user && !user.loading;
   
@@ -387,15 +408,15 @@ export const Navbar: React.FC = () => {
                 onMouseLeave={closeCategoryMenu}
               >
                 <ul className="py-2">
-                  <li 
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                    onClick={() => handleCategorySearch('laptop')}
-                  >
-                    Laptop
-                  </li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 2</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 3</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black">Categoría 4</li>
+                  {categories.map((category) => (
+                    <li 
+                      key={category.value}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
+                      onClick={() => handleCategorySearch(category.label)}
+                    >
+                      {category.label}
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}
