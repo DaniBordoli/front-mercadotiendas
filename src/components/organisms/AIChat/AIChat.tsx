@@ -26,11 +26,12 @@ interface AIChatProps {
 // Common questions asked by the AI to guide the user
 const TEMPLATE_QUESTIONS = [
   "¡Hola! Soy tu asistente para crear tu tienda. Te haré preguntas para configurarla según tus necesidades. ¿Cómo se llamará tu tienda?",
-  "¿En qué industria/rubro estás o qué tipo de productos venderás?",
-  "¿Puedes contarme un poco sobre tu marca? ¿Tiene una historia o misión que te gustaría transmitir?",
-  "¿Tenés un lema o frase que defina tu marca/propuesta?",
+  "¿En qué industria/rubro estás o qué tipo de productos venderás? Describe brevemente tu tienda.",
+  "¿Cuál es la misión de tu tienda? ¿Qué propósito tiene tu negocio?",
+  "¿Cuál es la visión de tu tienda? ¿Hacia dónde quieres que crezca en el futuro?",
+  "¿Puedes contarme la historia de tu marca? ¿Cómo surgió la idea de crear esta tienda?",
   "¿Qué valores son importantes para vos y te gustaría reflejar en la tienda?",
-  "¿Tenés preferencias de color o estilo?",
+  "¿Tenés preferencias de color o estilo para el diseño de tu tienda?",
 ];
 
 // Primary and hover colors from theme
@@ -147,6 +148,8 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
       const q = lastAIMessage.text.toLowerCase();
       console.log('[AIChat] Última pregunta IA:', q);
       console.log('[AIChat] Estado pendingShopData:', pendingShopData, 'Ref:', pendingShopDataRef.current);
+      
+      // Detectar campos básicos para la creación de tienda
       if (q.includes('¿cómo se llamará tu tienda?') || q.includes('como se llamara tu tienda')) {
         updatedTemplate.shopName = input;
       } else if (q.includes('¿qué diseño o plantilla prefieres') || q.includes('que diseño o plantilla prefieres')) {
@@ -157,6 +160,34 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         updatedTemplate.shopPhone = input;
       } else if (q.includes('¿qué subdominio quieres') || q.includes('que subdominio quieres')) {
         updatedTemplate.subdomain = input;
+      }
+      
+      // Detectar campos institucionales
+      else if (q.includes('¿en qué industria/rubro estás') || q.includes('que tipo de productos venderás') || q.includes('describe brevemente tu tienda')) {
+        updatedTemplate.description = input;
+      } else if (q.includes('¿cuál es la misión de tu tienda') || q.includes('que propósito tiene tu negocio')) {
+        updatedTemplate.mission = input;
+      } else if (q.includes('¿cuál es la visión de tu tienda') || q.includes('hacia dónde quieres que crezca')) {
+        updatedTemplate.vision = input;
+      } else if (q.includes('¿puedes contarme la historia de tu marca') || q.includes('como surgió la idea de crear esta tienda')) {
+        updatedTemplate.history = input;
+      } else if (q.includes('¿qué valores son importantes') || q.includes('te gustaría reflejar en la tienda')) {
+        updatedTemplate.values = input;
+      }
+      
+      // Mejorar reconocimiento de referencias al Hero
+      const userInput = input.toLowerCase();
+      const heroKeywords = [
+        'hero', 'principal', 'titulo principal', 'texto principal', 'imagen principal',
+        'encabezado', 'banner', 'portada', 'cabecera', 'sección principal',
+        'título grande', 'texto grande', 'primera sección'
+      ];
+      
+      if (heroKeywords.some(keyword => userInput.includes(keyword))) {
+        if (userInput.includes('color') || userInput.includes('cambiar')) {
+          // El usuario quiere cambiar algo del hero, pero necesitamos más contexto
+          // Esto se manejará en el backend con mejor procesamiento
+        }
       }
      
       if (
@@ -235,7 +266,6 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         messagesToAddAfterReply.push(newAiMessage);
       }
 
-     
       if (aiResponse.templateUpdates && typeof aiResponse.templateUpdates === 'object') {
         // Guardar el template actual antes de aplicar vista previa
         setPreviousTemplate({ ...currentTemplate });
@@ -248,15 +278,23 @@ export const AIChat: React.FC<AIChatProps> = ({ onApplyTemplateChanges, initialV
         setShowTemplateModal(true);
       }
 
-    
       if (aiResponse.isFinalStep && aiResponse.shopData) {
         onChatComplete(aiResponse.shopData);
         // No agregar mensaje adicional - el backend ya envía el resumen completo con confirmación
       } else {
-        // Only ask the next question if the chat is NOT complete
+        // Solo agregar la siguiente pregunta si:
+        // 1. No hay tienda creada (está en proceso de creación)
+        // 2. La IA no respondió con una pregunta específica
+        // 3. Aún quedan preguntas por hacer
         const nextQuestionIndex = currentQuestionIndex + 1;
         const aiReplyHasQuestion = aiResponse.reply.includes('?') || aiResponse.reply.includes('¿');
-        if (nextQuestionIndex < TEMPLATE_QUESTIONS.length && !aiReplyHasQuestion) {
+        
+        if (!hasShop && 
+            nextQuestionIndex < TEMPLATE_QUESTIONS.length && 
+            !aiReplyHasQuestion &&
+            !aiResponse.reply.includes('dime') &&
+            !aiResponse.reply.includes('cuál quieres') &&
+            !aiResponse.reply.includes('cuéntame')) {
           const nextQuestionMessage: Message = {
             id: Date.now().toString() + '-ai-q' + nextQuestionIndex,
             text: TEMPLATE_QUESTIONS[nextQuestionIndex],

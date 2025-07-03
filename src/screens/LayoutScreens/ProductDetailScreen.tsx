@@ -123,6 +123,9 @@ const ProductDetailScreen: React.FC = () => {
       <NavBar
         navbarLinks={editableVariables.navbarLinks}
         navbarTitle={editableVariables.navbarTitle}
+        navbarTitleColor={editableVariables.navbarTitleColor}
+        navbarLinksColor={editableVariables.navbarLinksColor}
+        navbarIconsColor={editableVariables.navbarIconsColor}
         backgroundColor={editableVariables.navbarBackgroundColor}
         textColor={editableVariables.textColor}
         fontType={editableVariables.fontType}

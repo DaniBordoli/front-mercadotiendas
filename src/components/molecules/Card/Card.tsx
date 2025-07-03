@@ -33,12 +33,14 @@ export const Card: React.FC<CardProps> = ({
     <div 
       className="card ml-6 w-84 h-108 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col"
       onClick={handleCardClick}
+      style={{ minHeight: '432px', maxHeight: '432px' }}
     >
-      <figure className="m-0 w-full h-60 flex-shrink-0">
+      <figure className="m-0 w-full flex-shrink-0" style={{ height: '240px' }}>
         <img
           className="w-full h-full object-cover"
           src={imageSrc || "https://placehold.co/600x400?text=No+Image"}
           alt={title}
+          style={{ objectFit: 'cover' }}
         />
       </figure>
       <div className="card-body p-4 flex flex-col items-start flex-grow">
@@ -51,7 +53,7 @@ export const Card: React.FC<CardProps> = ({
         </h5>
         <p className="text-lg mb-2 font-space">{formattedPrice}</p>
         
-        <div className="flex justify-center w-full mt-auto">
+        <div className="flex justify-center w-full">
           <DesignButton 
             variant="primary"
             className="w-full"
@@ -89,7 +91,7 @@ const cardData = [
 ];
 
 export const CardList: React.FC = () => {
-  const fetchActiveProducts = require('../../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
+  const fetchAllProducts = require('../../../stores').useAuthStore((state: any) => state.fetchAllProducts);
   const [loading, setLoading] = React.useState(false);
   const [products, setProducts] = React.useState<any[]>([]);
 
@@ -97,7 +99,7 @@ export const CardList: React.FC = () => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchActiveProducts();
+        const prods = await fetchAllProducts();
         setProducts(prods);
       } catch (err) {
         setProducts([]);
@@ -106,7 +108,7 @@ export const CardList: React.FC = () => {
       }
     };
     loadProducts();
-  }, [fetchActiveProducts]);
+  }, [fetchAllProducts]);
 
   const handleCardClick = (index: number) => {
     console.log(`Card ${index + 1} clicked`);
