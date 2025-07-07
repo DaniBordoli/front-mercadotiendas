@@ -113,6 +113,10 @@ export type AuthStore = AuthState & {
    * Obtiene todos los productos de todas las tiendas (para búsqueda global).
    */
   fetchAllProducts: () => Promise<any[]>;
+  /**
+   * Obtiene productos activos de una tienda específica (público).
+   */
+  fetchProductsByShop: (shopId: string) => Promise<any[]>;
   deleteProduct: (id: string) => Promise<void>;
   updateProduct: (id: string, data: {
     nombre?: string;

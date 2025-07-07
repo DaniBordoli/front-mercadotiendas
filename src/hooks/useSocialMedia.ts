@@ -9,23 +9,23 @@ export interface SocialMediaLink {
   isActive: boolean;
 }
 
-export const useSocialMedia = () => {
+export const useSocialMedia = (shopId?: string) => {
   const { user } = useAuthStore();
-  const shopId = user?.shop?._id;
+  const currentShopId = shopId || user?.shop?._id;
   const [socialData, setSocialData] = useState<ShopSocial>({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (shopId) {
+    if (currentShopId) {
       setLoading(true);
-      getShopSocial(shopId)
+      getShopSocial(currentShopId)
         .then(data => {
           if (data) setSocialData(data);
         })
         .catch(() => {})
         .finally(() => setLoading(false));
     }
-  }, [shopId]);
+  }, [currentShopId]);
 
   // Función para formatear usernames/URLs a enlaces completos
   const formatSocialLink = (platform: string, value: string): string => {

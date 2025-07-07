@@ -839,6 +839,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   /**
+   * Obtiene los productos activos de una tienda específica (endpoint público).
+   * Usado para mostrar productos cuando se visita la tienda de otro usuario.
+   */
+  fetchProductsByShop: async (shopId: string): Promise<any[]> => {
+    const apiUrl = `${API_URL}/products/shop/${shopId}`;
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const responseData = await response.json();
+    if (!response.ok) {
+      console.error('Error backend fetchProductsByShop:', responseData);
+      throw new Error(responseData.message || 'Error al obtener los productos de la tienda');
+    }
+    return responseData.data || [];
+  },
+
+  /**
    * Elimina un producto por su ID.
    */
   deleteProduct: async (id: string): Promise<void> => {

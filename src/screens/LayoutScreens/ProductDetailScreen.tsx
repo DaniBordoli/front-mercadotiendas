@@ -18,7 +18,7 @@ declare module '../../stores/searchStore' {
 }
 
 const ProductDetailScreen: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, productId } = useParams<{ id?: string; productId?: string }>();
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -26,6 +26,9 @@ const ProductDetailScreen: React.FC = () => {
   const [tab, setTab] = useState<'description' | 'reviews'>('description');
   const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  
+  // Usar productId si está disponible (desde ShopView), sino usar id (desde rutas normales)
+  const actualProductId = productId || id;
   
   const { 
     selectedProduct, 
@@ -40,18 +43,19 @@ const ProductDetailScreen: React.FC = () => {
 
   // Cargar los datos del producto cuando se monta el componente
   useEffect(() => {
-    if (id) {
-      console.log(`[ProductDetailScreen] Cargando producto con ID: ${id}`);
+    if (actualProductId) {
+      console.log(`[ProductDetailScreen] Cargando producto con ID: ${actualProductId}`);
+      console.log(`[ProductDetailScreen] Estilos aplicados:`, editableVariables);
       
       // Solo cargar si no está ya cargado o si es diferente al actual
-      if (!selectedProduct || selectedProduct.id !== id) {
-        fetchProductById(id);
+      if (!selectedProduct || selectedProduct.id !== actualProductId) {
+        fetchProductById(actualProductId);
       }
       
       setSelectedImage(0);
       setQuantity(1);
     }
-  }, [id, fetchProductById, clearSelectedProduct]); // Removido selectedProduct de las dependencias
+  }, [actualProductId, fetchProductById, clearSelectedProduct, editableVariables]); // Añadido editableVariables
   
   // Mostrar pantalla de carga si el producto está cargando
   if (isLoadingProduct) {
@@ -76,7 +80,7 @@ const ProductDetailScreen: React.FC = () => {
   }
 
   // Si no está cargando y no hay producto, mostrar mensaje de error
-  if (!isLoadingProduct && !selectedProduct && id) {
+  if (!isLoadingProduct && !selectedProduct && actualProductId) {
     return (
       <div style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
         <NavBar

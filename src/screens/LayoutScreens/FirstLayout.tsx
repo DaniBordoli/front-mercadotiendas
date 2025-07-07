@@ -12,7 +12,7 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { FirstLayoutEditableVariables } from '../../components/organisms/CustomizableMenu/types';
 import { fetchShopTemplate } from '../../services/api';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 const FirstLayout: React.FC = () => {
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
@@ -21,8 +21,10 @@ const FirstLayout: React.FC = () => {
   const shop = useShopStore(state => state.shop);
   const getShop = useShopStore(state => state.getShop);
   const location = useLocation();
+  const { shopId } = useParams<{ shopId: string }>();
 
   const fetchProducts = useAuthStore(state => state.fetchProducts);
+  const fetchProductsByShop = useAuthStore(state => state.fetchProductsByShop);
   const createShop = useShopStore(state => state.createShop);
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
@@ -32,32 +34,59 @@ const FirstLayout: React.FC = () => {
   const isPreview = typeof window !== 'undefined' && window.self !== window.top;
   const urlParams = new URLSearchParams(location.search);
   const isViewMode = urlParams.get('view') === 'true';
+  const isInShopView = !!shopId; // Detectar si estamos en ShopView
 
-  // No mostrar el chat AI si estamos en preview o en modo visualización
-  const shouldShowChat = !isPreview && !isViewMode;
+  // No mostrar el chat AI si estamos en preview, en modo visualización, o en ShopView
+  const shouldShowChat = !isPreview && !isViewMode && !isInShopView;
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoadingProducts(true);
-        const prods = await fetchProducts();
-        // Filter out inactive products
-        const activeProds = prods.filter((product: any) => 
-          !product.estado || product.estado === 'Activo'
-        );
-        setFeaturedProducts(activeProds);
+        let prods: any[] = [];
+        
+        // Si estamos en ShopView, usar fetchProductsByShop
+        if (isInShopView && shop) {
+          console.log('FirstLayout: En ShopView, obteniendo productos de la tienda:', shop._id);
+          prods = await fetchProductsByShop(shop._id);
+        } else {
+          // Si estamos en la propia tienda, usar fetchProducts
+          console.log('FirstLayout: En tienda propia, obteniendo productos');
+          prods = await fetchProducts();
+          // Filter out inactive products (el backend ya filtra los activos cuando usamos fetchProductsByShop)
+          prods = prods.filter((product: any) => 
+            !product.estado || product.estado === 'Activo'
+          );
+        }
+        
+        setFeaturedProducts(prods);
+        console.log('FirstLayout: Productos cargados:', prods.length);
       } catch (err) {
+        console.error('FirstLayout: Error al cargar productos:', err);
         setFeaturedProducts([]);
       } finally {
         setLoadingProducts(false);
       }
     };
-    loadProducts();
-  }, [fetchProducts]);
+
+    // Solo cargar productos si tenemos los datos necesarios
+    if (isInShopView && shop) {
+      loadProducts();
+    } else if (!isInShopView) {
+      loadProducts();
+    }
+  }, [fetchProducts, fetchProductsByShop, isInShopView, shop]);
 
   useEffect(() => {
     const loadShopData = async () => {
       try {
+        // Si estamos en ShopView, no cargar datos propios
+        if (isInShopView) {
+          console.log('FirstLayout: En modo ShopView, usando datos de ShopView');
+          return;
+        }
+        
+        // Solo cargar datos propios si NO estamos en ShopView
         if (!shop) {
           await getShop();
         }
@@ -66,12 +95,18 @@ const FirstLayout: React.FC = () => {
       }
     };
     loadShopData();
-  }, [shop, getShop]);
+  }, [shop, getShop, isInShopView]);
 
   // Cargar template después de que el shop esté cargado
   useEffect(() => {
     const getTemplate = async () => {
       try {
+        // Si estamos en ShopView, no cargar template propio
+        if (isInShopView) {
+          console.log('FirstLayout: En modo ShopView, no cargando template propio');
+          return;
+        }
+        
         const response = await fetchShopTemplate();
         console.log('Template response:', response);
         if (response && response.data && response.data.templateUpdate) {
@@ -101,10 +136,11 @@ const FirstLayout: React.FC = () => {
       }
     };
     
-    if (shop) {
+    // Solo ejecutar si tenemos shop Y no estamos en ShopView
+    if (shop && !isInShopView) {
       getTemplate();
     }
-  }, [shop, setEditableVariables, updateEditableVariables]);
+  }, [shop, setEditableVariables, updateEditableVariables, isInShopView]);
 
   const handleTemplateChanges = (changes: Partial<FirstLayoutEditableVariables>) => {
     updateEditableVariables(changes);

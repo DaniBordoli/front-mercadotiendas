@@ -20,6 +20,7 @@ interface ShopInstitutionalState {
   loading: boolean;
   error: string | null;
   getShopInstitutional: () => Promise<void>;
+  getShopInstitutionalByShopId: (shopId: string) => Promise<void>;
   updateShopInstitutional: (data: {
     description?: string;
     mission?: string;
@@ -43,6 +44,32 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
 
     try {
       const response = await fetch(`${API_URL}/shop-institutional/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener información institucional');
+      }
+
+      const result = await response.json();
+      set({ institutional: result.data?.institutional, loading: false });
+    } catch (error) {
+      set({ error: (error as Error).message, loading: false });
+      throw error;
+    }
+  },
+
+  getShopInstitutionalByShopId: async (shopId: string) => {
+    const token = getStorageItem('token');
+    if (!token) throw new Error('No authentication token found');
+
+    set({ loading: true, error: null });
+
+    try {
+      const response = await fetch(`${API_URL}/shop-institutional/shop/${shopId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`

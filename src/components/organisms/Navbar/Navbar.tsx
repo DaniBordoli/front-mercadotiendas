@@ -286,10 +286,10 @@ export const Navbar: React.FC = () => {
               </div>
               
               {/* Mostrar "Crear tienda" si no tiene tienda, "Ver mi tienda" si ya la tiene */}
-              {isUserReady && user.shop ? (
+              {isUserReady && user.shop?._id ? (
                 <div className="flex items-center cursor-pointer hover:text-red-500 transition-colors">
-                  <BsShop onClick={() => handleShopAccess('/first-layout?view=true')} className="text-xl mr-2" />
-                  <span onClick={() => handleShopAccess('/first-layout?view=true')}>Ver mi tienda</span>
+                  <BsShop onClick={() => navigate(`/shop/${user.shop?._id}`)} className="text-xl mr-2" />
+                  <span onClick={() => navigate(`/shop/${user.shop?._id}`)}>Ver mi tienda</span>
                 </div>
               ) : (
                 <div

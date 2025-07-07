@@ -7,19 +7,29 @@ import FAQCard from '../../components/LayoutComponents/FAQCard';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { fetchShopTemplate } from '../../services/api';
+import { useParams } from 'react-router-dom';
 
 const ContactScreen: React.FC = () => {
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   const setEditableVariables = useFirstLayoutStore(state => state.setEditableVariables);
   const { shop, getShop } = useShopStore();
+  const { shopId } = useParams<{ shopId: string }>();
+  const isInShopView = !!shopId;
   
   React.useEffect(() => {
     const loadShopAndTemplate = async () => {
       try {
+        // Si estamos en ShopView, no cargar datos propios
+        if (isInShopView) {
+          console.log('ContactScreen: En modo ShopView, usando datos de ShopView');
+          return;
+        }
+        
+        // Solo cargar datos propios si NO estamos en ShopView
         if (!shop) {
           await getShop();
         }
-        // Cargar template
+        // Cargar template solo si NO estamos en ShopView
         const response = await fetchShopTemplate();
         if (response && response.data && response.data.templateUpdate) {
           setEditableVariables(response.data.templateUpdate);
@@ -29,7 +39,7 @@ const ContactScreen: React.FC = () => {
       }
     };
     loadShopAndTemplate();
-  }, [shop, getShop, setEditableVariables]);
+  }, [shop, getShop, setEditableVariables, isInShopView]);
 
   // Datos dinámicos de la tienda
   const shopAddress = shop?.address || "123 Calle de la Moda, Nueva York, NY 10001";

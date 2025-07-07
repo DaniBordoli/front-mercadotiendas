@@ -10,15 +10,23 @@ import TeamMemberCard from '../../components/LayoutComponents/TeamMemberCard';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { useShopInstitutionalStore } from '../../stores/slices/shopInstitutionalStore';
+import { useParams } from 'react-router-dom';
 
 const AboutUsScreen: React.FC = () => {
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   const shop = useShopStore(state => state.shop);
-  const { institutional, getShopInstitutional } = useShopInstitutionalStore();
+  const { shopId } = useParams<{ shopId: string }>();
+  const { institutional, getShopInstitutional, getShopInstitutionalByShopId } = useShopInstitutionalStore();
 
   React.useEffect(() => {
-    getShopInstitutional();
-  }, [getShopInstitutional]);
+    // Si estamos en ShopView, obtener datos de la tienda específica
+    if (shopId && shop) {
+      getShopInstitutionalByShopId(shop._id);
+    } else {
+      // Si estamos en la tienda propia, obtener datos propios
+      getShopInstitutional();
+    }
+  }, [getShopInstitutional, getShopInstitutionalByShopId, shopId, shop]);
   return (
     <div className="min-h-screen flex flex-col bg-gray-50" style={{ backgroundColor: editableVariables.mainBackgroundColor }}>
       <NavBar
