@@ -3,7 +3,7 @@ import { FaFacebook, FaInstagram, FaTwitter, FaWhatsapp, FaTiktok, FaYoutube } f
 import { HiLocationMarker } from 'react-icons/hi';
 import { FaPhone } from 'react-icons/fa6';
 import { IoMail } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { useAuthStore } from '../../stores';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
@@ -25,10 +25,14 @@ const Footer: React.FC<FooterProps> = ({
   footerDescription = 'Tu destino integral para moda y accesorios.',
 }) => {
   const navigate = useNavigate();
+  const { shopId } = useParams<{ shopId: string }>();
   const { shop, getShop, setShop } = useShopStore();
   const { isAuthenticated, user } = useAuthStore();
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
-  const { getSocialLinks } = useSocialMedia();
+  
+  // Usar shopId correcto dependiendo del contexto
+  const currentShopId = shopId && shop ? shop._id : undefined;
+  const { getSocialLinks } = useSocialMedia(currentShopId);
 
   useEffect(() => {
     if (user?.shop && !shop) {
@@ -120,7 +124,7 @@ const Footer: React.FC<FooterProps> = ({
               <span
                 className="hover:opacity-75 cursor-pointer transition-opacity"
                 style={{ color: dynamicTextColor }}
-                onClick={() => navigate('/first-layout/aboutus-layout')}
+                onClick={() => navigate(shopId ? `/shop/${shopId}/about` : '/first-layout/aboutus-layout')}
               >
                 Sobre nosotros
               </span>
@@ -129,7 +133,7 @@ const Footer: React.FC<FooterProps> = ({
               <span
                 className="hover:opacity-75 cursor-pointer transition-opacity"
                 style={{ color: dynamicTextColor }}
-                onClick={() => navigate('/first-layout/contact-layout')}
+                onClick={() => navigate(shopId ? `/shop/${shopId}/contact` : '/first-layout/contact-layout')}
               >
                 Contacto
               </span>

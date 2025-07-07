@@ -49,6 +49,7 @@ import NewProductScreen from '../screens/NewProductScreen';
 import DataCatalog from '../screens/DataCatalog';
 import PaymentReturn from '../screens/PaymentReturn';
 import DataCurrency from '../screens/DataCurrency';
+import ShopView from '../screens/ShopView';
 
 
 export const publicRoutes = [
@@ -99,6 +100,31 @@ export const publicRoutes = [
   {
     path: '/producto/:id', 
     element: <ProductDetailPage />
+  },
+  // Rutas para tiendas individuales con Shop ID
+  {
+    path: '/shop/:shopId',
+    element: <ShopView />
+  },
+  {
+    path: '/shop/:shopId/tienda',
+    element: <ShopView />
+  },
+  {
+    path: '/shop/:shopId/producto/:productId',
+    element: <ShopView />
+  },
+  {
+    path: '/shop/:shopId/contacto',
+    element: <ShopView />
+  },
+  {
+    path: '/shop/:shopId/acerca-de',
+    element: <ShopView />
+  },
+  {
+    path: '/shop/:shopId/carrito',
+    element: <ShopView />
   },
   {
     path: '/domain-config', 

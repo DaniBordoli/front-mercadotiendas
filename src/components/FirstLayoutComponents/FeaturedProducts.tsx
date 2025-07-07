@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FiShoppingCart } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSearchStore } from '../../stores/searchStore';
+import { useShopStore } from '../../stores/slices/shopStore';
 
 interface Product {
   _id?: string;
@@ -13,6 +14,7 @@ interface Product {
   productImages?: string[];
   image?: string;
   estado?: string;
+  shop?: string | { _id: string };
 }
 
 interface FeaturedProductsProps {
@@ -39,7 +41,9 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   products,
 }) => {
   const navigate = useNavigate();
+  const { shopId } = useParams<{ shopId: string }>();
   const { fetchProductById } = useSearchStore();
+  const { shop: currentShop } = useShopStore();
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
   
   const defaultProducts = [
@@ -49,9 +53,13 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
     { id: 4, title: 'Producto 4', price: '$79.99', image: cardImage },
   ];
   
-  // Filter out inactive products
+  // Los productos ya vienen filtrados correctamente desde el componente padre
+  // (FirstLayout o ShopLayout) que usa la API correcta según el contexto
   const activeProducts = products && products.length > 0 
-    ? products.filter(product => !product.estado || product.estado === 'Activo')
+    ? products.filter(product => {
+        // Solo filtrar productos inactivos (el filtro por tienda ya se hace en el backend)
+        return !product.estado || product.estado === 'Activo';
+      })
     : defaultProducts;
   
   const showProducts = activeProducts;
@@ -75,14 +83,24 @@ const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
       setLoadingProductId(String(productId));
       // Precargar el producto antes de navegar
       await fetchProductById(String(productId));
-      // Una vez cargado, navegar al detalle
-      navigate(`/first-layout/detail-layout/${productId}`);
+      
+      // Navegar dependiendo del contexto (ShopView o normal)
+      if (shopId) {
+        navigate(`/shop/${shopId}/producto/${productId}`);
+      } else {
+        navigate(`/first-layout/detail-layout/${productId}`);
+      }
+      
       // Scroll al tope de la página
       window.scrollTo(0, 0);
     } catch (error) {
       console.error('Error al precargar producto:', error);
       // Si hay error, navegar de todas formas
-      navigate(`/first-layout/detail-layout/${productId}`);
+      if (shopId) {
+        navigate(`/shop/${shopId}/producto/${productId}`);
+      } else {
+        navigate(`/first-layout/detail-layout/${productId}`);
+      }
       // Scroll al tope incluso si hay error
       window.scrollTo(0, 0);
     } finally {

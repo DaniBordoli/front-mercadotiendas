@@ -3,7 +3,7 @@ import NavBar from '../../components/FirstLayoutComponents/NavBar';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import { SelectDefault } from '../../components/atoms/SelectDefault/SelectDefault';
 import Footer from '../../components/FirstLayoutComponents/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
 import { useShopStore } from '../../stores/slices/shopStore';
@@ -16,6 +16,7 @@ const ShopLayout: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [sort, setSort] = useState('latest');
   const navigate = useNavigate();
+  const { shopId } = useParams<{ shopId: string }>();
 
   // Obtener variables globales de estilo
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
@@ -23,6 +24,7 @@ const ShopLayout: React.FC = () => {
   const shop = useShopStore(state => state.shop);
   const getShop = useShopStore(state => state.getShop);
   const fetchActiveProducts = require('../../stores').useAuthStore((state: any) => state.fetchActiveProducts);
+  const fetchProductsByShop = require('../../stores').useAuthStore((state: any) => state.fetchProductsByShop);
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   
@@ -34,10 +36,18 @@ const ShopLayout: React.FC = () => {
   useEffect(() => {
     const loadShopAndTemplate = async () => {
       try {
+        // Si estamos en ShopView, no cargar la tienda del usuario autenticado
+        // Los datos ya vienen desde ShopView
+        if (shopId) {
+          console.log('ShopLayout: En modo ShopView, usando datos de ShopView');
+          return;
+        }
+        
+        // Solo cargar datos propios si NO estamos en ShopView
         if (!shop) {
           await getShop();
         }
-        // Cargar template
+        // Cargar template solo si NO estamos en ShopView
         const response = await fetchShopTemplate();
         if (response && response.data && response.data.templateUpdate) {
           setEditableVariables(response.data.templateUpdate);
@@ -47,36 +57,63 @@ const ShopLayout: React.FC = () => {
       }
     };
     loadShopAndTemplate();
-  }, [shop, getShop, setEditableVariables]);
+  }, [shop, getShop, setEditableVariables, shopId]);
 
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       try {
-        const prods = await fetchActiveProducts();
-        // Filter out inactive products
-        const activeProds = prods.filter((product: any) => 
-          !product.estado || product.estado === 'Activo'
-        );
-        setProducts(activeProds);
+        let prods: any[] = [];
+        
+        // Si estamos en ShopView, usar fetchProductsByShop
+        if (shopId && shop) {
+          console.log('ShopLayout: En ShopView, obteniendo productos de la tienda:', shop._id);
+          prods = await fetchProductsByShop(shop._id);
+        } else {
+          // Si estamos en la propia tienda, usar fetchActiveProducts
+          console.log('ShopLayout: En tienda propia, obteniendo productos activos');
+          prods = await fetchActiveProducts();
+        }
+        
+        // Los productos ya vienen filtrados por 'Activo' desde el backend
+        setProducts(prods);
+        console.log('ShopLayout: Productos cargados:', prods.length);
       } catch (err) {
+        console.error('ShopLayout: Error al cargar productos:', err);
         // Filter out inactive products from search store backup
-        const activeBackupProducts = baseSearchResults.filter(product =>
+        let activeBackupProducts = baseSearchResults.filter(product =>
           !product.estado || product.estado === 'Activo'
         );
+        
+        // Si estamos en ShopView, filtrar por la tienda específica
+        if (shopId && shop) {
+          activeBackupProducts = activeBackupProducts.filter(product => {
+            const productShopId = typeof product.shop === 'object' ? product.shop._id : product.shop;
+            return productShopId === shop._id;
+          });
+        }
+        
         setProducts(activeBackupProducts);
       } finally {
         setLoading(false);
       }
     };
-    loadProducts();
-  }, [fetchActiveProducts, baseSearchResults]);
+
+    // Solo cargar productos si tenemos shop data
+    if (shop) {
+      loadProducts();
+    }
+  }, [shop, shopId, fetchActiveProducts, fetchProductsByShop, baseSearchResults]);
 
   // Función para manejar la navegación a detalle con precarga
   const handleProductClick = async (product: any) => {
     const productId = product?.id || product?._id;
     if (!productId) {
-      navigate('/first-layout/detail-layout');
+      if (shopId) {
+        navigate(`/shop/${shopId}/producto/default`);
+      } else {
+        navigate('/first-layout/detail-layout');
+      }
       return;
     }
 
@@ -84,12 +121,21 @@ const ShopLayout: React.FC = () => {
       setLoadingProductId(productId);
       // Precargar el producto antes de navegar
       await fetchProductById(productId);
-      // Una vez cargado, navegar al detalle
-      navigate(`/first-layout/detail-layout/${productId}`);
+      
+      // Navegar dependiendo del contexto (ShopView o normal)
+      if (shopId) {
+        navigate(`/shop/${shopId}/producto/${productId}`);
+      } else {
+        navigate(`/first-layout/detail-layout/${productId}`);
+      }
     } catch (error) {
       console.error('Error al precargar producto:', error);
       // Si hay error, navegar de todas formas
-      navigate(`/first-layout/detail-layout/${productId}`);
+      if (shopId) {
+        navigate(`/shop/${shopId}/producto/${productId}`);
+      } else {
+        navigate(`/first-layout/detail-layout/${productId}`);
+      }
     } finally {
       setLoadingProductId(null);
     }
