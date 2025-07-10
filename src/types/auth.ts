@@ -94,6 +94,7 @@ export type AuthStore = AuthState & {
   clearError: () => void;
   setToken: (token: string) => void;
   clearToken: () => void;
+  setUser: (user: UserWithLoading | null) => void;
   createProduct: (
     data: {
       nombre: string;

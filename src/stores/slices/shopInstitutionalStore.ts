@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getStorageItem } from '../../utils/storage';
+import { authFetch } from '../../utils/authFetch';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -43,12 +44,7 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch(`${API_URL}/shop-institutional/me`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await authFetch(`${API_URL}/shop-institutional/me`);
 
       if (!response.ok) {
         throw new Error('Error al obtener información institucional');
@@ -69,12 +65,7 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch(`${API_URL}/shop-institutional/shop/${shopId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await authFetch(`${API_URL}/shop-institutional/shop/${shopId}`);
 
       if (!response.ok) {
         throw new Error('Error al obtener información institucional');
@@ -95,7 +86,7 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
     set({ loading: true, error: null });
 
     try {
-      const response = await fetch(`${API_URL}/shop-institutional/me`, {
+      const response = await authFetch(`${API_URL}/shop-institutional/me`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

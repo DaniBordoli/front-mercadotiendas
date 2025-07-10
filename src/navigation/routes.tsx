@@ -265,6 +265,10 @@ export const publicRoutes = [
     path: '/payment/return',
     element: <PaymentReturn />
   },
+  {
+    path: '/payment/return/*',
+    element: <PaymentReturn />
+  },
 ];
 
 

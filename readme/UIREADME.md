@@ -38,6 +38,10 @@
   - Layout necesita ajustes para mejorar responsividad
   - Cards con estilos básicos que pueden mejorar visualmente
 
+### Manejo de Stock
+
+- **Descripción:** Se ha corregido el tipo de dato del campo `stock` en el modelo `Product` de `String` a `Number` para permitir operaciones aritméticas correctas. Adicionalmente, se ha implementado la conversión explícita a `Number` al crear y actualizar productos para asegurar la consistencia del tipo de dato en la base de datos. Esta mejora garantiza que el stock de los productos se actualice correctamente después de cada venta, mejorando la fiabilidad del inventario.
+
 ## Plan de Implementación de Nuevas Funcionalidades
 
 ### Fase 1: Mejoras de UI/UX (Prioridad Alta)
