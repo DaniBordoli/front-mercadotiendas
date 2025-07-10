@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { getStorageItem } from '../utils/storage';
+import { authFetch } from '../utils/authFetch';
 
 export interface PaymentData {
   orderData: {
@@ -23,9 +25,13 @@ export interface PaymentData {
 export interface PaymentResponse {
   success: boolean;
   data: {
-    id: string;
-    url: string;
-    redirectUrl: string;
+    success: boolean;
+    data: {
+      id: string;
+      url: string;
+      redirectUrl: string; // Añadido: propiedad redirectUrl
+    };
+    message: string;
   };
   message: string;
 }
@@ -73,7 +79,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const token = localStorage.getItem('token');
+      const token = getStorageItem('token');
       console.log('=== PAYMENT STORE: Token de autenticación ===');
       console.log('Token existe:', !!token);
       console.log('Token (primeros 20 chars):', token ? token.substring(0, 20) + '...' : 'No token');
@@ -92,7 +98,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       });
       console.log('Body:', JSON.stringify(paymentData, null, 2));
 
-      const response = await fetch(apiUrl, {
+      const response = await authFetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,8 +123,16 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       console.log('=== PAYMENT STORE: Respuesta exitosa ===');
       console.log('Result:', JSON.stringify(result, null, 2));
       
-      set({ currentPayment: result, isLoading: false });
-      return result;
+      // Asegurarse de que el objeto data sea un objeto plano para evitar problemas de proxy/referencia
+      const finalResult: PaymentResponse = {
+        ...result,
+        data: JSON.parse(JSON.stringify(result.data))
+      };
+
+      console.log('=== PAYMENT STORE: Final result before return ===', JSON.stringify(finalResult, null, 2));
+
+      set({ currentPayment: finalResult, isLoading: false });
+      return finalResult;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       console.error('=== PAYMENT STORE: Error en createCheckout ===');
@@ -134,12 +148,12 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const token = localStorage.getItem('token');
+      const token = getStorageItem('token');
       if (!token) {
         throw new Error('No se encontró token de autenticación');
       }
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/payments/status/${paymentId}`, {
+      const response = await authFetch(`${process.env.REACT_APP_API_URL}/payments/status/${paymentId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import { getStorageItem } from '../utils/storage';
 import { PaymentData, PaymentResponse, PaymentStatus } from '../stores/paymentStore';
+import { authFetch } from '../utils/authFetch';
 
 export const API_URL = process.env.REACT_APP_API_URL;
 
@@ -18,7 +19,7 @@ export const createMobbexCheckout = async (paymentData: PaymentData): Promise<Pa
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/payments/checkout`, {
+    const response = await authFetch(`${API_URL}/api/payments/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export const getPaymentStatus = async (paymentId: string): Promise<PaymentStatus
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/payments/status/${paymentId}`, {
+    const response = await authFetch(`${API_URL}/api/payments/status/${paymentId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -62,7 +63,7 @@ export const getPaymentHistory = async (): Promise<any[]> => {
   }
 
   try {
-    const response = await fetch(`${API_URL}/api/payments/history`, {
+    const response = await authFetch(`${API_URL}/api/payments/history`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { usePaymentStore } from '../stores/paymentStore';
+import { useAuthStore } from '../stores/slices/authSlice';
 import { FaCheckCircle, FaTimesCircle, FaClock, FaSpinner } from 'react-icons/fa';
 
 interface PaymentStatus {
@@ -12,24 +13,41 @@ interface PaymentStatus {
 }
 
 const PaymentReturn: React.FC = () => {
+  console.log('[PaymentReturn] Componente montado');
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { checkPaymentStatus, isLoading } = usePaymentStore();
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
+  const loadProfile = useAuthStore(state => state.loadProfile);
 
   // Fix automático para HTTPS -> HTTP en localhost
+  // useEffect(() => {
+  //   const currentUrl = window.location.href;
+  //   if (currentUrl.startsWith('https://localhost:')) {
+  //     console.log('=== PAYMENT RETURN: Detectado HTTPS en localhost, redirigiendo a HTTP ===');
+  //     const correctedUrl = currentUrl.replace('https://localhost:', 'http://localhost:');
+  //     console.log('URL original:', currentUrl);
+  //     console.log('URL corregida:', correctedUrl);
+  //     window.location.replace(correctedUrl);
+  //     return;
+  //   }
+  // }, []);
+
   useEffect(() => {
-    const currentUrl = window.location.href;
-    if (currentUrl.startsWith('https://localhost:')) {
-      console.log('=== PAYMENT RETURN: Detectado HTTPS en localhost, redirigiendo a HTTP ===');
-      const correctedUrl = currentUrl.replace('https://localhost:', 'http://localhost:');
-      console.log('URL original:', currentUrl);
-      console.log('URL corregida:', correctedUrl);
-      window.location.replace(correctedUrl);
-      return;
+    // Rehidratación de sesión: si hay token en localStorage, forzar validación
+    const localToken = localStorage.getItem('mercadotiendas_token');
+    console.log('[PaymentReturn] Intentando rehidratar sesión. Token en localStorage:', localToken);
+    if (localToken) {
+      loadProfile().then((user) => {
+        if (user) {
+          console.log('[PaymentReturn] Sesión rehidratada tras volver de Mobbex.');
+        } else {
+          console.warn('[PaymentReturn] No se pudo rehidratar la sesión tras volver de Mobbex.');
+        }
+      });
     }
-  }, []);
+  }, [loadProfile]);
 
   useEffect(() => {
     const processPaymentReturn = async () => {
@@ -39,6 +57,18 @@ const PaymentReturn: React.FC = () => {
       const status = searchParams.get('status');
       const type = searchParams.get('type');
       const transactionId = searchParams.get('transactionId');
+
+      // Si estamos en un popup, enviar los datos a la ventana principal y cerrar
+      if (window.opener && status && transactionId) {
+        window.opener.postMessage({
+          source: 'mobbex-payment',
+          status,
+          type,
+          transactionId
+        }, '*'); // Cambiar '*' por el origen esperado en producción
+        window.close();
+        return;
+      }
 
       console.log('Parámetros recibidos de Mobbex:');
       console.log('- Status:', status);

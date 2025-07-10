@@ -3,6 +3,7 @@ import { API_URL } from '../../services/api';
 import { Shop } from '../../types/auth';
 import { useAuthStore } from '../';
 import { getStorageItem, setStorageItem } from '../../utils/storage';
+import { authFetch } from '../../utils/authFetch';
 
 interface ShopState {
     shop: Shop | null;
@@ -40,7 +41,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
                     formData.append(key, data[key]);
                 });
 
-                const response = await fetch(`${API_URL}/shops/${shopId}`, {
+                const response = await authFetch(`${API_URL}/shops/${shopId}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -69,7 +70,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
                     }
                 }
             } else {
-                const response = await fetch(`${API_URL}/shops/${shopId}`, {
+                const response = await authFetch(`${API_URL}/shops/${shopId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -137,7 +138,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
                 body = JSON.stringify(data);
             }
 
-            const response = await fetch(`${API_URL}/shops`, {
+            const response = await authFetch(`${API_URL}/shops`, {
                 method: 'POST',
                 headers,
                 body
@@ -183,7 +184,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
         set({ loading: true, error: null });
 
         try {
-            const response = await fetch(`${API_URL}/shops/me`, {
+            const response = await authFetch(`${API_URL}/shops/me`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -210,7 +211,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
         set({ loading: true, error: null });
 
         try {
-            const response = await fetch(`${API_URL}/shops/${shopId}`, {
+            const response = await authFetch(`${API_URL}/shops/${shopId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

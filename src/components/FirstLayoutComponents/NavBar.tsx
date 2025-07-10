@@ -146,7 +146,12 @@ const NavBar: React.FC<NavBarProps> = ({
             style={{ color: navbarIconsColor || textColor || '#374151' }} 
           />
           <div className="relative cursor-pointer hover:opacity-75 transition-opacity" onClick={() => {
-                        navigate('/cart-list');
+            // Si estamos en ShopView, ir al carrito de esa tienda
+            if (shopId) {
+              navigate(`/shop/${shopId}/carrito`);
+            } else {
+              navigate('/cart-list');
+            }
           }}>
             <FaShoppingCart 
               className="text-xl" 

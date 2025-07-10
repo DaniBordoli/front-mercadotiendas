@@ -10,6 +10,8 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from '../stores/cartStore';
 import { usePaymentStore } from '../stores/paymentStore';
 import { PaymentData } from '../stores/paymentStore';
+import { useEffect } from 'react';
+import { useAuthStore } from '../stores';
 
 export default function CartSummary() {
     const navigate = useNavigate();
@@ -18,6 +20,7 @@ export default function CartSummary() {
     
     // Payment store
     const { createCheckout, isLoading, error, clearPayment } = usePaymentStore();
+    const { user } = useAuthStore();
 
     const groupedByStore = React.useMemo(() => {
         const groups: Record<string, typeof cartItems> = {};
@@ -42,6 +45,12 @@ export default function CartSummary() {
             return;
         }
 
+        if (!user) {
+            alert('Debes iniciar sesión para continuar con la compra');
+            navigate('/login');
+            return;
+        }
+
         try {
             // Limpiar errores previos
             clearPayment();
@@ -60,16 +69,17 @@ export default function CartSummary() {
                     reference: `order_${Date.now()}`
                 },
                 customerData: {
-                    email: 'usuario@email.com', // TODO: Obtener del usuario autenticado
-                    name: 'Usuario de Prueba', // TODO: Obtener del usuario autenticado
-                    identification: '12345678' // TODO: Obtener del usuario autenticado
+                    email: user.email,
+                    name: user.name || 'Usuario de Prueba',
+                    identification: '12345678' // TODO: Obtener del usuario autenticado   
                 },
                 items: cartItems.map(item => ({
                     name: item.product.name,
                     description: `${item.product.name} - ${item.product.brand || 'MercadoTiendas'}`,
                     quantity: item.quantity,
                     price: item.product.price,
-                    image: item.product.imageUrls?.[0] || 'https://via.placeholder.com/150'
+                    image: item.product.imageUrls?.[0] || 'https://via.placeholder.com/150',
+                    productId: item.product.id
                 }))
             };
 
@@ -83,15 +93,34 @@ export default function CartSummary() {
             console.log('=== FRONTEND: Respuesta recibida del backend ===');
             console.log('CheckoutResponse:', JSON.stringify(checkoutResponse, null, 2));
             
-            if (checkoutResponse.success && checkoutResponse.data.url) {
-                console.log('=== FRONTEND: Checkout exitoso, limpiando carrito y redirigiendo ===');
-                console.log('URL de redirección:', checkoutResponse.data.url);
+            // Añadido para depuración: verificar el contenido de checkoutResponse.data.url justo antes de la condición
+            console.log('=== FRONTEND: Verificando checkoutResponse.data.url antes de la condición ===', checkoutResponse.data?.data?.url);
+
+            if (checkoutResponse.success && checkoutResponse.data?.data?.url) {
+                console.log('=== FRONTEND: Checkout exitoso, limpiando carrito y abriendo popup de Mobbex ===');
+                console.log('URL de redirección:', checkoutResponse.data.data.url);
                 
-                // Limpiar carrito antes de redirigir
+                // Limpiar carrito antes de abrir el popup
                 clearCart();
                 
-                // Redirigir a Mobbex para completar el pago
-                window.location.href = checkoutResponse.data.url;
+                // Abrir Mobbex en un popup
+                const mobbexWindow = window.open(
+                    checkoutResponse.data.data.url,
+                    'MobbexPago',
+                    'width=600,height=800,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes'
+                );
+                if (!mobbexWindow) {
+                    alert('El navegador ha bloqueado la ventana emergente. Por favor, permite popups para continuar con el pago.');
+                    return;
+                }
+                // Monitorear el cierre del popup
+                const popupInterval = setInterval(() => {
+                    if (mobbexWindow.closed) {
+                        clearInterval(popupInterval);
+                        // Eliminado: navigate('/payment/return');
+                        // Ya no se navega automáticamente, solo se limpia el intervalo
+                    }
+                }, 700);
             } else {
                 console.error('=== FRONTEND: Error en la respuesta del checkout ===');
                 console.error('Respuesta:', checkoutResponse);
@@ -104,6 +133,20 @@ export default function CartSummary() {
             alert(`Error al procesar el pago: ${error instanceof Error ? error.message : 'Error desconocido'}`);
         }
     };
+
+    useEffect(() => {
+        function handlePaymentMessage(event: MessageEvent) {
+            // Validar el origen en producción
+            if (event.data && event.data.source === 'mobbex-payment') {
+                const { status, type, transactionId } = event.data;
+                navigate(`/payment/return?status=${status}&type=${type || ''}&transactionId=${transactionId}`);
+            }
+        }
+        window.addEventListener('message', handlePaymentMessage);
+        return () => {
+            window.removeEventListener('message', handlePaymentMessage);
+        };
+    }, [navigate]);
 
     return (
         <>
