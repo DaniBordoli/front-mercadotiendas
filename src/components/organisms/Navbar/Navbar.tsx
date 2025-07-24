@@ -305,12 +305,38 @@ export const Navbar: React.FC = () => {
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
+                      <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/user-dashboard')}>
+                        Mi Dashboard
+                      </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/data-dashboard')}>
                         Mi Perfil
                       </li>
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/cart-list')}>
                         Mi carrito
                       </li>
+                      {isUserReady && user.shop ? (
+                        <>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/campaigns/create')}>
+                            Crear Campaña
+                          </li>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/campaigns')}>
+                            Mis Campañas
+                          </li>
+                        </>
+                      ) : isUserReady && user.isInfluencer ? (
+                        <>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/my-applications')}>
+                            Mis Aplicaciones
+                          </li>
+                          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/influencer-profile')}>
+                            Perfil de Influencer
+                          </li>
+                        </>
+                      ) : isUserReady ? (
+                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/become-influencer')}>
+                          Convertirme en Influencer
+                        </li>
+                      ) : null}
                       {/* Solo mostrar la opción de Crear Tienda si el usuario no tiene una tienda */}
                       {(!isUserReady || !user.shop) && (
                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={toggleModal}>
@@ -361,26 +387,69 @@ export const Navbar: React.FC = () => {
               <h3 className="text-lg font-bold mb-4 font-space text-center">
                 ¿Quieres ir por la creación manual o vía IA?
               </h3>
-              <div className="flex flex-col gap-4">
-                <DesignButton
-                  variant="secondary"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    navigate('/shop-create');
-                  }}
-                >
-                  Creación Manual
-                </DesignButton>
-                <DesignButton
-                  variant="secondary"
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    navigate('/layout-select');
-                  }}
-                >
-                  Creación vía IA
-                </DesignButton>
-              </div>
+              {isAuthenticated ? (
+                <div className="flex flex-col gap-2">
+                  <button
+                    className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-md w-full text-left"
+                    onClick={() => navigate('/user-dashboard')}
+                  >
+                    <FaRegUserCircle className="text-gray-600" />
+                    Mi dashboard
+                  </button>
+                  <button
+                    className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-md w-full text-left"
+                    onClick={() => navigate('/data-dashboard')}
+                  >
+                    <FaRegUserCircle className="text-gray-600" />
+                    Mi perfil
+                  </button>
+                  {user?.shop ? (
+                    <button
+                      className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-md w-full text-left"
+                      onClick={() => handleShopAccess('/shop-profile')}
+                    >
+                      <BsShop className="text-gray-600" />
+                      Mi tienda
+                    </button>
+                  ) : (
+                    <button
+                      className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-md w-full text-left"
+                      onClick={() => navigate('/my-applications')}
+                    >
+                      <BsShop className="text-gray-600" />
+                      Mis aplicaciones
+                    </button>
+                  )}
+                  <button
+                    className="flex items-center gap-2 hover:bg-gray-100 px-4 py-2 rounded-md w-full text-left"
+                    onClick={handleLogout}
+                  >
+                    <FaRegCircleQuestion className="text-gray-600" />
+                    Cerrar sesión
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  <DesignButton
+                    variant="secondary"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      navigate('/shop-create');
+                    }}
+                  >
+                    Creación Manual
+                  </DesignButton>
+                  <DesignButton
+                    variant="secondary"
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      navigate('/layout-select');
+                    }}
+                  >
+                    Creación vía IA
+                  </DesignButton>
+                </div>
+              )}
               <button
                 className="mt-4 text-sm text-gray-900 font-space w-full text-center"
                 onClick={toggleModal}
@@ -396,6 +465,7 @@ export const Navbar: React.FC = () => {
       <div className="hidden md:flex w-full justify-center bg-white border-b border-gray-100 py-3" style={{ position: 'fixed', top: '55px', left: '0', zIndex: 40 }}>
         <div className="flex gap-8 text-gray-600 text-sm justify-center">
           <a href="#" className="hover:text-red-500 transition-colors">Gestión de ventas</a>
+          <a className="hover:text-red-500 transition-colors cursor-pointer" onClick={() => navigate('/campaigns')}>Campañas</a>
           <div 
             className="relative"
             onMouseEnter={openCategoryMenu}
@@ -443,7 +513,7 @@ export const Navbar: React.FC = () => {
             src="https://randomuser.me/api/portraits/men/32.jpg"
             alt="Perfil"
             className="navbar-mobile-profile"
-            onClick={() => navigate(isAuthenticated ? '/data-dashboard' : '/login')}
+            onClick={() => navigate(isAuthenticated ? '/user-dashboard' : '/login')}
           />
         </div>
       </nav>
