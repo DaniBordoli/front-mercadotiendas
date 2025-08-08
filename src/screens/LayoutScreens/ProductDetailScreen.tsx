@@ -41,6 +41,173 @@ const ProductDetailScreen: React.FC = () => {
   
   const addToCart = useCartStore(state => state.addToCart);
 
+  // Función para cargar reseñas desde el backend
+  const fetchReviews = async (productId: string) => {
+    setIsLoadingReviews(true);
+    try {
+      const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    
+      if (response.ok) {
+        const data = await response.json();
+        // El backend devuelve las reseñas en la propiedad 'message'
+        const reviewsData = data.message || data.data || [];
+        // Asegurar que reviewsData es un array
+        const reviewsArray = Array.isArray(reviewsData) ? reviewsData : [];
+        setReviews(reviewsArray);
+      } else {
+        console.error('Error al cargar reseñas:', await response.text());
+        setReviews([]);
+        // Opcional: mostrar notificación de error al usuario
+        if (response.status === 404) {
+          // Producto no encontrado, pero no es crítico para mostrar la página
+          console.warn('Producto no encontrado para cargar reseñas');
+        } else if (response.status >= 500) {
+          // Error del servidor
+          console.error('Error del servidor al cargar reseñas');
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar reseñas:', error);
+      setReviews([]);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  // Función para enviar reseña al backend
+  const submitReview = async (reviewData: { rating: number; comment: string }) => {
+    if (!user || !isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Debes iniciar sesión para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    const token = getStorageItem('token');
+    if (!token) {
+      setNotification({
+        show: true,
+        message: 'No tienes permisos para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      const response = await fetch(`${API_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: actualProductId,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotification({
+          show: true,
+          message: 'Reseña enviada correctamente!'
+        });
+        setIsWritingReview(false);
+        
+        // Recargar reseñas después de crear una nueva
+        if (actualProductId) {
+          await fetchReviews(actualProductId);
+        }
+      } else {
+        const errorData = await response.json();
+        let errorMessage = 'Error al enviar la reseña';
+        
+        // Mensajes de error específicos según el código de estado
+        if (response.status === 400) {
+          if (errorData.message?.includes('rating')) {
+            errorMessage = 'Por favor, selecciona una calificación del 1 al 5';
+          } else if (errorData.message?.includes('comment')) {
+            errorMessage = 'Por favor, escribe un comentario para tu reseña';
+          } else if (errorData.message?.includes('productId')) {
+            errorMessage = 'Producto no válido';
+          } else if (errorData.message?.includes('ya has enviado')) {
+            errorMessage = 'Ya has enviado una reseña para este producto';
+          } else {
+            errorMessage = errorData.message || 'Datos de la reseña inválidos';
+          }
+        } else if (response.status === 401) {
+          errorMessage = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente';
+        } else if (response.status === 404) {
+          errorMessage = 'Producto no encontrado';
+        } else if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Intenta nuevamente más tarde';
+        } else {
+          errorMessage = errorData.message || 'Error desconocido al enviar la reseña';
+        }
+        
+        setNotification({
+          show: true,
+          message: errorMessage
+        });
+      }
+    } catch (error) {
+      console.error('Error al enviar reseña:', error);
+      let errorMessage = 'Error de conexión. Verifica tu conexión a internet';
+      
+      // Verificar si es un error de red
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet';
+      } else if (error instanceof Error) {
+        errorMessage = `Error: ${error.message}`;
+      }
+      
+      setNotification({
+        show: true,
+        message: errorMessage
+      });
+    } finally {
+      setIsSubmittingReview(false);
+    }
+    
+    setTimeout(() => setNotification({show: false, message: ''}), 3000);
+  };
+
+  // Funciones para manejar reseñas
+  const handleOpenReviewForm = () => {
+    if (!user || !isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Debes iniciar sesión para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+    setIsWritingReview(true);
+  };
+
+  const handleCancelReview = () => {
+    setIsWritingReview(false);
+  };
+
+  const handleReviewSubmit = async (reviewData: { rating: number; comment: string }) => {
+    await submitReview(reviewData);
+  };
+
+  // Calcular estadísticas de reseñas
+  const totalReviews = Array.isArray(reviews) ? reviews.length : 0;
+  const averageRating = totalReviews > 0
+    ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / totalReviews
+    : selectedProduct?.rating || 0;
+
   // Cargar los datos del producto cuando se monta el componente
   useEffect(() => {
     if (actualProductId) {
