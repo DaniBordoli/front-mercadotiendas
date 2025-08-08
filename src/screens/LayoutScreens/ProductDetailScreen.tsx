@@ -237,7 +237,7 @@ const ProductDetailScreen: React.FC = () => {
           'Content-Type': 'application/json',
         },
       });
-      
+    
       if (response.ok) {
         const data = await response.json();
         // El backend devuelve las reseñas en la propiedad 'message'
