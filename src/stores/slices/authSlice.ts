@@ -11,6 +11,7 @@ import {
 import { FirebaseError } from 'firebase/app';
 import { auth, googleProvider } from '../../config/firebase';
 import { API_URL } from '../../services/api';
+import { authFetch } from '../../utils/authFetch';
 
 // Función auxiliar para determinar si un usuario se logueó con Google
 export const isGoogleUser = (user: User | UserWithLoading | null): boolean => {
@@ -262,7 +263,9 @@ export const deleteProductImage = async (productId: string, imageUrl: string): P
   return responseData.data.productImages;
 };
 
+// Refuerzo: Esta función es CRÍTICA para la persistencia de sesión tras reload/retorno externo
 const checkInitialAuthState = () => {
+  // Siempre lee el token y el usuario desde localStorage
   const token = getStorageItem('token');
   const userStr = getStorageItem('user');
   let user: UserWithLoading | null = null;
@@ -271,42 +274,25 @@ const checkInitialAuthState = () => {
     try {
       user = JSON.parse(userStr);
       if (!user || !user.email) {
-        // Datos incompletos
+        user = null;
       }
     } catch (e) {
       removeStorageItem('user');
+      user = null;
     }
   }
 
-  if (token) {
-    if (!user) {
-      user = { 
-        loading: true,
-        _id: 'loading',
-        email: 'cargando@usuario.com',
-        name: 'Cargando...',
-        role: 'user',
-        isActivated: true,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        birthDate: '',
-        city: '',
-        province: '',
-        country: '',
-        authMethod: 'email'
-      };
-    }
-    
-    return { 
-      token, 
-      isAuthenticated: true, 
-      user
-    };
-  }
-
-  return { token: null, isAuthenticated: false, user: null };
+  // isAuthenticated SIEMPRE false tras reload, solo se marca true tras validación backend
+  return {
+    token: token || null,
+    user: user || null,
+    isAuthenticated: false,
+    error: null,
+    loading: false,
+  };
 };
 
+// Estado inicial SIEMPRE derivado de checkInitialAuthState
 const initialState = checkInitialAuthState();
 
 let logoutTimer: ReturnType<typeof setTimeout> | null = null;
@@ -336,62 +322,31 @@ export const clearAutoLogoutTimer = () => {
 export const useAuthStore = create<AuthStore>((set, get) => ({
   loadProfile: async () => {
     const token = get().token;
-    console.log('[Auth] loadProfile - token disponible:', !!token);
-    
+    console.log('[Auth] loadProfile llamado (posible origen: PaymentReturn). Token en store:', token);
     if (!token) {
       console.log('[Auth] No hay token disponible, no se puede cargar el perfil');
       return;
     }
-
     try {
       console.log('[Auth] Intentando cargar perfil desde el servidor...');
-      
-      // Indicar que el perfil está cargando para evitar problemas de UI
       const currentUser = get().user;
       if (currentUser) {
-        set({ 
-          user: { 
-            ...currentUser, 
-            loading: true 
-          } 
-        });
+        set({ user: { ...currentUser, loading: true } });
       }
-      
-      // Obtener el perfil del usuario desde el servidor
+      // Log antes de llamar a fetchUserProfile
+      console.log('[Auth] fetchUserProfile se llamará con token:', get().token);
       const user = await fetchUserProfile();
-
-      
-      // Verificar que el usuario tenga la estructura correcta
-      if (!user || !user.email) {
-
-        throw new Error('Datos de usuario incompletos');
-      }
-      
-      // Preservar el método de autenticación del usuario actual si existe
-      const userWithAuthMethod = {
-        ...user,
-        authMethod: currentUser?.authMethod || user.authMethod || 'email'
-      };
-      
-      // Guardar usuario en localStorage con el prefijo correcto
-      setStorageItem('user', JSON.stringify(userWithAuthMethod));
-      
-      // Actualizar el estado global con los datos completos
-      set({ 
-        user: userWithAuthMethod, 
-        isAuthenticated: true 
-      });
-      
-
-      return userWithAuthMethod; // Devolver el usuario para que pueda ser utilizado por el componente que llamó a loadProfile
+      if (!user || !user.email) throw new Error('Perfil inválido');
+      const userWithAuthMethod = { ...user, loading: false };
+      set({ user: userWithAuthMethod, isAuthenticated: true });
+      console.log('[Auth] Perfil cargado exitosamente, sesión rehidratada.');
+      return userWithAuthMethod;
     } catch (error) {
-
-      // Solo cerrar sesión si es un error de autenticación (401)
-      if (error instanceof Error && error.message.includes('401')) {
-
-        get().logout();
-      } else {
-        // Error no relacionado con autenticación, mantener sesión
+      set({ isAuthenticated: false });
+      console.error('[Auth] Error al cargar perfil en loadProfile:', error);
+      get().logout();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
       }
       return null;
     }
@@ -548,15 +503,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('Respuesta inválida del servidor');
       }
       
-      const { token, user } = responseData.data;
+      const { accessToken, refreshToken, user } = responseData.data;
       
       const isActivated = user?.isActivated === true;
       
       if (isActivated) {
-        setStorageItem('token', token);
+        setStorageItem('token', accessToken);
+        setStorageItem('refreshToken', refreshToken);
         set({
           isAuthenticated: true,
-          token,
+          token: accessToken,
           isLoading: false,
         });
         
@@ -567,11 +523,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           ...user,
           authMethod: 'email'
         };
-        setStorageItem('token', token);
+        setStorageItem('token', accessToken);
+        setStorageItem('refreshToken', refreshToken);
         setStorageItem('user', JSON.stringify(userWithAuthMethod));
         set({
           isAuthenticated: false,
-          token,
+          token: accessToken,
           user: userWithAuthMethod,
           isLoading: false,
 
@@ -976,6 +933,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    */
   clearAutoLogout: () => {
     clearAutoLogoutTimer();
+  },
+
+  setUser: (user: UserWithLoading | null) => {
+    set({ user });
+    if (user) {
+      setStorageItem('user', JSON.stringify(user));
+    } else {
+      removeStorageItem('user');
+    }
   },
 }));
 

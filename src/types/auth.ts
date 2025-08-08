@@ -69,6 +69,8 @@ export interface User {
   createdAt?: string;
   updatedAt?: string;
   authMethod?: 'email' | 'google';
+  isInfluencer?: boolean;
+  imageUrl?: string;
 }
 
 export interface UserWithLoading extends User {
@@ -94,6 +96,7 @@ export type AuthStore = AuthState & {
   clearError: () => void;
   setToken: (token: string) => void;
   clearToken: () => void;
+  setUser: (user: UserWithLoading | null) => void;
   createProduct: (
     data: {
       nombre: string;

@@ -50,6 +50,15 @@ import DataCatalog from '../screens/DataCatalog';
 import PaymentReturn from '../screens/PaymentReturn';
 import DataCurrency from '../screens/DataCurrency';
 import ShopView from '../screens/ShopView';
+import CampaignsListScreen from '../screens/CampaignsListScreen';
+import CampaignDetailScreen from '../screens/CampaignDetailScreen';
+import CampaignCreateScreen from '../screens/CampaignCreateScreen';
+import CampaignApplicationsScreen from '../screens/CampaignApplicationsScreen';
+import CampaignEditScreen from '../screens/CampaignEditScreen';
+import MyApplicationsScreen from '../screens/MyApplicationsScreen';
+import UserDashboard from '../screens/UserDashboard';
+import BecomeInfluencerScreen from '../screens/BecomeInfluencerScreen';
+import InfluencerProfileScreen from '../screens/InfluencerProfileScreen';
 
 
 export const publicRoutes = [
@@ -265,6 +274,18 @@ export const publicRoutes = [
     path: '/payment/return',
     element: <PaymentReturn />
   },
+  {
+    path: '/payment/return/*',
+    element: <PaymentReturn />
+  },
+  {
+    path: '/campaigns',
+    element: <CampaignsListScreen />
+  },
+  {
+    path: '/campaigns/:id',
+    element: <CampaignDetailScreen />
+  },
 ];
 
 
@@ -286,6 +307,34 @@ export const privateRoutes = [
    {
     path: '/shop-create',
     element: <ProtectedRoute><ShopCreate /></ProtectedRoute>
+  },
+  {
+    path: '/campaigns/create',
+    element: <ProtectedRoute><CampaignCreateScreen /></ProtectedRoute>
+  },
+  {
+    path: '/campaigns/:id/applications',
+    element: <ProtectedRoute><CampaignApplicationsScreen /></ProtectedRoute>
+  },
+  {
+    path: '/campaigns/:id/edit',
+    element: <ProtectedRoute><CampaignEditScreen /></ProtectedRoute>
+  },
+  {
+    path: '/my-applications',
+    element: <ProtectedRoute><MyApplicationsScreen /></ProtectedRoute>
+  },
+  {
+    path: '/user-dashboard',
+    element: <ProtectedRoute><UserDashboard /></ProtectedRoute>
+  },
+  {
+    path: '/become-influencer',
+    element: <ProtectedRoute><BecomeInfluencerScreen /></ProtectedRoute>
+  },
+  {
+    path: '/influencer-profile',
+    element: <ProtectedRoute><InfluencerProfileScreen /></ProtectedRoute>
   }
 ];
 
