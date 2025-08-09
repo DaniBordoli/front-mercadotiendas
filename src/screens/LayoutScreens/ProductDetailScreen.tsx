@@ -46,14 +46,127 @@ const ProductDetailScreen: React.FC = () => {
     isLoadingProduct, 
     fetchProductById, 
     clearSelectedProduct,
-    baseSearchResults,
-    productReviews,
-    isLoadingReviews,
-    fetchReviewsByProductId,
-    addReview
+    baseSearchResults
   } = useSearchStore();
   
   const addToCart = useCartStore(state => state.addToCart);
+
+  // Estados locales para reviews (no usar el searchStore para reviews)
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+
+  // Función para cargar reseñas desde el backend
+  const fetchReviews = async (productId: string) => {
+    setIsLoadingReviews(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        let reviewsData = [];
+        if (data.data && Array.isArray(data.data)) {
+          reviewsData = data.data;
+        } else if (data.message && Array.isArray(data.message)) {
+          reviewsData = data.message;
+        } else if (Array.isArray(data)) {
+          reviewsData = data;
+        }
+        
+        const reviewsArray = Array.isArray(reviewsData) ? reviewsData : [];
+        setReviews(reviewsArray);
+      } else {
+        setReviews([]);
+      }
+    } catch (error) {
+      console.error('Error al cargar reseñas:', error);
+      setReviews([]);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  // Función para enviar reseña al backend
+  const submitReview = async (reviewData: { rating: number; comment: string }) => {
+    if (!user || !isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Debes iniciar sesión para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    const token = getStorageItem('token');
+    if (!token) {
+      setNotification({
+        show: true,
+        message: 'No tienes permisos para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: actualProductId,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+        }),
+      });
+
+      if (response.ok) {
+        setNotification({
+          show: true,
+          message: 'Reseña enviada correctamente!'
+        });
+        
+        if (actualProductId) {
+          await fetchReviews(actualProductId);
+        }
+      } else {
+        const errorData = await response.json();
+        let errorMessage = 'Error al enviar la reseña';
+        
+        if (response.status === 400) {
+          errorMessage = errorData.message || 'Datos de la reseña inválidos';
+        } else if (response.status === 401) {
+          errorMessage = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente';
+        } else if (response.status === 404) {
+          errorMessage = 'Producto no encontrado';
+        } else if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Intenta nuevamente más tarde';
+        } else {
+          errorMessage = errorData.message || 'Error desconocido al enviar la reseña';
+        }
+        
+        setNotification({
+          show: true,
+          message: errorMessage
+        });
+      }
+    } catch (error) {
+      console.error('Error al enviar reseña:', error);
+      setNotification({
+        show: true,
+        message: 'Error de conexión. Verifica tu conexión a internet'
+      });
+    }
+    
+    setTimeout(() => setNotification({show: false, message: ''}), 3000);
+  };
 
   // Funciones para manejar reseñas
   const handleOpenReviewForm = () => {
@@ -74,29 +187,24 @@ const ProductDetailScreen: React.FC = () => {
 
   const handleReviewSubmit = async (reviewData: { rating: number; text: string }) => {
     if (!actualProductId) return;
-    addReview(actualProductId, reviewData);
+    await submitReview({ rating: reviewData.rating, comment: reviewData.text });
     setIsWritingReview(false);
   };
 
   // Calcular estadísticas de reseñas
-  const totalReviews = Array.isArray(productReviews) ? productReviews.length : 0;
+  const totalReviews = Array.isArray(reviews) ? reviews.length : 0;
   const averageRating = totalReviews > 0
-    ? productReviews.reduce((sum: number, review: any) => sum + (review.rating || 0), 0) / totalReviews
+    ? reviews.reduce((sum: number, review: any) => sum + (review.rating || 0), 0) / totalReviews
     : selectedProduct?.rating || 0;
 
   // Cargar los datos del producto cuando se monta el componente
   useEffect(() => {
     if (actualProductId) {
-      console.log(`[ProductDetailScreen] Cargando producto con ID: ${actualProductId}`);
-      console.log(`[ProductDetailScreen] Estilos aplicados:`, editableVariables);
-      
-      // Solo cargar si no está ya cargado o si es diferente al actual
       if (!selectedProduct || selectedProduct.id !== actualProductId) {
         fetchProductById(actualProductId);
       }
       
-      // Cargar reseñas del producto
-      fetchReviewsByProductId(actualProductId);
+      fetchReviews(actualProductId);
       
       setSelectedImage(0);
       setQuantity(1);
@@ -410,12 +518,16 @@ const ProductDetailScreen: React.FC = () => {
                   )}
                 </div>
                 
-                {productReviews && productReviews.length > 0 ? (
+                {isLoadingReviews ? (
+                  <div className="text-center py-4">
+                    <span style={{ color: editableVariables.textColor }}>Cargando reseñas...</span>
+                  </div>
+                ) : reviews && reviews.length > 0 ? (
                   <div className="space-y-4">
-                    {productReviews.map((review: any) => (
-                      <div key={review.id} className="border rounded-md p-4 bg-gray-50">
+                    {reviews.map((review: any) => (
+                      <div key={review._id || review.id} className="border rounded-md p-4 bg-gray-50">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-semibold text-sm">{review.userName}</span>
+                          <span className="font-semibold text-sm">{review.userName || 'Usuario Anónimo'}</span>
                           <span className="text-xs text-gray-500">
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>

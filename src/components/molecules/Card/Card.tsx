@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '../../../design/colors';
 import { DesignButton } from '../../atoms/DesignButton';
 import '../../../styles/responsive.css';
@@ -61,9 +62,15 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div 
-      className="card ml-6 w-84 h-108 bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col relative"
+      className="card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col relative"
       onClick={handleCardClick}
-      style={{ minHeight: '432px', maxHeight: '432px' }}
+      style={{ 
+        minHeight: '400px', 
+        maxHeight: '400px',
+        width: '260px',
+        minWidth: '260px',
+        maxWidth: '260px'
+      }}
     >
       {/* Overlay de carga */}
       {loadingProductId === productId && (
@@ -76,12 +83,16 @@ export const Card: React.FC<CardProps> = ({
           </div>
         </div>
       )}
-      <figure className="m-0 w-full flex-shrink-0" style={{ height: '240px' }}>
+      <figure className="m-0 w-full flex-shrink-0" style={{ height: '220px' }}>
         <img
           className="w-full h-full object-cover"
           src={imageSrc || "https://placehold.co/600x400?text=No+Image"}
           alt={title}
-          style={{ objectFit: 'cover' }}
+          style={{ 
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%'
+          }}
         />
       </figure>
       <div className="card-body p-4 flex flex-col items-start flex-grow">
@@ -92,9 +103,9 @@ export const Card: React.FC<CardProps> = ({
           className="card-title mb-1 font-semibold text-left text-base font-space line-clamp-2">
           {title}
         </h5>
-        <p className="text-lg mb-2 font-space">{formattedPrice}</p>
+        <p className="text-lg mb-2 font-space font-bold">{formattedPrice}</p>
         
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full mt-auto">
           <DesignButton 
             variant="primary"
             className="w-full"
@@ -143,6 +154,7 @@ export const CardList: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [products, setProducts] = React.useState<any[]>([]);
   const [loadingProductId, setLoadingProductId] = React.useState<string | null>(null);
+  const [currentSlide, setCurrentSlide] = React.useState(0);
 
   React.useEffect(() => {
     const loadProducts = async () => {
@@ -194,26 +206,112 @@ export const CardList: React.FC = () => {
         isLoading: false,
       }));
 
+
+  const ITEMS_PER_SLIDE = 4;
+  const totalSlides = Math.ceil(productsToShow.length / ITEMS_PER_SLIDE);
+  const shouldShowCarousel = productsToShow.length > ITEMS_PER_SLIDE;
+
+  const handlePrevSlide = () => {
+    setCurrentSlide((prev) => prev === 0 ? totalSlides - 1 : prev - 1);
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlide((prev) => prev === totalSlides - 1 ? 0 : prev + 1);
+  };
+
+  const getVisibleProducts = () => {
+    if (!shouldShowCarousel) return productsToShow;
+    
+    const startIndex = currentSlide * ITEMS_PER_SLIDE;
+    const endIndex = startIndex + ITEMS_PER_SLIDE;
+    return productsToShow.slice(startIndex, endIndex);
+  };
+
   return (
     <div className="text-center mt-8">
-      <div className="flex justify-center flex-wrap">
-        {loading ? (
-          <FullScreenLoader />
-        ) : (
-          productsToShow.map((card, index) => (
-            <Card 
-              key={index} 
-              imageSrc={card.imageSrc} 
-              title={card.title}
-              price={card.price}
-              category={card.category}
-              productId={card.productId}
-              shopId={card.shopId}
-              onClick={card.onClick}
-            />
-          ))
-        )}
-      </div>
+      {loading ? (
+        <FullScreenLoader />
+      ) : (
+        <div className="relative overflow-hidden">
+         
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, x: 100 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="flex justify-center gap-4 px-4"
+            >
+              {getVisibleProducts().map((card, index) => (
+                <motion.div
+                  key={`${currentSlide}-${index}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="flex-shrink-0"
+                >
+                  <Card 
+                    imageSrc={card.imageSrc} 
+                    title={card.title}
+                    price={card.price}
+                    category={card.category}
+                    productId={card.productId}
+                    shopId={card.shopId}
+                    onClick={card.onClick}
+                  />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
+          
+
+          {shouldShowCarousel && (
+            <>
+            
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handlePrevSlide}
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10"
+                style={{ marginLeft: '-20px' }}
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </motion.button>
+              
+        
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleNextSlide}
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10"
+                style={{ marginRight: '-20px' }}
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </motion.button>
+              
+        
+              <div className="flex justify-center mt-6 space-x-2">
+                {Array.from({ length: totalSlides }).map((_, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.2 }}
+                    whileTap={{ scale: 0.8 }}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      index === currentSlide ? 'bg-blue-500' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
