@@ -6,6 +6,10 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
 import { useCartStore } from '../../stores/cartStore';
+import { useAuthStore } from '../../stores/slices/authSlice';
+import { getStorageItem } from '../../utils/storage';
+import { API_URL } from '../../config';
+import { ReviewForm } from '../../components/organisms/ReviewForm/ReviewForm';
 import FullScreenLoader from '../../components/molecules/FullScreenLoader';
 
 // Tipos adicionales para la interfaz de Product si es necesario
@@ -25,7 +29,14 @@ const ProductDetailScreen: React.FC = () => {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [tab, setTab] = useState<'description' | 'reviews'>('description');
   const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
+  
+  // Review-related states
+  const [isWritingReview, setIsWritingReview] = useState(false);
+  
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
+  
+  // Auth state
+  const { user, isAuthenticated } = useAuthStore();
   
   // Usar productId si está disponible (desde ShopView), sino usar id (desde rutas normales)
   const actualProductId = productId || id;
@@ -35,22 +46,165 @@ const ProductDetailScreen: React.FC = () => {
     isLoadingProduct, 
     fetchProductById, 
     clearSelectedProduct,
-    productReviews,
     baseSearchResults
   } = useSearchStore();
   
   const addToCart = useCartStore(state => state.addToCart);
 
+  // Estados locales para reviews (no usar el searchStore para reviews)
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+
+  // Función para cargar reseñas desde el backend
+  const fetchReviews = async (productId: string) => {
+    setIsLoadingReviews(true);
+    
+    try {
+      const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        let reviewsData = [];
+        if (data.data && Array.isArray(data.data)) {
+          reviewsData = data.data;
+        } else if (data.message && Array.isArray(data.message)) {
+          reviewsData = data.message;
+        } else if (Array.isArray(data)) {
+          reviewsData = data;
+        }
+        
+        const reviewsArray = Array.isArray(reviewsData) ? reviewsData : [];
+        setReviews(reviewsArray);
+      } else {
+        setReviews([]);
+      }
+    } catch (error) {
+      console.error('Error al cargar reseñas:', error);
+      setReviews([]);
+    } finally {
+      setIsLoadingReviews(false);
+    }
+  };
+
+  // Función para enviar reseña al backend
+  const submitReview = async (reviewData: { rating: number; comment: string }) => {
+    if (!user || !isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Debes iniciar sesión para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    const token = getStorageItem('token');
+    if (!token) {
+      setNotification({
+        show: true,
+        message: 'No tienes permisos para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: actualProductId,
+          rating: reviewData.rating,
+          comment: reviewData.comment,
+        }),
+      });
+
+      if (response.ok) {
+        setNotification({
+          show: true,
+          message: 'Reseña enviada correctamente!'
+        });
+        
+        if (actualProductId) {
+          await fetchReviews(actualProductId);
+        }
+      } else {
+        const errorData = await response.json();
+        let errorMessage = 'Error al enviar la reseña';
+        
+        if (response.status === 400) {
+          errorMessage = errorData.message || 'Datos de la reseña inválidos';
+        } else if (response.status === 401) {
+          errorMessage = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente';
+        } else if (response.status === 404) {
+          errorMessage = 'Producto no encontrado';
+        } else if (response.status === 500) {
+          errorMessage = 'Error interno del servidor. Intenta nuevamente más tarde';
+        } else {
+          errorMessage = errorData.message || 'Error desconocido al enviar la reseña';
+        }
+        
+        setNotification({
+          show: true,
+          message: errorMessage
+        });
+      }
+    } catch (error) {
+      console.error('Error al enviar reseña:', error);
+      setNotification({
+        show: true,
+        message: 'Error de conexión. Verifica tu conexión a internet'
+      });
+    }
+    
+    setTimeout(() => setNotification({show: false, message: ''}), 3000);
+  };
+
+  // Funciones para manejar reseñas
+  const handleOpenReviewForm = () => {
+    if (!user || !isAuthenticated) {
+      setNotification({
+        show: true,
+        message: 'Debes iniciar sesión para escribir una reseña'
+      });
+      setTimeout(() => setNotification({show: false, message: ''}), 3000);
+      return;
+    }
+    setIsWritingReview(true);
+  };
+
+  const handleCancelReview = () => {
+    setIsWritingReview(false);
+  };
+
+  const handleReviewSubmit = async (reviewData: { rating: number; text: string }) => {
+    if (!actualProductId) return;
+    await submitReview({ rating: reviewData.rating, comment: reviewData.text });
+    setIsWritingReview(false);
+  };
+
+  // Calcular estadísticas de reseñas
+  const totalReviews = Array.isArray(reviews) ? reviews.length : 0;
+  const averageRating = totalReviews > 0
+    ? reviews.reduce((sum: number, review: any) => sum + (review.rating || 0), 0) / totalReviews
+    : selectedProduct?.rating || 0;
+
   // Cargar los datos del producto cuando se monta el componente
   useEffect(() => {
     if (actualProductId) {
-      console.log(`[ProductDetailScreen] Cargando producto con ID: ${actualProductId}`);
-      console.log(`[ProductDetailScreen] Estilos aplicados:`, editableVariables);
-      
-      // Solo cargar si no está ya cargado o si es diferente al actual
       if (!selectedProduct || selectedProduct.id !== actualProductId) {
         fetchProductById(actualProductId);
       }
+      
+      fetchReviews(actualProductId);
       
       setSelectedImage(0);
       setQuantity(1);
@@ -183,7 +337,7 @@ const ProductDetailScreen: React.FC = () => {
                 <FaRegStar key={i} className="text-yellow-400 mr-1" />
               )
             )}
-            <span className="ml-2 text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>({productReviews?.length || 0} Reseñas)</span>
+            <span className="ml-2 text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>({totalReviews} Reseñas)</span>
           </div>
 
           <div className="text-2xl font-bold mb-4" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#333' }}>${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
@@ -326,7 +480,7 @@ const ProductDetailScreen: React.FC = () => {
                 style={{ color: tab === 'reviews' ? editableVariables.textColor : editableVariables.textColor, borderColor: tab === 'reviews' ? editableVariables.textColor : 'transparent' }}
                 onClick={() => setTab('reviews')}
               >
-                Reviews ({productReviews?.length || 0})
+                Reviews ({totalReviews})
               </button>
           </div>
           <div>            {tab === 'description' && (
@@ -351,13 +505,29 @@ const ProductDetailScreen: React.FC = () => {
               </>
             )}            {tab === 'reviews' && (
               <div style={{ color: editableVariables.textColor }}>
-                <h3 className="text-lg font-semibold mb-2">Reviews ({productReviews?.length || 0})</h3>
-                {productReviews && productReviews.length > 0 ? (
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Reviews ({totalReviews})</h3>
+                  {!isWritingReview && (
+                    <button
+                      onClick={handleOpenReviewForm}
+                      className="px-4 py-2 text-white rounded text-sm"
+                      style={{ backgroundColor: editableVariables.primaryColor }}
+                    >
+                      Escribir Reseña
+                    </button>
+                  )}
+                </div>
+                
+                {isLoadingReviews ? (
+                  <div className="text-center py-4">
+                    <span style={{ color: editableVariables.textColor }}>Cargando reseñas...</span>
+                  </div>
+                ) : reviews && reviews.length > 0 ? (
                   <div className="space-y-4">
-                    {productReviews.map(review => (
-                      <div key={review.id} className="border rounded-md p-4 bg-gray-50">
+                    {reviews.map((review: any) => (
+                      <div key={review._id || review.id} className="border rounded-md p-4 bg-gray-50">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-semibold text-sm">{review.userName}</span>
+                          <span className="font-semibold text-sm">{review.userName || 'Usuario Anónimo'}</span>
                           <span className="text-xs text-gray-500">
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
@@ -371,7 +541,7 @@ const ProductDetailScreen: React.FC = () => {
                             )
                           )}
                         </div>
-                        <p className="text-sm">{review.text}</p>
+                        <p className="text-sm">{review.comment || review.text}</p>
                       </div>
                     ))}
                   </div>
@@ -449,6 +619,14 @@ const ProductDetailScreen: React.FC = () => {
         textColor={editableVariables.footerTextColor}
         footerDescription={editableVariables.footerDescription}
       />
+      
+      {isWritingReview && actualProductId && (
+        <ReviewForm
+          productId={actualProductId}
+          onCancel={handleCancelReview}
+          onSubmit={handleReviewSubmit}
+        />
+      )}
     </div>
   );
 };
