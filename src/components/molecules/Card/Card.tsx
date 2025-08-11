@@ -188,7 +188,7 @@ export const CardList: React.FC = () => {
     }
   };
 
-  // Si hay productos reales, usarlos. Si no, usar los mock de cardData
+  // Mostrar solo productos reales, nunca los mock
   const productsToShow = products && products.length > 0
     ? products.map((prod, idx) => ({
         imageSrc: prod.productImages?.[0] || prod.productImage || '',
@@ -197,14 +197,10 @@ export const CardList: React.FC = () => {
         category: prod.categoria || prod.estado || 'General',
         productId: prod._id,
         shopId: typeof prod.shop === 'object' ? prod.shop._id : prod.shop,
-        onClick: undefined, // No usar onClick para productos reales
+        onClick: undefined,
         isLoading: loadingProductId === prod._id,
       }))
-    : cardData.map((card, idx) => ({
-        ...card,
-        onClick: () => handleCardClick(idx, card.productId, card.shopId),
-        isLoading: false,
-      }));
+    : [];
 
 
   const ITEMS_PER_SLIDE = 4;

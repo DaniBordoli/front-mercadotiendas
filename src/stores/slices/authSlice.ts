@@ -775,16 +775,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    * Obtiene todos los productos de todas las tiendas (para búsqueda global).
    */
   fetchAllProducts: async (): Promise<any[]> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products/all`;
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
     const responseData = await response.json();
