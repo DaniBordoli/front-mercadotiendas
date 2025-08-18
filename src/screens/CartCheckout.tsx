@@ -1,4 +1,8 @@
+
 import * as React from 'react';
+import { create } from 'zustand';
+import { useCartStore } from '../stores/cartStore';
+import { useFirstLayoutStore } from '../stores/firstLayoutStore';
 import { Logo } from '../components/atoms/Logo';
 import { useNavigate } from 'react-router-dom';
 import { StatusTags } from '../components/atoms/StatusTags/StatusTags';
@@ -10,11 +14,28 @@ import { FaCcVisa } from "react-icons/fa6";
 import { RiCashFill } from "react-icons/ri";
 import { DesignButton } from '../components/atoms/DesignButton';
 
+interface CheckoutState {
+    shippingMethod: string;
+    paymentMethod: string;
+    setShippingMethod: (method: string) => void;
+    setPaymentMethod: (method: string) => void;
+}
+
+export const useCheckoutStore = create<CheckoutState>((set) => ({
+    shippingMethod: 'domicilio',
+    paymentMethod: 'tarjeta',
+    setShippingMethod: (method) => set({ shippingMethod: method }),
+    setPaymentMethod: (method) => set({ paymentMethod: method }),
+}));
+
 
 
 export default function CartCheckout() {
+    const { shippingMethod, paymentMethod, setShippingMethod, setPaymentMethod } = useCheckoutStore();
+    const editableVariables = useFirstLayoutStore(state => state.editableVariables);
     const navigate = useNavigate();
-    const subtotal = 349.97;
+    const cartItems = useCartStore(state => state.items);
+    const subtotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
     const envio = 10.00;
     const total = subtotal + envio;
 
@@ -59,12 +80,12 @@ export default function CartCheckout() {
                   
                         <div className="flex items-center mb-4">
                             <img
-                                src="https://randomuser.me/api/portraits/men/32.jpg"
-                                alt="avatar"
+                                src={editableVariables.logoUrl || '/logo.png'}
+                                alt="logo-tienda"
                                 className="w-10 h-10 rounded-full mr-3"
                             />
                             <div>
-                                <div className="font-semibold text-gray-800">Sports Equipment Store</div>
+                                <div className="font-semibold text-gray-800">{cartItems[0]?.product.storeName || cartItems[0]?.product.shop?.name || ''}</div>
                                 <StatusTags status="Active" className="mt-1 text-xs" />
                             </div>
                         </div>
@@ -73,7 +94,7 @@ export default function CartCheckout() {
                         <div className="flex flex-col gap-4">
                  
                             <div className="flex items-center border rounded-lg px-4 py-3 bg-white">
-                                <input type="radio" name="envio" className="mr-4 accent-red-500" defaultChecked />
+                                <input type="radio" name="envio" className="mr-4 accent-red-500" checked={shippingMethod === 'domicilio'} onChange={() => setShippingMethod('domicilio')} />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <FaTruck className="text-red-500" />
@@ -84,9 +105,8 @@ export default function CartCheckout() {
                                 </div>
                                 <div className="text-base font-medium text-gray-700 ml-4">$10.00</div>
                             </div>
-                       
                             <div className="flex items-center border rounded-lg px-4 py-3 bg-white">
-                                <input type="radio" name="envio" className="mr-4 accent-red-500" />
+                                <input type="radio" name="envio" className="mr-4 accent-red-500" checked={shippingMethod === 'retiro'} onChange={() => setShippingMethod('retiro')} />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <FaStore className="text-red-500" />
@@ -103,7 +123,7 @@ export default function CartCheckout() {
                         <div className="flex flex-col gap-4">
                           
                             <div className="flex items-center border rounded-lg px-4 py-3 bg-white">
-                                <input type="radio" name="pago" className="mr-4 accent-red-500" defaultChecked />
+                                <input type="radio" name="pago" className="mr-4 accent-red-500" checked={paymentMethod === 'tarjeta'} onChange={() => setPaymentMethod('tarjeta')} />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <FaCcVisa className="text-black" />
@@ -112,9 +132,8 @@ export default function CartCheckout() {
                                     <div className="text-xs mt-1" style={{ color: colors.accentTeal }}>Pago seguro · Hasta 12 cuotas sin interés</div>
                                 </div>
                             </div>
-                         
                             <div className="flex items-center border rounded-lg px-4 py-3 bg-white">
-                                <input type="radio" name="pago" className="mr-4 accent-red-500" />
+                                <input type="radio" name="pago" className="mr-4 accent-red-500" checked={paymentMethod === 'transferencia'} onChange={() => setPaymentMethod('transferencia')} />
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2">
                                         <RiCashFill className="text-red-500" />
