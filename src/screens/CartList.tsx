@@ -9,8 +9,10 @@ import CartFooter from '../components/CartComponents/CartFooter';
 import LoginModal from '../components/CartComponents/LoginModal';
 import { useAuthStore } from '../stores/slices/authSlice';
 import { useCartStore } from '../stores/cartStore';
+import { useFirstLayoutStore } from '../stores/firstLayoutStore';
 
 export default function CartList() {
+    const editableVariables = useFirstLayoutStore(state => state.editableVariables);
     const navigate = useNavigate();
     const [showLoginModal, setShowLoginModal] = React.useState(false);
     const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -69,12 +71,12 @@ export default function CartList() {
                                 <div key={item.product.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
                                     <div className="flex items-center mb-4">
                                         <img
-                                            src={item.product.imageUrls?.[0] || ''}
-                                            alt="avatar"
+                                            src={editableVariables.logoUrl || '/logo.png'}
+                                            alt="logo-tienda"
                                             className="w-10 h-10 rounded-full mr-3"
                                         />
                                         <div>
-                                            <div className="font-semibold text-gray-800">{item.product.storeName || 'Tienda'}</div>
+                                            <div className="font-semibold text-gray-800">{item.product.storeName || item.product.shop?.name || ''}</div>
                                             <StatusTags status="Active" className="mt-1 text-xs" />
                                         </div>
                                     </div>

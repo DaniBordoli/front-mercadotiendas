@@ -1,10 +1,13 @@
+import { useCheckoutStore } from './CartCheckout';
+import { useFirstLayoutStore } from '../stores/firstLayoutStore';
 import * as React from 'react';
 import { Logo } from '../components/atoms/Logo';
 import { useNavigate } from 'react-router-dom';
 import { StatusTags } from '../components/atoms/StatusTags/StatusTags';
 import CartFooter from '../components/CartComponents/CartFooter';
-import { FaTruck } from "react-icons/fa";
+import { FaTruck, FaStore } from "react-icons/fa";
 import { FaCcVisa } from "react-icons/fa6";
+import { RiCashFill } from "react-icons/ri";
 import { DesignButton } from '../components/atoms/DesignButton';
 import { FaCheckCircle } from "react-icons/fa";
 import { useCartStore } from '../stores/cartStore';
@@ -14,6 +17,8 @@ import { useEffect } from 'react';
 import { useAuthStore } from '../stores';
 
 export default function CartSummary() {
+    const { shippingMethod, paymentMethod } = useCheckoutStore();
+    const editableVariables = useFirstLayoutStore(state => state.editableVariables);
     const navigate = useNavigate();
     const cartItems = useCartStore(state => state.items);
     const clearCart = useCartStore(state => state.clearCart);
@@ -25,7 +30,7 @@ export default function CartSummary() {
     const groupedByStore = React.useMemo(() => {
         const groups: Record<string, typeof cartItems> = {};
         cartItems.forEach(item => {
-            const store = item.product.storeName || 'Tienda';
+            const store = item.product.storeName || item.product.shop?.name || '';
             if (!groups[store]) groups[store] = [];
             groups[store].push(item);
         });
@@ -195,8 +200,8 @@ export default function CartSummary() {
                                 <div key={storeName} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
                                     <div className="flex items-center mb-4">
                                         <img
-                                            src={items[0].product.imageUrls?.[0] || ''}
-                                            alt="avatar"
+                                            src={editableVariables.logoUrl || '/logo.png'}
+                                            alt="logo-tienda"
                                             className="w-10 h-10 rounded-full mr-3"
                                         />
                                         <div>
@@ -218,18 +223,35 @@ export default function CartSummary() {
                                         <div className="text-gray-700 font-space mb-2">Método de envío</div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2 text-sm">
-                                                <FaTruck className="font-space text-gray-500" />
-                                                <span>Envío a domicilio</span>
+                                                {shippingMethod === 'domicilio' ? (
+                                                    <>
+                                                        <FaTruck className="font-space text-gray-500" />
+                                                        <span>Envío a domicilio</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <FaStore className="font-space text-gray-500" />
+                                                        <span>Retiro en tienda</span>
+                                                    </>
+                                                )}
                                             </div>
-                                            <span>${shipping.toFixed(2)}</span>
+                                            <span>{shippingMethod === 'domicilio' ? `$${shipping.toFixed(2)}` : 'Gratis'}</span>
                                         </div>
                                     </div>
-                                
                                     <div className="bg-gray-50 rounded-lg px-6 py-4 mb-4">
                                         <div className=" text-gray-700 font-space mb-2">Método de pago</div>
                                         <div className="flex items-center gap-2 text-sm">
-                                            <FaCcVisa className="text-black" />
-                                            <span className='font-space'>Visa terminada en 4242</span>
+                                            {paymentMethod === 'tarjeta' ? (
+                                                <>
+                                                    <FaCcVisa className="text-black" />
+                                                    <span className='font-space'>Tarjeta de crédito</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <RiCashFill className="text-red-500" />
+                                                    <span className='font-space'>Transferencia bancaria</span>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
