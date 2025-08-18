@@ -455,22 +455,23 @@ export const Navbar: React.FC = () => {
       <div className="flex items-center space-x-6">
         <div 
           className="flex items-center cursor-pointer hover:text-red-500 transition-colors relative"
-          onClick={() => navigate('/cart-list')}
           onMouseEnter={() => setIsCartPreviewVisible(true)}
           onMouseLeave={() => setIsCartPreviewVisible(false)}
         >
-          <span className="relative mr-2">
-            {cartCount > 0 && (
-              <span
-                className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
-                style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                {cartCount}
-              </span>
-            )}
-            <FaShoppingCart className="text-xl" />
-          </span>
-          <span>Ver mi carrito</span>
+          <div onClick={() => navigate('/cart-list')} className="flex items-center">
+            <span className="relative mr-2">
+              {cartCount > 0 && (
+                <span
+                  className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                  style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {cartCount}
+                </span>
+              )}
+              <FaShoppingCart className="text-xl" />
+            </span>
+            <span>Ver mi carrito</span>
+          </div>
           <CartPreview 
             isVisible={isCartPreviewVisible} 
             onMouseEnter={() => setIsCartPreviewVisible(true)}

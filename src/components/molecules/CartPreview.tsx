@@ -29,11 +29,19 @@ const CartPreview: React.FC<CartPreviewProps> = ({ isVisible, onMouseEnter, onMo
   }
 
   return (
-    <div 
-      className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
+    <>
+      {/* Área invisible para mantener el hover */}
+      <div 
+        className="absolute right-0 top-full w-80 h-1 z-40"
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      />
+      <div 
+        className="absolute right-0 top-full w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+        style={{ marginTop: '0.25rem' }}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+      >
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-3 text-gray-800">Mi Carrito</h3>
         
@@ -74,7 +82,8 @@ const CartPreview: React.FC<CartPreviewProps> = ({ isVisible, onMouseEnter, onMo
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
