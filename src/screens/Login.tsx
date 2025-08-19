@@ -17,6 +17,8 @@ function Login() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'user' | 'admin'>('user'); // MT-30: Role selection for login
+  // MT-30: TODO - Implement role-based authentication validation
 
   useEffect(() => {
     const timer = setTimeout(() => setInitialLoading(false), 900);
