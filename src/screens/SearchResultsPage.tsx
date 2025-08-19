@@ -5,7 +5,7 @@ import { useSearchStore } from '../stores';
 import type { Product, SortOrder } from '../stores/searchStore'; // Importar tipos directamente
 import { Navbar } from '../components/organisms/Navbar';
 import { ProductListItem } from '../components/molecules/ProductListItem';
-import { Footer } from '../components/organisms/Footer';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 import { FilterSection } from '../components/molecules/FilterSection/FilterSection'; // Importar FilterSection
 
 // Necesitamos adaptar CardList o crear una versión que acepte Productos del store
@@ -40,6 +40,7 @@ const SearchResultsPage: React.FC = () => {
   // Estado local para inputs de precio (para no actualizar en cada keystroke)
   const [localMinPrice, setLocalMinPrice] = useState<string>(priceRange.min?.toString() || '');
   const [localMaxPrice, setLocalMaxPrice] = useState<string>(priceRange.max?.toString() || '');
+  
 
   // Obtener el query y category de la URL
   const queryParams = new URLSearchParams(location.search);
@@ -71,7 +72,16 @@ const SearchResultsPage: React.FC = () => {
   const handleProductClick = (product: Product) => {
     // console.log('Producto clickeado en resultados:', product); // Comentar o eliminar log
     // Navegar a la página de detalle del producto usando el hook navigate
-    navigate(`/producto/${product.id}`);
+    // Pasar contexto de la búsqueda para breadcrumbs más precisos
+    const searchContext = {
+      type: isCategorySearch ? 'category' : 'search',
+      value: isCategorySearch ? category : query,
+      previousPath: location.pathname + location.search
+    };
+    
+    navigate(`/producto/${product.id}`, { 
+      state: { searchContext } 
+    });
   };
 
   // Handler para el cambio en el dropdown
@@ -102,6 +112,8 @@ const SearchResultsPage: React.FC = () => {
        setPriceRange({ min: null, max: null }); // Limpiar si ambos inputs están vacíos/inválidos
     }
   };
+
+
   
   // TODO: Implementar componente de Paginación
   const PaginationComponent = () => {
@@ -116,20 +128,47 @@ const SearchResultsPage: React.FC = () => {
       );
   }
 
+  const showBreadcrumbs = Boolean(query || category);
+  const isCategorySearch = Boolean(category);
+
   return (
     <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#F8F8F8' }}> {/* Fondo Ultra Light Gray */} 
       <Navbar />
+      {/* Breadcrumbs */}
+      {showBreadcrumbs && (
+        <div className="container mx-auto px-4 pt-4 mt-2">
+          <div className="py-4">
+            <div className="flex items-center text-sm text-[#1c1c1e] font-medium">
+              <button onClick={() => navigate('/')} className="hover:text-[#ff4f41]">Inicio</button>
+              <span className="mx-2 text-xs text-[#666666]">›</span>
+              {isCategorySearch ? (
+                <>
+                  <span className="hover:text-[#ff4f41] cursor-pointer" onClick={() => navigate('/categorias')}>Categorías</span>
+                  <span className="mx-2 text-xs text-[#666666]">›</span>
+                  <span className="text-[#ff4f41] font-semibold">{category}</span>
+                </>
+              ) : (
+                <>
+                  <span className="hover:text-[#ff4f41] cursor-default">Resultados</span>
+                  <span className="mx-2 text-xs text-[#666666]">›</span>
+                  <span className="text-[#ff4f41] font-semibold">"{query}"</span>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Contenedor principal con padding y centrado */}
-      <div className="container mx-auto px-4 pt-24 flex flex-col md:flex-row gap-6"> {/* flex-col en móvil */}
+      <div className="container mx-auto px-4 pt-6 flex flex-col md:flex-row gap-8"> {/* flex-col en móvil */}
         
         {/* Columna Izquierda (Filtros) */}
         <aside className="w-full md:w-1/4 lg:w-1/5 flex-shrink-0"> 
-          <div className="bg-white p-4 rounded shadow-sm sticky top-24"> {/* Sticky para que se quede visible */} 
+          <div className="bg-white p-4 rounded shadow-sm sticky top-20"> {/* Sticky para que se quede visible */} 
             <div className="flex justify-between items-center mb-1 border-b border-gray-200 pb-3"> {/* Ajustar padding/border */}
               <h2 className="text-xl font-semibold" style={{ color: '#1C1C1E' }}>Filtros</h2>
               <button 
                 onClick={clearFilters} 
-                className="text-sm text-sky-600 hover:text-sky-800"
+                className="text-sm text-[#ff4f41] hover:text-[#ff4f41]/80 hover:underline transition-colors"
               >
                 Limpiar filtros
               </button>
@@ -212,6 +251,8 @@ const SearchResultsPage: React.FC = () => {
               </FilterSection>
             )}
 
+
+
           </div>
         </aside>
 
@@ -221,9 +262,8 @@ const SearchResultsPage: React.FC = () => {
           <div className="mb-4 flex justify-between items-center"> {/* Usar flex para alinear */} 
             <div>
               <h1 className="text-2xl font-semibold mb-1" style={{ color: '#1C1C1E' }}>
-                {category ? `Categoría: ${category}` : query}
+                {`Mostrando ${totalResults} resultados`}
               </h1>
-              <p className="text-sm" style={{ color: '#666666' }}>{totalResults} resultados</p>
             </div>
              {/* Dropdown de Ordenamiento */}
             <div className="flex items-center">
@@ -275,9 +315,9 @@ const SearchResultsPage: React.FC = () => {
           )}
         </main>
       </div>
-      <Footer />
+      <FooterHome />
     </div>
   );
 };
 
-export default SearchResultsPage; 
+export default SearchResultsPage;

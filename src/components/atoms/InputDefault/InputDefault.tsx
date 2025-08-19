@@ -21,9 +21,9 @@ export const InputDefault: React.FC<InputDefaultProps> = ({
   icon,
 }) => {
   return (
-    <div className={`relative ${icon ? 'flex items-center' : ''}`}>
+    <div className={`relative ${icon ? 'flex items-center' : ''}`} style={{ width: '382px', height: '44px' }}>
       {icon && (
-        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+        <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
           {icon}
         </div>
       )}
@@ -36,8 +36,9 @@ export const InputDefault: React.FC<InputDefaultProps> = ({
           borderColor: colors.lightGray,
           color: colors.darkGray,
           borderRadius: '0.5rem',
+          height: '100%',
         }}
-        className={`border px-3 py-2 ${icon ? 'pl-10' : ''} font-space ${className || ''}`}
+        className={`border px-3 py-2 ${icon ? 'pr-10' : ''} font-space ${className || ''} w-full`}
         disabled={disabled}
       />
     </div>

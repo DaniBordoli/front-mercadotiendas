@@ -17,11 +17,14 @@ import Toast from '../../atoms/Toast';
 import { useShopStore } from '../../../stores/slices/shopStore';
 import { fetchMainCategories } from '../../../stores/slices/authSlice';
 import './NavbarMobile.css';
+import { FaChevronDown, FaLaptop, FaTshirt, FaHome, FaDumbbell, FaGamepad, FaStar } from "react-icons/fa";
+import CartPreview from '../../molecules/CartPreview';
 
 export const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCartPreviewVisible, setIsCartPreviewVisible] = useState(false);
   const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
   const [toast, setToast] = useState({
     show: false,
@@ -248,11 +251,11 @@ export const Navbar: React.FC = () => {
                 <form onSubmit={handleSearchSubmit} className="relative">
                   <InputDefault
                     type="text"
-                    placeholder="Buscar productos..."
+                    placeholder="Buscá por marca, modelo o palabra clave"
                     value={searchTerm}
                     onChange={handleSearchChange ? (v) => handleSearchChange({ target: { value: v } } as any) : undefined}
-                    icon={<FaSearch className="text-gray-400" />}
-                    className="w-full px-3 py-1.5 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent"
+                    icon={<FaSearch className="text-[#666666]" />}
+                    className="w-full h-11 pl-4 pr-12 bg-[#f8f8f8] rounded-lg border border-[#e5e5e7] text-[#1c1c1e] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20 focus:border-[#ff4f41]"
                   />
                   <SearchSuggestions 
                     suggestions={suggestions}
@@ -264,12 +267,103 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex items-start space-x-6 mt-1 pr-4">
+        <div className="flex items-center space-x-6 mt-1 pr-4">
+          <div className="flex items-center space-x-6">
+            <div className="relative group" onMouseEnter={openCategoryMenu} onMouseLeave={closeCategoryMenu}>
+              <span className="cursor-pointer hover:text-red-500 transition-colors flex items-center font-medium">
+                Categorías
+                <FaChevronDown className="ml-1 text-xs" />
+              </span>
+              {isCategoryMenuOpen && (
+                <div className="absolute bg-white shadow-lg rounded-lg border border-[#e5e5e7] mt-2 w-56 z-10"
+                  onMouseEnter={openCategoryMenu} onMouseLeave={closeCategoryMenu}>
+                  <div className="py-2">
+                    <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer"
+                      onClick={() => handleCategorySearch('Electrónica')}>
+                      <FaLaptop className="mr-3 text-[#ff4f41] flex-shrink-0" />
+                      Electrónica
+                    </span>
+                    <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#00a699] transition-colors cursor-pointer"
+                      onClick={() => handleCategorySearch('Moda')}>
+                      <FaTshirt className="mr-3 text-[#00a699] flex-shrink-0" />
+                      Moda
+                    </span>
+                    <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer"
+                      onClick={() => handleCategorySearch('Hogar')}>
+                      <FaHome className="mr-3 text-[#ff4f41] flex-shrink-0" />
+                      Hogar
+                    </span>
+                    <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#00a699] transition-colors cursor-pointer"
+                      onClick={() => handleCategorySearch('Deportes')}>
+                      <FaDumbbell className="mr-3 text-[#00a699] flex-shrink-0" />
+                      Deportes
+                    </span>
+                    <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer"
+                      onClick={() => handleCategorySearch('Gaming')}>
+                      <FaGamepad className="mr-3 text-[#ff4f41] flex-shrink-0" />
+                      Gaming
+                    </span>
+                    <div className="border-t border-[#e5e5e7] mt-2 pt-2">
+                      <span className="flex items-center px-4 py-3 text-[#ff4f41] hover:bg-[#f8f8f8] transition-colors font-medium cursor-pointer"
+                        onClick={() => navigate('/categories')}>
+                        Ver todas las categorías
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="relative group">
+              <span className="cursor-pointer hover:text-red-500 transition-colors flex items-center font-medium">
+                En Vivo
+                <FaChevronDown className="ml-1 text-xs" />
+              </span>
+              <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-[#e5e5e7] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="py-2">
+                  <span className="block px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer">
+                    <span className="text-red-500 mr-3">🔴</span>En vivo ahora
+                  </span>
+                  <span className="block px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer">
+                    <span className="mr-3">📅</span>Próximas transmisiones
+                  </span>
+                  <span className="block px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer">
+                    <span className="mr-3">🧑‍💻</span>Tutoriales en vivo
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <span className="cursor-pointer hover:text-red-500 transition-colors flex items-center font-medium">
+                ¿Cómo Funciona?
+                <FaChevronDown className="ml-1 text-xs" />
+              </span>
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#e5e5e7] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="py-2">
+                  <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer">
+                    <FaShoppingCart className="mr-3 text-[#ff4f41] flex-shrink-0" />
+                    Para compradores
+                  </span>
+                  <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#00a699] transition-colors cursor-pointer">
+                    <BsShop className="mr-3 text-[#00a699] flex-shrink-0" />
+                    Para tiendas
+                  </span>
+                  <span className="flex items-center px-4 py-3 text-[#1c1c1e] hover:bg-[#f8f8f8] hover:text-[#ff4f41] transition-colors cursor-pointer">
+                    <FaStar className="mr-3 text-[#ff4f41] flex-shrink-0" />
+                    Para influencers
+                  </span>
+                </div>
+              </div>
+            </div>
+            <span className="cursor-pointer hover:text-red-500 transition-colors" onClick={() => navigate('/contacto')}>Contacto</span>
+          </div>
           {isAuthenticated ? (
             <>
               <div 
                 className="flex items-center cursor-pointer px-2 hover:text-red-500 transition-colors relative"
                 onClick={() => navigate('/cart-list')}
+                onMouseEnter={() => setIsCartPreviewVisible(true)}
+                onMouseLeave={() => setIsCartPreviewVisible(false)}
               >
                 <span className="relative mr-2">
                   {cartCount > 0 && (
@@ -283,6 +377,11 @@ export const Navbar: React.FC = () => {
                   <FaShoppingCart className="text-xl" />
                 </span>
                 <span>Mi carrito</span>
+                <CartPreview 
+                  isVisible={isCartPreviewVisible} 
+                  onMouseEnter={() => setIsCartPreviewVisible(true)}
+                  onMouseLeave={() => setIsCartPreviewVisible(false)}
+                />
               </div>
               
               {/* Mostrar "Crear tienda" si no tiene tienda, "Ver mi tienda" si ya la tiene */}
@@ -356,20 +455,28 @@ export const Navbar: React.FC = () => {
       <div className="flex items-center space-x-6">
         <div 
           className="flex items-center cursor-pointer hover:text-red-500 transition-colors relative"
-          onClick={() => navigate('/cart-list')}
+          onMouseEnter={() => setIsCartPreviewVisible(true)}
+          onMouseLeave={() => setIsCartPreviewVisible(false)}
         >
-          <span className="relative mr-2">
-            {cartCount > 0 && (
-              <span
-                className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
-                style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                {cartCount}
-              </span>
-            )}
-            <FaShoppingCart className="text-xl" />
-          </span>
-          <span>Ver mi carrito</span>
+          <div onClick={() => navigate('/cart-list')} className="flex items-center">
+            <span className="relative mr-2">
+              {cartCount > 0 && (
+                <span
+                  className="absolute -top-2 -left-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold"
+                  style={{ minWidth: 18, minHeight: 18, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {cartCount}
+                </span>
+              )}
+              <FaShoppingCart className="text-xl" />
+            </span>
+            <span>Ver mi carrito</span>
+          </div>
+          <CartPreview 
+            isVisible={isCartPreviewVisible} 
+            onMouseEnter={() => setIsCartPreviewVisible(true)}
+            onMouseLeave={() => setIsCartPreviewVisible(false)}
+          />
         </div>
         <div 
           className="flex items-center cursor-pointer hover:text-red-500 transition-colors"
@@ -461,42 +568,7 @@ export const Navbar: React.FC = () => {
         )}
       </nav>
       
-      {/* Desktop Menu Below Navbar - Posición fija independiente */}
-      <div className="hidden md:flex w-full justify-center bg-white border-b border-gray-100 py-3" style={{ position: 'fixed', top: '55px', left: '0', zIndex: 40 }}>
-        <div className="flex gap-8 text-gray-600 text-sm justify-center">
-          <a href="#" className="hover:text-red-500 transition-colors">Gestión de ventas</a>
-          <a className="hover:text-red-500 transition-colors cursor-pointer" onClick={() => navigate('/campaigns')}>Campañas</a>
-          <div 
-            className="relative"
-            onMouseEnter={openCategoryMenu}
-            onMouseLeave={closeCategoryMenu}
-          >
-            <a href="#" className="hover:text-red-500 transition-colors">Categorias</a>
-            {isCategoryMenuOpen && (
-              <div 
-                className="absolute bg-white shadow-lg rounded-md border border-gray-200 mt-2 w-48 z-10"
-                onMouseEnter={openCategoryMenu}
-                onMouseLeave={closeCategoryMenu}
-              >
-                <ul className="py-2">
-                  {categories.map((category) => (
-                    <li 
-                      key={category.value}
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black"
-                      onClick={() => handleCategorySearch(category.label)}
-                    >
-                      {category.label}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-          <a href="#" className="hover:text-red-500 transition-colors">Cupones</a>
-          <a href="#" className="hover:text-red-500 transition-colors">Productos</a>
-          <a href="#" className="hover:text-red-500 transition-colors">Ofertas</a>
-        </div>
-      </div>
+
       
       {/* Espaciador para compensar el menú fijo */}
       <div className="hidden md:block w-full h-[110px]" /> 

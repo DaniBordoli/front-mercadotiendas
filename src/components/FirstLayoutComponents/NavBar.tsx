@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaUser, FaShoppingCart } from 'react-icons/fa';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCartStore } from '../../stores/cartStore';
 import { useShopStore } from '../../stores/slices/shopStore';
 import { useAuthStore } from '../../stores';
 import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
+import CartPreview from '../molecules/CartPreview';
 
 interface NavBarProps {
   navbarLinks?: { label: string; href: string }[];
@@ -33,6 +34,7 @@ const NavBar: React.FC<NavBarProps> = ({
   const { shopId } = useParams<{ shopId: string }>();
   const cartItems = useCartStore(state => state.items);
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const [isCartPreviewVisible, setIsCartPreviewVisible] = useState(false);
   
   const { shop, getShop, setShop } = useShopStore();
   const { isAuthenticated, user } = useAuthStore();
@@ -145,9 +147,14 @@ const NavBar: React.FC<NavBarProps> = ({
             className="text-xl cursor-pointer hover:opacity-75 transition-opacity" 
             style={{ color: navbarIconsColor || textColor || '#374151' }} 
           />
-          <div className="relative cursor-pointer hover:opacity-75 transition-opacity" onClick={() => {
-            navigate('/cart-list');
-          }}>
+          <div 
+            className="relative cursor-pointer hover:opacity-75 transition-opacity" 
+            onClick={() => {
+              navigate('/cart-list');
+            }}
+            onMouseEnter={() => setIsCartPreviewVisible(true)}
+            onMouseLeave={() => setIsCartPreviewVisible(false)}
+          >
             <FaShoppingCart 
               className="text-xl" 
               style={{ color: navbarIconsColor || textColor || '#374151' }} 
@@ -158,6 +165,11 @@ const NavBar: React.FC<NavBarProps> = ({
                 {cartCount}
               </span>
             )}
+            <CartPreview 
+              isVisible={isCartPreviewVisible} 
+              onMouseEnter={() => setIsCartPreviewVisible(true)}
+              onMouseLeave={() => setIsCartPreviewVisible(false)}
+            />
           </div>
         </div>
       </div>

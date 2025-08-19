@@ -6,6 +6,8 @@ import { DesignButton } from '../../atoms/DesignButton';
 import '../../../styles/responsive.css';
 import { useSearchStore } from '../../../stores';
 import FullScreenLoader from '../FullScreenLoader';
+import { useCartStore } from '../../../stores/cartStore';
+import { FaHeart } from 'react-icons/fa';
 
 interface CardProps {
   imageSrc?: string;
@@ -28,6 +30,7 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   const navigate = useNavigate();
   const { fetchProductById } = useSearchStore();
+  const { addToCart } = useCartStore();
   const [loadingProductId, setLoadingProductId] = React.useState<string | null>(null);
 
   const handleCardClick = async () => {
@@ -56,20 +59,58 @@ export const Card: React.FC<CardProps> = ({
     }
   };
 
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (productId && shopId) {
+      try {
+        // Obtener el producto completo del store antes de agregarlo al carrito
+        await fetchProductById(productId);
+        // El producto se almacena en selectedProduct del store
+        const { selectedProduct } = useSearchStore.getState();
+        
+        if (selectedProduct) {
+          addToCart(selectedProduct, 1);
+        } else {
+          // Fallback: crear un producto básico si no se puede obtener del store
+          const product = {
+            id: productId,
+            name: title || '',
+            price: price || 0,
+            imageUrls: imageSrc ? [imageSrc] : [],
+            condition: 'new' as const,
+            categoria: category || ''
+          };
+          addToCart(product, 1);
+        }
+      } catch (error) {
+        console.error('Error al obtener producto para el carrito:', error);
+        // Fallback en caso de error
+        const product = {
+          id: productId,
+          name: title || '',
+          price: price || 0,
+          imageUrls: imageSrc ? [imageSrc] : [],
+          condition: 'new' as const,
+          categoria: category || ''
+        };
+        addToCart(product, 1);
+      }
+    }
+  };
+
   const formattedPrice = price !== undefined 
     ? `$${price.toLocaleString()}`
     : "Precio no disponible";
 
   return (
     <div 
-      className="card bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow flex flex-col relative"
+      className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer"
       onClick={handleCardClick}
       style={{ 
-        minHeight: '400px', 
-        maxHeight: '400px',
-        width: '260px',
-        minWidth: '260px',
-        maxWidth: '260px'
+        width: '290px',
+        height: '338.96px',
+        minWidth: '290px',
+        maxWidth: '290px'
       }}
     >
       {/* Overlay de carga */}
@@ -83,35 +124,58 @@ export const Card: React.FC<CardProps> = ({
           </div>
         </div>
       )}
-      <figure className="m-0 w-full flex-shrink-0" style={{ height: '220px' }}>
-        <img
-          className="w-full h-full object-cover"
-          src={imageSrc || "https://placehold.co/600x400?text=No+Image"}
-          alt={title}
-          style={{ 
-            objectFit: 'cover',
-            width: '100%',
-            height: '100%'
-          }}
-        />
-      </figure>
-      <div className="card-body p-4 flex flex-col items-start flex-grow">
-        <p 
-          style={{ color: colors.mediumGray }}
-          className="text-xs font-light mb-1">{category}</p>
-        <h5 
-          className="card-title mb-1 font-semibold text-left text-base font-space line-clamp-2">
-          {title}
-        </h5>
-        <p className="text-lg mb-2 font-space font-bold">{formattedPrice}</p>
-        
-        <div className="flex justify-center w-full mt-auto">
-          <DesignButton 
-            variant="primary"
-            className="w-full"
+      
+      <div className="relative" style={{ width: '287.33px', height: '161.63px' }}>
+        <div className="w-full h-full bg-gray-100">
+          <img
+            className="w-full h-full object-cover"
+            src={imageSrc || "https://placehold.co/600x400?text=No+Image"}
+            alt={title}
+          />
+        </div>
+        <button className="absolute top-3 left-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors">
+          <FaHeart className="text-[#666666] hover:text-[#ff4f41] transition-colors" />
+        </button>
+      </div>
+      
+      <div className="p-4" style={{ width: '287.33px', height: '174.67px' }}>
+        <h3 className="text-base font-semibold text-[#1c1c1e] mb-2 text-left">{title}</h3>
+        <div className="flex items-center mb-3">
+          <div className="flex text-yellow-400 text-sm mr-2">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+            </svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+            </svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+            </svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+            </svg>
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+            </svg>
+          </div>
+          <span className="text-xs text-[#666666]">(124)</span>
+        </div>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xl font-bold text-[#1c1c1e]">{formattedPrice}</span>
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={handleAddToCart}
+            className="flex-1 py-2 bg-[#ff4f41] text-white rounded-lg text-sm font-semibold hover:bg-[#ff4f41]/80 transition-colors"
           >
-            Comprar
-          </DesignButton>
+            Agregar
+          </button>
+          <button 
+            onClick={handleCardClick}
+            className="px-4 py-2 border border-[#e5e5e7] text-[#666666] rounded-lg text-sm font-medium hover:border-[#ff4f41] hover:text-[#ff4f41] transition-colors opacity-0 group-hover:opacity-100"
+          >
+            Ver más
+          </button>
         </div>
       </div>
     </div>

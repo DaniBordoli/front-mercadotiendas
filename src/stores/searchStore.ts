@@ -26,6 +26,8 @@ export interface Product {
   shop?: {
     name: string;
     _id?: string;
+    active?: boolean;
+    imageUrl?: string;
   };
   descripcion?: string; 
 }
