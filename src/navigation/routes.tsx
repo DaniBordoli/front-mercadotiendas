@@ -7,7 +7,6 @@ import AccountActivation from '../screens/AccountActivation';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
-import { HomeRedirect } from '../components/utils/HomeRedirect';
 import ResetPass from '../screens/ResetPass';
 import GoogleComplete from '../screens/GoogleComplete';
 import CreateShopAIScreen from '../screens/CreateShopAIScreen';
@@ -69,7 +68,7 @@ import Success from '../screens/Success';
 import CategoriesPage from '../screens/CategoriesPage';
 import SubcategoriesElectroAudio from '../screens/SubcategoriesElectroAudio';
 import SubcategoriaModa from '../screens/SubcategoriaModa';
-import HomeBuyer from '../screens/HomeBuyer';
+import { HomeBuyer } from '../screens/HomeBuyer';
 
 
 export const publicRoutes = [
@@ -392,7 +391,7 @@ export const privateRoutes = [
 export const redirectRoutes = [
   {
     path: '/',
-    element: <HomeRedirect />
+    element: <Navigate to="/dashboard" replace />
   },
   {
     path: '*',
