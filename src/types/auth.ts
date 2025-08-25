@@ -1,7 +1,6 @@
 export interface LoginCredentials {
   email: string;
   password: string;
-  role?: 'user' | 'admin'; // MT-30: Optional role selection for login
 }
 
 export interface RegisterData extends LoginCredentials {
