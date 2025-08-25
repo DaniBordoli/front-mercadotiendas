@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Form } from '../components/organisms/Form';
 import { resetPassword } from '../stores/slices/authSlice';
 import { DesignButton } from '../components/atoms/DesignButton';
+import { Navbar } from '../components/organisms/Navbar';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 
 function VerifyPassword() {
   const navigate = useNavigate();
@@ -42,14 +44,12 @@ function VerifyPassword() {
   ];
 
   return (
-    <div className="bg-white h-screen flex flex-col items-center">
-      <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
-        <div className="flex flex-col items-center justify-center w-full">
-          <img
-            src="/logoLogin/logoLogin.png"
-            alt="Logo MercadoTiendas"
-            className="w-60 h-auto"
-          />
+    <div className="bg-white min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-0" style={{paddingTop: '10px', paddingBottom: '20px'}}>
+        <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-4 py-6 md:px-8 md:py-10 flex flex-col items-center w-full max-w-lg">
+          <div className="flex items-center justify-center w-full">
+            <img src="/logonuevoalto.png" alt="MercadoTiendas Logo" className="w-32 md:w-48 h-auto" />
 
         </div>
         <div className="mt-6 w-full max-w-md px-4 flex flex-col items-center">
@@ -104,6 +104,8 @@ function VerifyPassword() {
           </button>
         </div>
       </div>
+      </div>
+      <FooterHome />
     </div>
   );
 }

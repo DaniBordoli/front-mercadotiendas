@@ -44,6 +44,7 @@ export interface Review {
 }
 
 export type SortOrder = 'relevance' | 'price_asc' | 'price_desc' | 'rating_desc';
+export type DisplayMode = 'initial' | 'loadMore' | 'pagination';
 
 interface PriceRange {
   min: number | null;
@@ -345,6 +346,8 @@ interface SearchState {
   currentPage: number;
   totalPages: number;
   itemsPerPage: number; // Podría ser configurable
+  displayMode: DisplayMode;    // Modo de visualización actual
+  itemsToShow: number;         // Cantidad de items a mostrar en modo loadMore
 
   // Ordenamiento y Filtros
   sortOrder: SortOrder;
@@ -363,6 +366,7 @@ interface SearchState {
   fetchSearchResults: (options?: { term?: string; page?: number; keepFilters?: boolean }) => void; // Ya no es async
   fetchResultsByCategory: (categoryName: string, options?: { page?: number; keepFilters?: boolean }) => void; // Nueva función
   goToPage: (pageNumber: number) => void;
+  loadMoreResults: () => void;         // Cargar más resultados hasta 10
   _updateDisplayedResults: () => void; // Helper interno
 
   // Ordenamiento y Filtrado
@@ -378,6 +382,8 @@ interface SearchState {
   // --- NUEVO: Acciones para Opiniones ---
   fetchReviewsByProductId: (productId: string) => void;
   addReview: (productId: string, reviewData: { rating: number; text: string }) => void;
+  // --- NUEVO: Productos relacionados ---
+  fetchRelatedProducts: (productId: string) => Promise<Product[]>;
 }
 
 // --- Implementación del Store ---
@@ -405,6 +411,8 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   currentPage: 1,
   totalPages: 1,
   itemsPerPage: 3, // Bajar para probar paginación con pocos mocks
+  displayMode: 'initial',
+  itemsToShow: 3,
 
   sortOrder: 'relevance',
   availableFilters: null, 
@@ -438,7 +446,7 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   _updateDisplayedResults: () => {
       const { 
           baseSearchResults, selectedBrands, selectedCondition, priceRange, 
-          sortOrder, currentPage, itemsPerPage 
+          sortOrder, currentPage, itemsPerPage, displayMode, itemsToShow 
       } = get();
 
       // 1. Aplicar filtros de usuario
@@ -447,17 +455,27 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       // 2. Ordenar
       const sorted = sortProducts(userFiltered, sortOrder);
 
-      // 3. Paginar
-      const totalPages = Math.ceil(sorted.length / itemsPerPage);
-      const pageIndex = currentPage - 1;
-      const startIndex = pageIndex * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedResults = sorted.slice(startIndex, endIndex);
+      // 3. Determinar qué mostrar según el modo de visualización
+      let resultsToShow: Product[];
+      let totalPages = 1;
+
+      if (displayMode === 'initial' || displayMode === 'loadMore') {
+          // Mostrar los primeros itemsToShow elementos
+          resultsToShow = sorted.slice(0, itemsToShow);
+          totalPages = 1; // No hay paginación en estos modos
+      } else {
+          // Modo pagination: usar paginación normal
+          totalPages = Math.ceil(sorted.length / itemsPerPage);
+          const pageIndex = currentPage - 1;
+          const startIndex = pageIndex * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          resultsToShow = sorted.slice(startIndex, endIndex);
+      }
 
       set({
-          searchResults: paginatedResults,
-          totalPages: totalPages > 0 ? totalPages : 1, // Evitar 0 páginas
-          // currentPage se mantiene como está
+          searchResults: resultsToShow,
+          totalPages: totalPages > 0 ? totalPages : 1,
+          totalResults: sorted.length, // Actualizar total de resultados filtrados
       });
   },
 
@@ -507,7 +525,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
           selectedBrands: [],
           selectedCondition: null,
           priceRange: { min: null, max: null },
-          sortOrder: 'relevance'
+          sortOrder: 'relevance',
+          displayMode: 'initial',
+          itemsToShow: 3
+        };
+      } else {
+        newStatePartial = {
+          ...newStatePartial,
+          displayMode: 'initial',
+          itemsToShow: 3
         };
       }
       set(newStatePartial);
@@ -535,7 +561,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
             selectedBrands: [],
             selectedCondition: null,
             priceRange: { min: null, max: null },
-            sortOrder: 'relevance'
+            sortOrder: 'relevance',
+            displayMode: 'initial',
+            itemsToShow: 3
+          };
+        } else {
+          newStatePartial = {
+            ...newStatePartial,
+            displayMode: 'initial',
+            itemsToShow: 3
           };
         }
         set(newStatePartial);
@@ -591,7 +625,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
           selectedBrands: [],
           selectedCondition: null,
           priceRange: { min: null, max: null },
-          sortOrder: 'relevance'
+          sortOrder: 'relevance',
+          displayMode: 'initial',
+          itemsToShow: 3
+        };
+      } else {
+        newStatePartial = {
+          ...newStatePartial,
+          displayMode: 'initial',
+          itemsToShow: 3
         };
       }
       
@@ -624,7 +666,15 @@ export const useSearchStore = create<SearchState>((set, get) => ({
             selectedBrands: [],
             selectedCondition: null,
             priceRange: { min: null, max: null },
-            sortOrder: 'relevance'
+            sortOrder: 'relevance',
+            displayMode: 'initial',
+            itemsToShow: 3
+          };
+        } else {
+          newStatePartial = {
+            ...newStatePartial,
+            displayMode: 'initial',
+            itemsToShow: 3
           };
         }
         
@@ -637,14 +687,27 @@ export const useSearchStore = create<SearchState>((set, get) => ({
   goToPage: (pageNumber) => {
     const { totalPages, currentPage } = get();
     if (pageNumber >= 1 && pageNumber <= totalPages && pageNumber !== currentPage) {
-      set({ currentPage: pageNumber }); // Actualiza página
+      set({ currentPage: pageNumber, displayMode: 'pagination' }); // Actualiza página y modo
       get()._updateDisplayedResults();   // Recalcula resultados para esa página
+    }
+  },
+
+  loadMoreResults: () => {
+    const { itemsToShow, displayMode } = get();
+    if (displayMode === 'initial') {
+      // Cambiar a modo loadMore y mostrar hasta 10 elementos
+      set({ displayMode: 'loadMore', itemsToShow: 10 });
+      get()._updateDisplayedResults();
+    } else if (displayMode === 'loadMore') {
+      // Cambiar a modo pagination
+      set({ displayMode: 'pagination', currentPage: 1 });
+      get()._updateDisplayedResults();
     }
   },
 
   // --- Acciones de Ordenamiento y Filtrado (ahora llaman a _updateDisplayedResults) ---
   setSortOrder: (order) => {
-    set({ sortOrder: order, currentPage: 1 }); // Resetear a página 1
+    set({ sortOrder: order, currentPage: 1, displayMode: 'initial', itemsToShow: 3 }); // Resetear a estado inicial
     get()._updateDisplayedResults();
   },
 
@@ -653,17 +716,17 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     const newSelected = currentSelected.includes(brand)
       ? currentSelected.filter(b => b !== brand)
       : [...currentSelected, brand];
-    set({ selectedBrands: newSelected, currentPage: 1 }); // Resetear a página 1
+    set({ selectedBrands: newSelected, currentPage: 1, displayMode: 'initial', itemsToShow: 3 }); // Resetear a estado inicial
     get()._updateDisplayedResults();
   },
 
   setConditionFilter: (condition) => {
-    set({ selectedCondition: condition, currentPage: 1 }); // Resetear a página 1
+    set({ selectedCondition: condition, currentPage: 1, displayMode: 'initial', itemsToShow: 3 }); // Resetear a estado inicial
     get()._updateDisplayedResults();
   },
 
   setPriceRange: (range) => {
-    set({ priceRange: range, currentPage: 1 }); // Resetear a página 1
+    set({ priceRange: range, currentPage: 1, displayMode: 'initial', itemsToShow: 3 }); // Resetear a estado inicial
     get()._updateDisplayedResults();
   },
 
@@ -673,7 +736,9 @@ export const useSearchStore = create<SearchState>((set, get) => ({
       selectedCondition: null,
       priceRange: { min: null, max: null },
       sortOrder: 'relevance', 
-      currentPage: 1, // Resetear a página 1
+      currentPage: 1,
+      displayMode: 'initial',
+      itemsToShow: 3,
     });
     get()._updateDisplayedResults(); 
   },
@@ -764,5 +829,52 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     // Opcional: podrías querer recalcular el rating promedio del producto aquí también
     // const currentProduct = get().selectedProduct;
     // if (currentProduct) { ... recalcular y actualizar selectedProduct ... }
+  },
+
+  // --- NUEVO: Función para obtener productos relacionados ---
+  fetchRelatedProducts: async (productId: string): Promise<Product[]> => {
+    try {
+      // Obtener el producto actual para conocer su tienda y categoría
+      const currentProduct = get().selectedProduct;
+      if (!currentProduct) {
+        console.warn('[fetchRelatedProducts] No hay producto seleccionado');
+        return [];
+      }
+
+      // Obtener todos los productos disponibles
+      const productsFromBackend = await useAuthStore.getState().fetchAllProducts();
+      const allProducts: Product[] = mergeProductsWithMocks(productsFromBackend);
+      
+      // Filtrar productos relacionados
+      let relatedProducts = allProducts.filter(p => 
+        p.id !== productId && // Excluir el producto actual
+        (p.estado === 'Activo' || !p.estado) // Solo productos activos
+      );
+
+      // Solo productos de la misma categoría
+      const sameCategoryProducts = relatedProducts.filter(p => 
+        p.categoria && currentProduct.categoria && 
+        p.categoria.toLowerCase() === currentProduct.categoria.toLowerCase()
+      );
+
+      // Limitar a máximo 12 productos de la misma categoría
+      const combinedProducts = sameCategoryProducts.slice(0, 12);
+
+      console.log(`[fetchRelatedProducts] Encontrados ${combinedProducts.length} productos relacionados para ${productId}`);
+      return combinedProducts;
+      
+    } catch (error) {
+      console.error('Error al obtener productos relacionados:', error);
+      // Fallback con productos mock
+      const currentProduct = get().selectedProduct;
+      if (!currentProduct) return [];
+      
+      const relatedMocks = mockProducts.filter(p => 
+        p.id !== productId && 
+        (p.estado === 'Activo' || !p.estado)
+      ).slice(0, 12);
+      
+      return relatedMocks;
+    }
   },
 }));

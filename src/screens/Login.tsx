@@ -11,6 +11,8 @@ import { BsFacebook } from 'react-icons/bs';
 import { Loading } from '../components/molecules/Loading';
 import { DesignButton } from '../components/atoms/DesignButton';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
+import { Navbar } from '../components/organisms/Navbar/Navbar';
 function Login() {
   const navigate = useNavigate();
   const { login, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
@@ -55,31 +57,33 @@ function Login() {
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col items-center">
+    <div className="bg-white min-h-screen flex flex-col">
+      <Navbar />
       {isLoading && <FullScreenLoader />}
-      <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-0" style={{paddingTop: '10px', paddingBottom: '20px'}}>
+        <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-4 py-6 md:px-8 md:py-10 flex flex-col items-center w-full max-w-lg">
         <div className="flex items-center justify-center w-full">
-          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
+          <img src="/logonuevoalto.png" alt="MercadoTiendas Logo" className="w-32 md:w-48 h-auto" />
         </div>
-        <div className="mt-6 flex items-center space-x-10">
+        <div className="mt-4 md:mt-6 flex items-center space-x-6 md:space-x-10">
           <div className="flex flex-col items-center">
             <span style={{color: colors.primaryRed}} className="text-lg font-space">Iniciar sesión</span>
             <div
-              className="w-[200px] h-0.5 mt-1"
+              className="w-[120px] md:w-[200px] h-0.5 mt-1"
               style={{ backgroundColor: colors.primaryRed }}
             ></div>
           </div>
           <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/register')}>
-            <span className="text-lg font-space">Crear cuenta</span>
+            <span className="text-sm md:text-lg font-space">Crear cuenta</span>
             <div
-              className="w-[200px] h-0.5 mt-1"
+              className="w-[120px] md:w-[200px] h-0.5 mt-1"
               style={{ backgroundColor: colors.lightGray }}
             ></div>
           </div>
         </div>
         
-        <form onSubmit={handleSubmit} className="mt-10 w-full max-w-md px-4">
-          <div className="mb-4">
+        <form onSubmit={handleSubmit} className="mt-6 md:mt-10 w-full max-w-md px-2 md:px-4">
+          <div className="mb-3 md:mb-4">
             <label className="block mb-2 font-space text-darkGray">
               Correo electrónico
             </label>
@@ -93,7 +97,7 @@ function Login() {
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
-          <div>
+          <div className="mb-3 md:mb-4">
             <label className="block mb-2 font-space text-darkGray">
               Contraseña
             </label>
@@ -107,19 +111,19 @@ function Login() {
             />
           </div>
           
-          <div className="flex justify-between items-center mt-4">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-3 md:mt-4 space-y-2 md:space-y-0">
             <div className="flex items-center">
               <input
                 type="checkbox"
                 id="keepLoggedIn"
                 className="mr-2"
               />
-              <label style={{color: colors.darkGray}} htmlFor="keepLoggedIn" className="font-space text-sm">
+              <label style={{color: colors.darkGray}} htmlFor="keepLoggedIn" className="font-space text-xs md:text-sm">
                 Mantener sesión iniciada
               </label>
             </div>
             <span 
-              className="font-space text-sm cursor-pointer"
+              className="font-space text-xs md:text-sm cursor-pointer text-center md:text-left"
               style={{ color: colors.primaryRed }}
               onClick={() => navigate('/reset-password')}
             >
@@ -127,7 +131,7 @@ function Login() {
             </span>
           </div>
           
-          <div className="mt-8">
+          <div className="mt-4 md:mt-8">
             <DesignButton
              className='w-full'
               type="submit"
@@ -138,12 +142,12 @@ function Login() {
             </DesignButton>
           </div>
           
-          <div className="flex items-center justify-center mt-8">
+          <div className="flex items-center justify-center mt-4 md:mt-8">
             <div 
               className="flex-1 h-0.5" 
               style={{ backgroundColor: colors.lightGray }}
             ></div>
-            <span className="px-4 font-space text-sm" style={{ color: colors.mediumGray }}>
+            <span className="px-2 md:px-4 font-space text-xs md:text-sm" style={{ color: colors.mediumGray }}>
               O continúa con
             </span>
             <div 
@@ -152,7 +156,7 @@ function Login() {
             ></div>
           </div>
           
-          <div className="flex justify-center space-x-4 mt-6">
+          <div className="flex justify-center space-x-2 md:space-x-4 mt-4 md:mt-6">
             <div className="w-1/2">
               <DesignButton 
               className='w-full'
@@ -181,7 +185,7 @@ function Login() {
             </div>
           </div>
           
-          <div className="flex justify-center mt-8 font-space text-sm">
+          <div className="flex justify-center mt-4 md:mt-8 font-space text-xs md:text-sm">
             <span style={{color: colors.mediumGray}}>¿No tenés cuenta?</span>
             <span 
               className="ml-1 cursor-pointer"
@@ -192,7 +196,9 @@ function Login() {
             </span>
           </div>
         </form>
+        </div>
       </div>
+      <FooterHome />
     </div>
   );
 }

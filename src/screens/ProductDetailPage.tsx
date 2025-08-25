@@ -57,6 +57,7 @@ const ProductDetailPage: React.FC = () => {
     productReviews,
     isLoadingReviews,
     addReview,
+    fetchRelatedProducts,
   } = useSearchStore();
   const addToCart = useCartStore(state => state.addToCart);
   const { getShop, shop } = useShopStore();
@@ -68,6 +69,11 @@ const ProductDetailPage: React.FC = () => {
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'descripcion' | 'especificaciones' | 'opiniones' | 'preguntas'>('descripcion');
+  // Estados para productos relacionados
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(false);
+  const [currentRelatedIndex, setCurrentRelatedIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   // Mostrar el nombre de la tienda del producto, no del usuario logueado
   const shopName = selectedProduct?.shop?.name || null;
 
@@ -86,6 +92,59 @@ const ProductDetailPage: React.FC = () => {
     };
   }, [id, fetchProductById, clearSelectedProduct]);
 
+  // Cargar productos relacionados cuando se selecciona un producto
+  useEffect(() => {
+    const loadRelatedProducts = async () => {
+      if (selectedProduct && id) {
+        setIsLoadingRelated(true);
+        try {
+          const related = await fetchRelatedProducts(id);
+          setRelatedProducts(related);
+          setCurrentRelatedIndex(0); // Resetear índice
+        } catch (error) {
+          console.error('Error cargando productos relacionados:', error);
+        } finally {
+          setIsLoadingRelated(false);
+        }
+      }
+    };
+    
+    loadRelatedProducts();
+  }, [selectedProduct, id, fetchRelatedProducts]);
+
+  // Manejar cambios de tamaño de ventana
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Funciones para manejar navegación de productos relacionados
+  const handlePrevRelated = () => {
+    if (relatedProducts.length > 6) {
+      setCurrentRelatedIndex(prev => Math.max(0, prev - 6));
+    }
+  };
+
+  const handleNextRelated = () => {
+    if (relatedProducts.length > 6) {
+      const maxIndex = Math.max(0, relatedProducts.length - 6);
+      setCurrentRelatedIndex(prev => Math.min(maxIndex, prev + 6));
+    }
+  };
+
+  const canGoPrev = currentRelatedIndex > 0;
+  const canGoNext = currentRelatedIndex + 6 < relatedProducts.length;
+
+  // Obtener productos visibles (2 para mobile, 6 para web)
+  const getVisibleProducts = () => {
+    const itemsToShow = isMobile ? 2 : 6;
+    return relatedProducts.slice(currentRelatedIndex, currentRelatedIndex + itemsToShow);
+  };
+
   // Derivar breadcrumbs a partir del estado de navegación o del producto
   const navState: any = (location as any)?.state || {};
   const searchContext = (navState.searchContext || {}) as { type?: 'search' | 'category'; value?: string; previousPath?: string };
@@ -96,7 +155,7 @@ const ProductDetailPage: React.FC = () => {
     const items: { label: string; onClick?: () => void; active?: boolean }[] = [];
     items.push({ label: 'Inicio', onClick: () => navigate('/') });
     if (isFromCategory && searchContext.value) {
-      items.push({ label: 'Categorías', onClick: () => navigate('/categorias') });
+      items.push({ label: 'Categorías', onClick: () => navigate('/categories') });
       items.push({
         label: String(searchContext.value),
         onClick: () => {
@@ -116,7 +175,7 @@ const ProductDetailPage: React.FC = () => {
       });
       items.push({ label: `"${String(searchContext.value)}"` });
     } else if (selectedProduct && selectedProduct.categoria) {
-      items.push({ label: 'Categorías', onClick: () => navigate('/categorias') });
+      items.push({ label: 'Categorías', onClick: () => navigate('/categories') });
       const category = selectedProduct.categoria; // ensure non-undefined
       items.push({
         label: category,
@@ -265,7 +324,7 @@ const ProductDetailPage: React.FC = () => {
                 <img 
                   src={displayImageUrl} 
                   alt={selectedProduct.name} 
-                  className="w-full h-[600px] object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
+                  className="w-full h-[292px] md:h-[600px] object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
                   onClick={() => setIsZoomModalOpen(true)}
                 />
                 {selectedProduct.imageUrls && selectedProduct.imageUrls.length > 1 && (
@@ -296,7 +355,7 @@ const ProductDetailPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-full h-24 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 ${
+                      className={`w-full h-16 md:h-24 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 ${
                         index === currentImageIndex 
                           ? 'border-[#ff4f41] opacity-100' 
                           : 'border-transparent hover:border-[#ff4f41] opacity-60 hover:opacity-100'
@@ -314,7 +373,7 @@ const ProductDetailPage: React.FC = () => {
           <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-fit">
             <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7]">
               {/* Badges de estado del producto */}
-               <div className="flex items-center gap-2 mb-3">
+               <div className="flex items-center gap-2 mb-3 md:mt-0 mt-6">
               {selectedProduct.condition === 'new' && (
                 <span className="px-3 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-sm font-semibold">Nuevo</span>
               )}
@@ -433,9 +492,9 @@ const ProductDetailPage: React.FC = () => {
                             // Lógica básica para comprar ahora (por ahora solo añade al carrito)
                             handleAddToCart();
                         }}
-                        className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors"
+                        className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors flex items-center justify-center"
                     >
-                        Comprar ahora
+                        <span className="pt-0.5">Comprar ahora</span>
                     </button>
                     <button 
                         onClick={handleAddToCart}
@@ -461,7 +520,7 @@ const ProductDetailPage: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <button className="px-3 py-1 bg-white border border-[#e5e5e7] text-[#666666] rounded-lg hover:bg-gray-50 transition-colors text-xs">
+                            <button className="px-3 py-1 bg-white border border-[#e5e5e7] text-[#666666] rounded-lg hover:bg-gray-50 transition-colors text-xs hidden md:block">
                                 Ver tienda
                             </button>
                             <button className="px-3 py-1 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
@@ -475,8 +534,8 @@ const ProductDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Details Tabs */}
-        <div className="mb-8" id="product-tabs">
+        {/* Product Details Tabs - Desktop version */}
+        <div className="mb-8 hidden md:block" id="product-tabs">
             <div className="border-b border-[#e5e5e7]">
                 <nav className="flex space-x-8">
                     <button 
@@ -522,7 +581,7 @@ const ProductDetailPage: React.FC = () => {
                 </nav>
             </div>
             
-            {/* Tab Content */}
+            {/* Desktop Tab Content */}
             {activeTab === 'descripcion' && (
                 <div className="py-6">
                     <div className="prose max-w-none">
@@ -745,86 +804,121 @@ const ProductDetailPage: React.FC = () => {
             )}
         </div>
 
+        {/* Mobile Description Card */}
+        <div className="mb-8 md:hidden">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-[#e5e5e7]">
+                <h3 className="text-lg font-semibold text-[#1c1c1e] mb-4">Descripción</h3>
+                <div className="text-[#666666] leading-relaxed text-left">
+                    {selectedProduct.descripcion || selectedProduct.description ? (
+                        <p>{selectedProduct.descripcion || selectedProduct.description}</p>
+                    ) : (
+                        <p className="italic text-gray-400">Este producto no tiene descripción.</p>
+                    )}
+                </div>
+            </div>
+        </div>
+
         {/* Related Products */}
         <div className="mb-12" id="related-products">
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold font-space text-[#1c1c1e]">También te puede interesar</h3>
-                <div className="flex items-center gap-2">
-                    <button className="w-10 h-10 bg-white border border-[#e5e5e7] rounded-lg flex items-center justify-center hover:bg-[#f8f8f8] transition-colors">
-                        <FaChevronLeft className="text-[#666666]" />
-                    </button>
-                    <button className="w-10 h-10 bg-white border border-[#e5e5e7] rounded-lg flex items-center justify-center hover:bg-[#f8f8f8] transition-colors">
-                        <FaChevronRight className="text-[#666666]" />
-                    </button>
-                </div>
+                {!isMobile && relatedProducts.length > 6 && (
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onClick={handlePrevRelated}
+                            disabled={!canGoPrev}
+                            className={`w-10 h-10 bg-white border border-[#e5e5e7] rounded-lg flex items-center justify-center transition-colors ${
+                                canGoPrev ? 'hover:bg-[#f8f8f8] text-[#666666]' : 'text-gray-300 cursor-not-allowed'
+                            }`}
+                        >
+                            <FaChevronLeft />
+                        </button>
+                        <button 
+                            onClick={handleNextRelated}
+                            disabled={!canGoNext}
+                            className={`w-10 h-10 bg-white border border-[#e5e5e7] rounded-lg flex items-center justify-center transition-colors ${
+                                canGoNext ? 'hover:bg-[#f8f8f8] text-[#666666]' : 'text-gray-300 cursor-not-allowed'
+                            }`}
+                        >
+                            <FaChevronRight />
+                        </button>
+                    </div>
+                )}
             </div>
-            <div className="flex gap-2 mb-4">
-                <span className="px-3 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-sm font-medium">Similar</span>
-                <span className="px-3 py-1 bg-[#00a699]/10 text-[#00a699] rounded-full text-sm font-medium">Complemento</span>
-                <span className="px-3 py-1 bg-[#f8f8f8] text-[#666666] rounded-full text-sm font-medium">Otros de la tienda</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/0bbb141a47-7b4119f8b9b173bb385a.png" alt="Producto relacionado" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Auriculares Gaming Pro</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$89.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
+            
+            {isLoadingRelated ? (
+                <div className="flex justify-center items-center py-12">
+                    <FaSpinner className="animate-spin text-2xl text-[#ff4f41]" />
+                    <span className="ml-2 text-gray-600">Cargando productos relacionados...</span>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/1e75206b42-b4e16299efe5d7570dfe.png" alt="Producto relacionado" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Auriculares Sport</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$45.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
+            ) : relatedProducts.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                    <p>No se encontraron productos relacionados</p>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/deb3d05bdc-57e6cac172514806de50.png" alt="modern black wireless headphones with premium design and sleek finish" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Auriculares Pro</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$129.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
+            ) : (
+                <div className={`grid gap-0 md:gap-4 ${
+                    isMobile ? 'grid-cols-2' : 'grid-cols-3 lg:grid-cols-6'
+                }`}>
+                    {getVisibleProducts().map((product) => (
+                        <div 
+                            key={product.id} 
+                            className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                            onClick={() => navigate(`/product/${product.id}`)}
+                        >
+                            <img 
+                                className="w-full h-36 object-cover" 
+                                src={product.imageUrls?.[0] || product.imagen || product.images?.[0] || '/placeholder-image.jpg'} 
+                                alt={product.name || product.nombre || 'Producto'}
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = '/placeholder-image.jpg';
+                                }}
+                            />
+                            <div className="p-3">
+                                <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm line-clamp-2">
+                                    {product.name || product.nombre || 'Producto sin nombre'}
+                                </h4>
+                                <div className="text-base font-bold text-[#1c1c1e] mb-2">
+                                    ${product.price || product.precio || '0.00'}
+                                </div>
+                                <button 
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const productToAdd = {
+                                            id: product.id,
+                                            name: product.name || product.nombre || 'Producto',
+                                            price: parseFloat(product.price?.toString() || product.precio?.toString() || '0'),
+                                            imageUrls: product.imageUrls || (product.imagen ? [product.imagen] : (product.images || ['/placeholder-image.jpg'])),
+                                            condition: 'new' as const,
+                                            categoria: product.categoria || product.category || '',
+                                            storeName: product.storeName || product.shop?.name || '',
+                                            shop: product.shop
+                                        };
+                                        addToCart(productToAdd, 1);
+                                    }}
+                                    className="w-full py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs"
+                                >
+                                    Agregar
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/714d0225c5-31abc0e6860d5da99410.png" alt="Producto relacionado" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Auriculares Pro Max</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$129.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
+            )}
+            
+            {/* Indicador de productos (solo en mobile si hay más de 2) */}
+            {isMobile && relatedProducts.length > 2 && (
+                <div className="flex justify-center mt-4 gap-1">
+                    {Array.from({ length: Math.ceil(relatedProducts.length / 2) }).map((_, index) => (
+                        <div 
+                            key={index}
+                            className={`w-2 h-2 rounded-full transition-colors ${
+                                Math.floor(currentRelatedIndex / 2) === index ? 'bg-[#ff4f41]' : 'bg-gray-300'
+                            }`}
+                        />
+                    ))}
                 </div>
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/578d4c2e27-2595efd7a7a64d2b9d72.png" alt="white noise cancelling headphones luxury premium design" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Auriculares Luxury</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$199.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-                <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow">
-                    <img className="w-full h-36 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/8fec872a9c-fee3d0686c63e22cad2f.png" alt="premium wireless earbuds with charging case modern design" />
-                    <div className="p-3">
-                        <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm">Earbuds Pro</h4>
-                        <div className="text-base font-bold text-[#1c1c1e]">$79.99</div>
-                        <button className="w-full mt-2 py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs">
-                            Agregar
-                        </button>
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
 
       </main>
