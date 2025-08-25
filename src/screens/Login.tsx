@@ -20,7 +20,23 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState<'user' | 'admin'>('user'); // MT-30: Role selection for login
-  // MT-30: TODO - Implement role-based authentication validation
+  const [formErrors, setFormErrors] = useState<{email?: string; password?: string; role?: string}>({});
+  const [isFormValid, setIsFormValid] = useState(false);
+  
+  // MT-30: Form validation logic
+  useEffect(() => {
+    const emailValid = email.length > 0 && email.includes('@');
+    const passwordValid = password.length >= 6;
+    setIsFormValid(emailValid && passwordValid);
+    
+    // Clear form errors when user starts typing
+    if (formErrors.email && emailValid) {
+      setFormErrors(prev => ({ ...prev, email: undefined }));
+    }
+    if (formErrors.password && passwordValid) {
+      setFormErrors(prev => ({ ...prev, password: undefined }));
+    }
+  }, [email, password, formErrors]);
 
   useEffect(() => {
     const timer = setTimeout(() => setInitialLoading(false), 900);
@@ -31,12 +47,42 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // MT-30: Validate form before submission
+    const errors: {email?: string; password?: string; role?: string} = {};
+    
+    if (!email || !email.includes('@')) {
+      errors.email = 'Por favor ingresa un email válido';
+    }
+    
+    if (!password || password.length < 6) {
+      errors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+    
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+    
     // MT-30: Include selected role in login credentials
-    await login({
+    const credentials = {
       email,
       password,
       role: selectedRole
-    });
+    };
+    
+    try {
+      await login(credentials);
+    } catch (error: any) {
+      console.error('Login failed:', error);
+      
+      // MT-30: Handle role-specific errors
+      if (error.message && error.message.includes('permisos')) {
+        setFormErrors({ role: error.message });
+      } else {
+        setFormErrors({ email: 'Credenciales inválidas. Verifica tu email y contraseña.' });
+      }
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -94,9 +140,16 @@ function Login() {
               value={email}
               onChange={handleEmailChange}
               placeholder="nombre@ejemplo.com"
-              className='w-full'
+              className={`w-full ${
+                formErrors.email 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-300 focus:ring-blue-500'
+              }`}
               icon={<MdMailOutline style={{ color: colors.mediumGray }} />}
             />
+            {formErrors.email && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+            )}
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
           <div className="mb-3 md:mb-4">
@@ -108,9 +161,16 @@ function Login() {
               value={password}
               onChange={handlePasswordChange}
               placeholder="•••••••••"
-              className='w-full'
+              className={`w-full ${
+                formErrors.password 
+                  ? 'border-red-500 focus:ring-red-500' 
+                  : 'border-gray-300 focus:ring-blue-500'
+              }`}
               icon={<AiOutlineQuestionCircle style={{ color: colors.mediumGray }} />}
             />
+            {formErrors.password && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+            )}
           </div>
           
           {/* MT-30: Role Selection Component */}
@@ -142,6 +202,9 @@ function Login() {
                 Administrador
               </button>
             </div>
+            {formErrors.role && (
+              <p className="mt-1 text-sm text-red-600">{formErrors.role}</p>
+            )}
           </div>
           
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-3 md:mt-4 space-y-2 md:space-y-0">
@@ -168,10 +231,10 @@ function Login() {
             <DesignButton
              className='w-full'
               type="submit"
-              disabled={isLoading}
+              disabled={!isFormValid || isLoading}
               variant='primary'
             >
-              {isLoading ? "Cargando..." : "Iniciar sesión"}
+              {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </DesignButton>
           </div>
           
