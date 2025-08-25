@@ -40,7 +40,7 @@ import AboutUsScreen from '../screens/LayoutScreens/AboutUsScreen';
 import ContactScreen from '../screens/LayoutScreens/ContactScreen';
 import LayoutSelection from '../screens/LayoutSelection';
 import CartList from '../screens/CartList';
-import CartCheckout from '../screens/CartCheckout'
+import CartCheckout from '../screens/CartCheckout';
 import CartSummary from '../screens/CartSummary';
 import CartCompleted from '../screens/CartCompleted';
 import MyProductsSection from '../screens/MyProductsSection';
@@ -68,7 +68,7 @@ import Success from '../screens/Success';
 import CategoriesPage from '../screens/CategoriesPage';
 import SubcategoriesElectroAudio from '../screens/SubcategoriesElectroAudio';
 import SubcategoriaModa from '../screens/SubcategoriaModa';
-import { HomeBuyer } from '../screens/HomeBuyer';
+import HomeBuyer from '../screens/HomeBuyer';
 
 
 export const publicRoutes = [
