@@ -11,7 +11,7 @@ export const useAuthRedirect = () => {
     useEffect(() => {
         if (isLoading) return;
 
-        const publicRoutes = ['/login', '/register', '/reset-password'];
+        const publicRoutes = ['/login', '/register', '/reset-password', '/basic-data', '/register-data', '/data-seller', '/data-influencer', '/success', '/role-configuration'];
         const isPublicRoute = publicRoutes.includes(location.pathname);
 
         if (!user && !isPublicRoute) {

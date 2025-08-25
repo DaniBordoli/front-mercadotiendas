@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { Navbar } from '../components/organisms/Navbar';
 import FooterHome from '../components/organisms/FooterHome/FooterHome';
-import { FaCheck, FaChevronDown, FaShoppingCart, FaStore, FaStar, FaUser, FaExchangeAlt, FaSignOutAlt, FaInfoCircle, FaCloudUploadAlt, FaInstagram, FaTiktok, FaYoutube, FaTimes } from 'react-icons/fa';
+import { FaCheck, FaChevronDown, FaShoppingCart, FaStore, FaStar, FaUser, FaExchangeAlt, FaSignOutAlt, FaInfoCircle, FaCloudUploadAlt, FaInstagram, FaTiktok, FaYoutube, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { getCountryOptions, getCountryByCode, getCountryOptionLabel, type CountryOption } from '../utils/countriesLibrary';
 import { fetchMainCategories } from '../stores/slices/authSlice';
 
@@ -15,7 +16,10 @@ interface AccordionState {
 
 function RoleConfigurationScreen() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<UserType>('buyer');
+  const location = useLocation();
+  const initialSelectedRoles: UserType[] = (location.state as any)?.selectedRoles || ['buyer'];
+  const [selectedRoles] = useState<UserType[]>(initialSelectedRoles);
+  const [activeTab, setActiveTab] = useState<UserType>(initialSelectedRoles[0]);
   const [accordionStates, setAccordionStates] = useState<AccordionState>({
     address: true,
     storeBasics: true,
@@ -27,7 +31,7 @@ function RoleConfigurationScreen() {
   // Estado para modal de confirmación
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
-  const [selectedRoles] = useState<UserType[]>(['buyer', 'seller', 'influencer']); // Simular roles seleccionados
+  // selectedRoles se inicializa arriba desde la navegación y contiene solo los roles elegidos
 
   // Estado para dirección preferida
   const [preferredAddress, setPreferredAddress] = useState({
@@ -110,6 +114,7 @@ function RoleConfigurationScreen() {
   };
 
   const handleTabChange = (tab: UserType) => {
+    if (!selectedRoles.includes(tab)) return;
     setActiveTab(tab);
   };
 
@@ -247,17 +252,22 @@ function RoleConfigurationScreen() {
 
   // Función para manejar "Terminar más tarde"
   const handleFinishLater = () => {
-    navigate('/success', { 
-      state: { 
-        fromRoleConfiguration: true,
-        selectedRoles: selectedRoles,
-        completedRoles: selectedRoles.map(role => ({
-          role,
-          progress: getRoleProgress(role)
-        })),
-        finishedLater: true
-      } 
-    });
+    if (selectedRoles.length > 1) {
+      setShowConfirmModal(true);
+      setPendingNavigation(null); // stay on this screen
+    } else {
+      navigate('/success', { 
+        state: { 
+          fromRoleConfiguration: true,
+          selectedRoles: selectedRoles,
+          completedRoles: selectedRoles.map(role => ({
+            role,
+            progress: getRoleProgress(role)
+          })),
+          finishedLater: true
+        } 
+      });
+    }
   };
 
   // Funciones del modal de confirmación
@@ -494,15 +504,21 @@ function RoleConfigurationScreen() {
           <div className="flex items-center justify-between">
             {/* Left side - Status chips */}
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#00a699]/10 text-[#00a699] text-xs rounded-full">
-                Comprador {getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}
-              </span>
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
-                Vendedor {getRoleProgress('seller').completed}/{getRoleProgress('seller').total}
-              </span>
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
-                Influencer {getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}
-              </span>
+                {selectedRoles.includes('buyer') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
+                    Comprador {getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}
+                  </span>
+                )}
+                {selectedRoles.includes('seller') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
+                    Vendedor {getRoleProgress('seller').completed}/{getRoleProgress('seller').total}
+                  </span>
+                )}
+                {selectedRoles.includes('influencer') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#ff4f41]/10 text-[#ff4f41] text-xs rounded-full">
+                    Influencer {getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}
+                  </span>
+                )}
             </div>
             
             {/* Right side - Action buttons */}
@@ -796,15 +812,21 @@ function RoleConfigurationScreen() {
           <div className="flex items-center justify-between">
             {/* Left side - Status chips */}
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
-                Comprador {getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}
-              </span>
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#ff4f41]/10 text-[#ff4f41] text-xs rounded-full">
-                Vendedor {getRoleProgress('seller').completed}/{getRoleProgress('seller').total}
-              </span>
-              <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
-                Influencer {getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}
-              </span>
+                {selectedRoles.includes('buyer') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
+                    Comprador {getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}
+                  </span>
+                )}
+                {selectedRoles.includes('seller') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#f8f8f8] text-[#666666] text-xs rounded-full">
+                    Vendedor {getRoleProgress('seller').completed}/{getRoleProgress('seller').total}
+                  </span>
+                )}
+                {selectedRoles.includes('influencer') && (
+                  <span className="inline-flex items-center px-3 py-1.5 bg-[#ff4f41]/10 text-[#ff4f41] text-xs rounded-full">
+                    Influencer {getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}
+                  </span>
+                )}
             </div>
             
             {/* Right side - Action buttons */}
@@ -1034,7 +1056,7 @@ function RoleConfigurationScreen() {
         <Navbar />
         
         {/* Main Content */}
-        <main className="flex-1 py-16 pt-32 pb-32">
+        <main className="flex-1 pt-[20px] pb-32">
           <div className="max-w-4xl mx-auto px-6">
             {/* Progress Indicator */}
             <div className="mb-8">
@@ -1063,54 +1085,68 @@ function RoleConfigurationScreen() {
             {/* Segmented Control */}
             <div className="flex justify-center mb-8">
               <div className="inline-flex bg-[#f8f8f8] rounded-lg p-1">
-                <button 
-                className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
-                  activeTab === 'buyer' 
-                    ? 'bg-white text-[#ff4f41] shadow-sm' 
-                    : activeTab === 'seller' || activeTab === 'influencer'
-                      ? 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                      : 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                }`}
-                onClick={() => handleTabChange('buyer')}
-              >
-                <FaShoppingCart className="text-sm" />
-                Comprador
-                <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                  activeTab === 'buyer' ? 'bg-[#00a699]' : 'bg-[#adaebc]'
-                }`}>{getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}</span>
-              </button>
-                <button 
-                className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
-                  activeTab === 'seller' 
-                    ? 'bg-white text-[#ff4f41] shadow-sm' 
-                    : activeTab === 'buyer' || activeTab === 'influencer'
-                      ? 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                      : 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                }`}
-                onClick={() => handleTabChange('seller')}
-              >
-                <FaStore className="text-sm" />
-                Vendedor
-                <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                  activeTab === 'seller' ? 'bg-[#ff4f41]' : 'bg-[#adaebc]'
-                }`}>{getRoleProgress('seller').completed}/{getRoleProgress('seller').total}</span>
-              </button>
-                <button 
-                className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
-                  activeTab === 'influencer' 
-                    ? 'bg-white text-[#ff4f41] shadow-sm' 
-                    : activeTab === 'buyer' || activeTab === 'seller'
-                      ? 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                      : 'text-[#adaebc] opacity-50 cursor-not-allowed'
-                }`}
-                onClick={() => handleTabChange('influencer')}
-              >
-                <FaStar className="text-sm" />
-                Influencer
-                <span className={`text-white text-xs px-2 py-1 rounded-full ${
-                  activeTab === 'influencer' ? 'bg-[#ff4f41]' : 'bg-[#adaebc]'
-                }`}>{getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}</span>
-              </button>
+                {selectedRoles.includes('buyer') && (
+                  <button
+                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
+                      activeTab === 'buyer'
+                        ? 'bg-white text-[#ff4f41] shadow-sm'
+                        : 'text-[#adaebc] opacity-50 cursor-not-allowed'
+                    }`}
+                    onClick={() => handleTabChange('buyer')}
+                  >
+                    <FaShoppingCart className="text-sm" />
+                    Comprador
+                    <span
+                      className={`text-white text-xs px-2 py-1 rounded-full ${
+                        activeTab === 'buyer' ? 'bg-[#00a699]' : 'bg-[#adaebc]'
+                      }`}
+                    >
+                      {getRoleProgress('buyer').completed}/{getRoleProgress('buyer').total}
+                    </span>
+                  </button>
+                )}
+                {selectedRoles.includes('seller') && (
+                  <button
+                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
+                      activeTab === 'seller'
+                        ? 'bg-white text-[#ff4f41] shadow-sm'
+                        : 'text-[#adaebc] opacity-50 cursor-not-allowed'
+                    }`}
+                    onClick={() => handleTabChange('seller')}
+                  >
+                    <FaStore className="text-sm" />
+                    Vendedor
+                    <span
+                      className={`text-white text-xs px-2 py-1 rounded-full ${
+                        activeTab === 'seller' ? 'bg-[#ff4f41]' : 'bg-[#adaebc]'
+                      }`}
+                    >
+                      {getRoleProgress('seller').completed}/{getRoleProgress('seller').total}
+                    </span>
+                  </button>
+                )}
+                {selectedRoles.includes('influencer') && (
+                  <button
+                    className={`px-6 py-3 rounded-md font-medium transition-all duration-200 flex items-center gap-2 ${
+                      activeTab === 'influencer'
+                        ? 'bg-white text-[#ff4f41] shadow-sm'
+                        : 'text-[#adaebc] opacity-50 cursor-not-allowed'
+                    }`}
+                    onClick={() => handleTabChange('influencer')}
+                  >
+                    <FaStar className="text-sm" />
+                    Influencer
+                    <span
+                      className={`text-white text-xs px-2 py-1 rounded-full ${
+                        activeTab === 'influencer' ? 'bg-[#ff4f41]' : 'bg-[#adaebc]'
+                      }`}
+                    >
+                      {getRoleProgress('influencer').completed}/{getRoleProgress('influencer').total}
+                    </span>
+                  </button>
+                )}
+
+
               </div>
             </div>
 
@@ -1122,6 +1158,33 @@ function RoleConfigurationScreen() {
         </main>
         
         <FooterHome />
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <FaExclamationTriangle className="text-3xl text-yellow-600" />
+                </div>
+              </div>
+              <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">¿Continuar configurando?</h2>
+              <p className="text-center text-gray-600 mb-6">Aún tenés roles sin completar. ¿Querés seguir configurando o finalizar ahora?</p>
+              <div className="flex space-x-3">
+                <button
+                  onClick={handleContinueConfiguring}
+                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Seguir configurando
+                </button>
+                <button
+                  onClick={handleCompleteNow}
+                  className="flex-1 px-4 py-3 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/90 transition-colors font-medium"
+                >
+                  Finalizar ahora
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

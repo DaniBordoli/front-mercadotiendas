@@ -3,30 +3,42 @@ import { useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/organisms/Navbar';
 import FooterHome from '../components/organisms/FooterHome/FooterHome';
 import Select from 'react-select';
+import { useAuthStore } from '../stores';
 import { getCountryOptions, getCountryByCode, getCountryOptionLabel, type CountryOption } from '../utils/countriesLibrary';
-import { uploadShopLogo } from '../services/api';
+import { getStorageItem, setStorageItem, removeStorageItem } from '../utils/storage';
+
 import { useShopStore } from '../stores/slices/shopStore';
 
 function DataSeller() {
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const { createShop } = useShopStore();
+  const savedDraftStr = getStorageItem('sellerFormData');
+  const savedDraft = savedDraftStr ? JSON.parse(savedDraftStr) : null;
+
   const [formData, setFormData] = useState({
-    storeName: '',
-    phone: '',
-    country: '',
-    province: '',
-    city: '',
-    cuit: '',
+    storeName: savedDraft?.storeName || '',
+    phone: savedDraft?.phone || '',
+    country: savedDraft?.country || '',
+    province: savedDraft?.province || '',
+    city: savedDraft?.city || '',
+    cuit: savedDraft?.cuit || '',
     logo: null as File | null
   });
-  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<CountryOption | null>(
+    savedDraft?.country ? getCountryByCode(savedDraft.country) ?? null : null
+  );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      setStorageItem('sellerFormData', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const handleCountryChange = (selectedOption: CountryOption | null) => {
@@ -53,9 +65,12 @@ function DataSeller() {
       return;
     }
 
+    // Restablecer errores previos
     setLogoError(null);
+
+    // Guardar archivo en el estado
     setFormData(prev => ({ ...prev, logo: file }));
-    
+
     // Crear preview
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -66,43 +81,55 @@ function DataSeller() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validar campos requeridos
+    if (!formData.storeName || !formData.phone || !selectedCountry) {
+      setLogoError('Por favor completa todos los campos requeridos.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setLogoError(null);
+
     try {
       // Prepare shop data according to the Shop model
       const shopData: any = {
-        name: formData.storeName,
+        shopName: formData.storeName, // Backend expects shopName
         shopPhone: formData.phone,
         country: selectedCountry?.value || '',
         province: formData.province,
         city: formData.city,
-        taxAdress: formData.cuit, // Using taxAdress field for CUIT/CUIL
+        address: `${formData.city}, ${formData.province}, ${selectedCountry?.label || ''}`, // Backend expects address
+        subdomain: formData.storeName.toLowerCase().replace(/[^a-z0-9]/g, '-').substring(0, 30), // Generate subdomain from store name
+        layoutDesign: 'default', // Required field
+        contactEmail: user?.email || '', // Email del usuario autenticado
+        category: 'other', // Default category
+        description: '', // Default description
         active: true
       };
 
-      // If there's a logo, upload it first
+      // If there's a logo, include it in the shop data
       if (formData.logo) {
-        setIsUploadingLogo(true);
-        
-        try {
-          // Upload logo and get the URL
-          const logoResponse = await uploadShopLogo(formData.logo);
-          if (logoResponse.success) {
-            shopData.imageUrl = logoResponse.data.logoUrl;
-          }
-        } catch (logoError) {
-          console.error('Error uploading logo:', logoError);
-          setLogoError('Error al subir el logo');
-        } finally {
-          setIsUploadingLogo(false);
-        }
+        shopData.image = formData.logo; // Pass the file directly to createShop
       }
 
-      // Create or update shop
+      // Create shop (this will handle logo upload internally)
       await createShop(shopData);
+
+      // Limpiar borrador guardado
+      removeStorageItem('sellerFormData');
       console.log('Shop created successfully');
-      // Navigate to success page
-      navigate('/success');
+      
+      // Small delay before navigation to ensure state is stable
+      setTimeout(() => {
+        navigate('/success');
+      }, 500);
+      
     } catch (error) {
       console.error('Error saving seller data:', error);
+      setLogoError('Error al crear la tienda. Por favor, intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -266,9 +293,7 @@ function DataSeller() {
                     className="w-full h-12 px-4 bg-white rounded-lg border border-[#e5e5e7] text-[#1c1c1e] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20 focus:border-[#ff4f41]"
                   />
                 </div>
-
-                    {/* Store Logo */}
-                     <div>
+                    <div className="hidden">
                        <label className="block text-sm font-medium text-[#1c1c1e] mb-2">
                          Logo de la tienda (opcional) - Tamaño máximo: 10MB Recomendado: 200x200 píxeles
                        </label>
@@ -294,7 +319,7 @@ function DataSeller() {
                               htmlFor="logo" 
                               className="inline-flex items-center justify-center w-[158px] h-[42px] bg-white border border-[#e5e5e7] rounded-lg text-[#666666] hover:bg-[#f8f8f8] cursor-pointer transition-colors"
                             >
-                              {isUploadingLogo ? (
+                              {isSubmitting ? (
                                 <>
                                   <i className="fa-solid fa-spinner fa-spin mr-2"></i>
                                   Subiendo...
@@ -326,10 +351,10 @@ function DataSeller() {
                 <div className="flex flex-col sm:flex-row gap-4 pt-6">
                   <button 
                      type="submit"
-                     disabled={isUploadingLogo}
+                     disabled={isSubmitting}
                      className="flex-1 h-12 bg-[#ff4f41] text-white rounded-lg font-medium hover:bg-[#e63e32] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20"
                    >
-                    {isUploadingLogo ? (
+                    {isSubmitting ? (
                       <>
                         <i className="fa-solid fa-spinner fa-spin mr-2"></i>
                         Guardando...
@@ -343,7 +368,7 @@ function DataSeller() {
                   </button>
                   <button 
                     type="button"
-                    disabled={isUploadingLogo}
+                    disabled={isSubmitting}
                     onClick={() => navigate('/success')}
                     className="flex-1 h-12 bg-white border border-[#e5e5e7] text-[#666666] rounded-lg font-medium hover:bg-[#f8f8f8] transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20"
                   >

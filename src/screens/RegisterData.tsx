@@ -37,13 +37,21 @@ function RegisterData() {
       // Navegar según la cantidad de roles seleccionados
       if (selectedRoles.length > 1) {
         // Si seleccionó más de un rol, ir a configuración de roles
-        navigate('/role-configuration');
+        navigate('/role-configuration', { state: { selectedRoles } });
       } else {
         // Si seleccionó un solo rol, usar la lógica anterior
         if (selectedRoles.includes('seller')) {
           navigate('/data-seller');
+        } else if (selectedRoles.includes('influencer')) {
+          navigate('/data-influencer');
         } else {
-          navigate('/register/basic-data');
+          // Para el rol 'buyer', ir directamente a success
+          navigate('/success', { 
+            state: { 
+              selectedRoles: selectedRoles,
+              fromRegistration: true 
+            } 
+          });
         }
       }
     } catch (error) {
@@ -104,11 +112,8 @@ function RegisterData() {
                           ? 'bg-[#ff4f41] text-white'
                           : 'bg-[#e5e5e7] text-[#666666]'
                       }`}>
-                        {selectedRoles.includes('buyer') ? (
-                          <><i className="fa-solid fa-check mr-1"></i>Seleccionado</>
-                        ) : (
-                          'Seleccionar'
-                        )}
+                        <i className={`fa-solid fa-check mr-1 ${selectedRoles.includes('buyer') ? '' : 'hidden'}`}></i>
+                        {selectedRoles.includes('buyer') ? 'Seleccionado' : 'Seleccionar'}
                       </span>
                     </div>
                   </div>
@@ -135,11 +140,8 @@ function RegisterData() {
                           ? 'bg-[#ff4f41] text-white'
                           : 'bg-[#e5e5e7] text-[#666666]'
                       }`}>
-                        {selectedRoles.includes('seller') ? (
-                          <><i className="fa-solid fa-check mr-1"></i>Seleccionado</>
-                        ) : (
-                          'Seleccionar'
-                        )}
+                        <i className={`fa-solid fa-check mr-1 ${selectedRoles.includes('seller') ? '' : 'hidden'}`}></i>
+                        {selectedRoles.includes('seller') ? 'Seleccionado' : 'Seleccionar'}
                       </span>
                     </div>
                   </div>
@@ -166,11 +168,8 @@ function RegisterData() {
                           ? 'bg-[#ff4f41] text-white'
                           : 'bg-[#e5e5e7] text-[#666666]'
                       }`}>
-                        {selectedRoles.includes('influencer') ? (
-                          <><i className="fa-solid fa-check mr-1"></i>Seleccionado</>
-                        ) : (
-                          'Seleccionar'
-                        )}
+                        <i className={`fa-solid fa-check mr-1 ${selectedRoles.includes('influencer') ? '' : 'hidden'}`}></i>
+                        {selectedRoles.includes('influencer') ? 'Seleccionado' : 'Seleccionar'}
                       </span>
                     </div>
                   </div>

@@ -9,77 +9,55 @@ function App() {
   
   // Obtener funciones y estado del store de autenticación
   const loadProfile = useAuthStore(state => state.loadProfile);
-  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
-  const user = useAuthStore(state => state.user);
-  const token = useAuthStore(state => state.token);
   const setToken = useAuthStore(state => state.setToken);
   const setUser = useAuthStore(state => state.setUser);
 
-  // Efecto de rehidratación forzada al montar la app
-  useEffect(() => {
-    const localToken = localStorage.getItem('mercadotiendas_token');
-    const localUser = localStorage.getItem('mercadotiendas_user');
-    if (localToken) {
-      setToken(localToken);
-      console.log('[App] Token rehidratado desde localStorage.');
-      setTimeout(() => {
-        console.log('[App] Token tras setToken:', useAuthStore.getState().token);
-      }, 100);
-    }
-    if (localUser) {
-      try {
-        setUser(JSON.parse(localUser));
-        console.log('[App] Usuario rehidratado desde localStorage.');
-      } catch (e) {
-        setUser(null);
-        console.warn('[App] Error al parsear usuario de localStorage.');
-      }
-    }
-  }, [setToken, setUser]);
-
-  // Cuando el token esté en el store, llama a loadProfile
-  useEffect(() => {
-    if (token) {
-      loadProfile().then((user) => {
-        if (user) {
-          console.log('[App] Perfil cargado tras rehidratación (efecto dependiente de token, robusto).');
-        } else {
-          console.warn('[App] No se pudo cargar el perfil tras rehidratación (efecto dependiente de token, robusto).');
-        }
-      });
-    }
-  }, [token, loadProfile]);
-
+  // Efecto único de inicialización
   useEffect(() => {
     const initApp = async () => {
-      // Refuerzo: leer token directamente de localStorage si el store no lo tiene
-      let effectiveToken = token;
-      if (!effectiveToken) {
-        effectiveToken = localStorage.getItem('mercadotiendas_token');
-        if (effectiveToken) {
-          // Actualizar el store con el token recuperado
-          // @ts-ignore
-          if (typeof useAuthStore.getState().setToken === 'function') {
-            useAuthStore.getState().setToken(effectiveToken);
-            console.log('[App] Token recuperado de localStorage y puesto en el store.');
+      try {
+        // Rehidratar desde localStorage
+        const localToken = localStorage.getItem('mercadotiendas_token');
+        const localUser = localStorage.getItem('mercadotiendas_user');
+        
+        if (localToken) {
+          setToken(localToken);
+          console.log('[App] Token rehidratado desde localStorage.');
+        }
+        
+        if (localUser) {
+          try {
+            setUser(JSON.parse(localUser));
+            console.log('[App] Usuario rehidratado desde localStorage.');
+          } catch (e) {
+            setUser(null);
+            console.warn('[App] Error al parsear usuario de localStorage.');
           }
         }
-      }
-      if (effectiveToken) {
-        try {
-          console.log('[App] Intentando cargar perfil con token:', effectiveToken.substring(0, 10) + '...');
-          const loadedUser = await loadProfile();
-          if (!loadedUser) {
-            console.warn('[App] No se pudo cargar el perfil del usuario.');
+        
+        // Cargar perfil si hay token
+        if (localToken) {
+          try {
+            console.log('[App] Intentando cargar perfil con token:', localToken.substring(0, 10) + '...');
+            const loadedUser = await loadProfile();
+            if (loadedUser) {
+              console.log('[App] Perfil cargado correctamente.');
+            } else {
+              console.warn('[App] No se pudo cargar el perfil del usuario.');
+            }
+          } catch (error) {
+            console.error('[App] Error al cargar perfil:', error);
           }
-        } catch (error) {
-          console.error('[App] Error al cargar perfil:', error);
         }
+      } catch (error) {
+        console.error('[App] Error durante la inicialización:', error);
+      } finally {
+        setIsInitialized(true);
       }
-      setIsInitialized(true);
     };
+    
     initApp();
-  }, [loadProfile, token]);
+  }, [loadProfile, setToken, setUser]); // Solo se ejecuta una vez al montar
 
   // Mostrar un indicador de carga mientras se inicializa la aplicación
   if (!isInitialized) {
