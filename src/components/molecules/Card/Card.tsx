@@ -104,13 +104,10 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div 
-      className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer"
+      className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group cursor-pointer w-full max-w-[290px] md:w-[290px] md:min-w-[290px] md:max-w-[290px]"
       onClick={handleCardClick}
       style={{ 
-        width: '290px',
         height: '338.96px',
-        minWidth: '290px',
-        maxWidth: '290px'
       }}
     >
       {/* Overlay de carga */}
@@ -125,7 +122,7 @@ export const Card: React.FC<CardProps> = ({
         </div>
       )}
       
-      <div className="relative" style={{ width: '287.33px', height: '161.63px' }}>
+      <div className="relative w-full h-40 md:h-[161.63px]">
         <div className="w-full h-full bg-gray-100">
           <img
             className="w-full h-full object-cover"
@@ -138,30 +135,32 @@ export const Card: React.FC<CardProps> = ({
         </button>
       </div>
       
-      <div className="p-4" style={{ width: '287.33px', height: '174.67px' }}>
-        <h3 className="text-base font-semibold text-[#1c1c1e] mb-2 text-left">{title}</h3>
-        <div className="flex items-center mb-3">
-          <div className="flex text-yellow-400 text-sm mr-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
-              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
-            </svg>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
-              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
-            </svg>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
-              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
-            </svg>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
-              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
-            </svg>
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
-              <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
-            </svg>
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="text-base font-semibold text-[#1c1c1e] mb-2 text-left line-clamp-2">{title}</h3>
+          <div className="flex items-center mb-3">
+            <div className="flex text-yellow-400 text-sm mr-2">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+                <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+              </svg>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+                <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+              </svg>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+                <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+              </svg>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+                <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+              </svg>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 576 512">
+                <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+              </svg>
+            </div>
+            <span className="text-xs text-[#666666]">(124)</span>
           </div>
-          <span className="text-xs text-[#666666]">(124)</span>
-        </div>
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xl font-bold text-[#1c1c1e]">{formattedPrice}</span>
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xl font-bold text-[#1c1c1e]">{formattedPrice}</span>
+          </div>
         </div>
         <div className="flex gap-2">
           <button 
@@ -172,7 +171,7 @@ export const Card: React.FC<CardProps> = ({
           </button>
           <button 
             onClick={handleCardClick}
-            className="px-4 py-2 border border-[#e5e5e7] text-[#666666] rounded-lg text-sm font-medium hover:border-[#ff4f41] hover:text-[#ff4f41] transition-colors opacity-0 group-hover:opacity-100"
+            className="px-4 py-2 border border-[#e5e5e7] text-[#666666] rounded-lg text-sm font-medium hover:border-[#ff4f41] hover:text-[#ff4f41] transition-colors"
           >
             Ver más
           </button>
@@ -266,10 +265,17 @@ export const CardList: React.FC = () => {
       }))
     : [];
 
-
-  const ITEMS_PER_SLIDE = 4;
-  const totalSlides = Math.ceil(productsToShow.length / ITEMS_PER_SLIDE);
-  const shouldShowCarousel = productsToShow.length > ITEMS_PER_SLIDE;
+  // Responsive items per slide - máximo 2 en móvil, 4 en desktop
+  const ITEMS_PER_SLIDE = window.innerWidth < 768 ? 2 : 4;
+  const MAX_PRODUCTS_MOBILE = 2;
+  
+  // Limitar productos en móvil
+  const productsToDisplay = window.innerWidth < 768 
+    ? productsToShow.slice(0, MAX_PRODUCTS_MOBILE)
+    : productsToShow;
+    
+  const totalSlides = Math.ceil(productsToDisplay.length / ITEMS_PER_SLIDE);
+  const shouldShowCarousel = productsToDisplay.length > ITEMS_PER_SLIDE;
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => prev === 0 ? totalSlides - 1 : prev - 1);
@@ -280,11 +286,11 @@ export const CardList: React.FC = () => {
   };
 
   const getVisibleProducts = () => {
-    if (!shouldShowCarousel) return productsToShow;
+    if (!shouldShowCarousel) return productsToDisplay;
     
     const startIndex = currentSlide * ITEMS_PER_SLIDE;
     const endIndex = startIndex + ITEMS_PER_SLIDE;
-    return productsToShow.slice(startIndex, endIndex);
+    return productsToDisplay.slice(startIndex, endIndex);
   };
 
   return (
@@ -301,7 +307,7 @@ export const CardList: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="flex justify-center gap-4 px-4"
+              className="flex justify-center gap-4 px-4 flex-wrap md:flex-nowrap"
             >
               {getVisibleProducts().map((card, index) => (
                 <motion.div
@@ -309,7 +315,7 @@ export const CardList: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.4, delay: index * 0.1 }}
-                  className="flex-shrink-0"
+                  className="flex-shrink-0 w-full max-w-[290px] md:w-auto"
                 >
                   <Card 
                     imageSrc={card.imageSrc} 
@@ -333,7 +339,7 @@ export const CardList: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handlePrevSlide}
-                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10"
+                className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10 hidden md:flex"
                 style={{ marginLeft: '-20px' }}
               >
                 <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -346,7 +352,7 @@ export const CardList: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={handleNextSlide}
-                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10"
+                className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors z-10 hidden md:flex"
                 style={{ marginRight: '-20px' }}
               >
                 <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
