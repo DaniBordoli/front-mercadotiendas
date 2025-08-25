@@ -68,7 +68,7 @@ export const ProductListItem: React.FC<ProductListItemProps> = ({ product, onCli
 
   return (
     <div 
-      className="flex bg-white border rounded-md overflow-hidden shadow-sm mb-4 p-4 cursor-pointer hover:shadow-md transition-shadow relative"
+      className="product-list-item flex bg-white border rounded-md overflow-hidden shadow-sm mb-4 p-4 cursor-pointer hover:shadow-md transition-shadow relative"
       style={{ borderColor: '#E6E6E7' }}
       onClick={handleClick}
     >

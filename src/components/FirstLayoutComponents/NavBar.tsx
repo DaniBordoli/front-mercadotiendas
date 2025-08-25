@@ -88,9 +88,10 @@ const NavBar: React.FC<NavBarProps> = ({
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
         <div className="flex items-center gap-4">
           <img 
-            src="/logo.png" 
+            src="/logonuevo.png" 
             alt="Dashboard Logo" 
-            className="h-8 w-8 object-contain cursor-pointer"
+            className="cursor-pointer"
+            style={{ width: '165px', height: '40px', objectFit: 'contain' }}
             onClick={() => navigate('/dashboard')}
           />
           <div

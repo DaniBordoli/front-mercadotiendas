@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { API_URL } from '../../services/api';
 import { Shop } from '../../types/auth';
-import { useAuthStore } from '../';
+import { useAuthStore } from './authSlice';
 import { getStorageItem, setStorageItem } from '../../utils/storage';
 import { authFetch } from '../../utils/authFetch';
 

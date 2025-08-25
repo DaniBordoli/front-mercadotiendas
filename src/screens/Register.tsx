@@ -9,52 +9,45 @@ import { useAuthStore } from '../stores';
 import { SelectDefault } from '../components/atoms/SelectDefault/SelectDefault';
 import { Navbar } from '../components/organisms/Navbar';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 
 const Register = () => {
   const navigate = useNavigate();
   const { register, isLoading, clearError } = useAuthStore();
   const [values, setValues] = useState({
-    fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
-    birthDate: '',
-    city: '',
-    province: '',
-    country: ''
+    acceptTerms: false
   });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
-  const validateForm = (values: Record<string, string>): Record<string, string> => {
+  const validateForm = (values: any): Record<string, string> => {
     const errors: Record<string, string> = {};
-    if (!values.fullName?.trim()) {
-      errors.fullName = 'Nombre completo es requerido';
-    } else if (values.fullName.length < 3) {
-      errors.fullName = 'El nombre completo debe tener al menos 3 caracteres';
-    }
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!values.email?.trim()) {
       errors.email = 'Email es requerido';
     } else if (!emailRegex.test(values.email)) {
       errors.email = 'Por favor ingresa un email válido';
     }
+    
     if (!values.password) {
-      errors.password = 'Contraseña es requerido';
-    } else {
-      const lengthValid = values.password.length >= 8;
-      const uppercaseValid = /[A-Z]/.test(values.password);
-      const lowercaseValid = /[a-z]/.test(values.password);
-      const specialCharValid = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(values.password);
-      
-      if (!lengthValid || !uppercaseValid || !lowercaseValid || !specialCharValid) {
-        errors.password = 'La contraseña debe tener al menos 8 caracteres, una mayúscula, y un carácter especial';
-      }
+      errors.password = 'Contraseña es requerida';
+    } else if (values.password.length < 8) {
+      errors.password = 'La contraseña debe tener al menos 8 caracteres';
     }
+    
     if (!values.confirmPassword) {
       errors.confirmPassword = 'Por favor confirma tu contraseña';
     } else if (values.confirmPassword !== values.password) {
       errors.confirmPassword = 'Las contraseñas no coinciden';
     }
+    
+    if (!values.acceptTerms) {
+      errors.acceptTerms = 'Debes aceptar los términos y condiciones';
+    }
+    
     return errors;
   };
 
@@ -67,7 +60,13 @@ const Register = () => {
       return;
     }
     try {
-      await register(values);
+      // Solo enviamos email y password al backend
+      const registrationData = {
+        email: values.email,
+        password: values.password,
+        confirmPassword: values.confirmPassword
+      };
+      await register(registrationData);
       navigate(`/activate-account?email=${encodeURIComponent(values.email)}`);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
@@ -79,52 +78,33 @@ const Register = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mb-4">
+    <div className="bg-white min-h-screen flex flex-col">
+      <Navbar />
       {isLoading && <FullScreenLoader />}
-      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-0" style={{paddingTop: '10px', paddingBottom: '20px'}}>
+      <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-4 py-6 md:px-8 md:py-10 flex flex-col items-center w-full max-w-lg">
         <div className="flex items-center justify-center w-full">
-          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
+          <img src="/logonuevoalto.png" alt="MercadoTiendas Logo" className="w-32 md:w-48 h-auto" />
         </div>
-        <div className="mt-6 flex items-center space-x-10">
+        <div className="mt-4 md:mt-6 flex items-center space-x-6 md:space-x-10">
           <div className="flex flex-col items-center cursor-pointer" onClick={() => navigate('/login')}>
-            <span className="text-lg font-space">Iniciar sesión</span>
+            <span className="text-sm md:text-lg font-space">Iniciar sesión</span>
             <div
-              className="w-[200px] h-0.5 mt-1"
+              className="w-[120px] md:w-[200px] h-0.5 mt-1"
               style={{ backgroundColor: colors.lightGray }}
             ></div>
           </div>
           <div className="flex flex-col items-center">
-            <span style={{color: colors.primaryRed}} className="text-lg font-space">Crear cuenta</span>
+            <span style={{color: colors.primaryRed}} className="text-sm md:text-lg font-space">Crear cuenta</span>
             <div
-              className="w-[200px] h-0.5 mt-1"
+              className="w-[120px] md:w-[200px] h-0.5 mt-1"
               style={{ backgroundColor: colors.primaryRed }}
             ></div>
           </div>
         </div>
         
-        <form className="mt-10 w-full max-w-md px-4" onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block mb-2 font-space text-darkGray">
-              Nombre completo
-            </label>
-            <InputDefault
-              type="text"
-              placeholder="Ingresa tu nombre completo*"
-              className="w-full"
-              icon={<MdPersonOutline style={{ color: colors.mediumGray }} />}
-              value={values.fullName}
-              onChange={(value: string) => {
-                clearError();
-                setValidationErrors((prev) => ({ ...prev, fullName: '' }));
-                setValues((prev) => ({ ...prev, fullName: value }));
-              }}
-            />
-            {validationErrors.fullName && (
-              <span className="text-red-500 text-sm">{validationErrors.fullName}</span>
-            )}
-          </div>
-          
-          <div className="mb-4">
+        <form className="mt-6 md:mt-10 w-full max-w-md px-2 md:px-4" onSubmit={handleSubmit}>
+          <div className="mb-3 md:mb-4">
             <label className="block mb-2 font-space text-darkGray">
               Correo electrónico
             </label>
@@ -144,88 +124,8 @@ const Register = () => {
               <span className="text-red-500 text-sm">{validationErrors.email}</span>
             )}
           </div>
-          
-          <div className="mb-4">
-            <label className="block mb-2 font-space text-darkGray">
-              Fecha de nacimiento
-            </label>
-            <input
-              type="date"
-              placeholder="Selecciona tu fecha de nacimiento"
-              className="w-full border border-gray-300 rounded-md p-2"
-              value={values.birthDate}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                clearError();
-                setValidationErrors((prev) => ({ ...prev, birthDate: '' }));
-                setValues((prev) => ({ ...prev, birthDate: e.target.value }));
-              }}
-            />
-            {validationErrors.birthDate && (
-              <span className="text-red-500 text-sm">{validationErrors.birthDate}</span>
-            )}
-          </div>
-          
-            <div className="mb-4">
-              <label className="block mb-2 font-space text-darkGray">País</label>
-              <SelectDefault
-                options={[
-                  { value: 'Argentina', label: 'Argentina' }
-                ]}
-                value={values.country}
-                onChange={(value: string) => {
-                  clearError();
-                  setValidationErrors((prev) => ({ ...prev, country: '' }));
-                  setValues((prev) => ({ ...prev, country: value }));
-                }}
-                placeholder="Selecciona tu país"
-                className="w-full"
-              />
-              {validationErrors.country && (
-                <span className="text-red-500 text-sm">{validationErrors.country}</span>
-              )}
-            </div>
         
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Provincia
-          </label>
-          <InputDefault
-            type="text"
-            placeholder="Ingresa tu provincia"
-            className="w-full"
-            value={values.province}
-            onChange={(value: string) => {
-              clearError();
-              setValidationErrors((prev) => ({ ...prev, province: '' }));
-              setValues((prev) => ({ ...prev, province: value }));
-            }}
-          />
-          {validationErrors.province && (
-            <span className="text-red-500 text-sm">{validationErrors.province}</span>
-          )}
-        </div>
-            
-        <div className="mb-4">
-          <label className="block mb-2 font-space text-darkGray">
-            Ciudad
-          </label>
-          <InputDefault
-            type="text"
-            placeholder="Ingresa tu ciudad"
-            className="w-full"
-            value={values.city}
-            onChange={(value: string) => {
-              clearError();
-              setValidationErrors((prev) => ({ ...prev, city: '' }));
-              setValues((prev) => ({ ...prev, city: value }));
-            }}
-          />
-          {validationErrors.city && (
-            <span className="text-red-500 text-sm">{validationErrors.city}</span>
-          )}
-        </div>
-        
-        <div className="mb-4">
+        <div className="mb-3 md:mb-4">
           <label className="block mb-2 font-space text-darkGray">
             Contraseña
           </label>
@@ -246,7 +146,7 @@ const Register = () => {
           )}
         </div>
         
-        <div className="mb-4">
+        <div className="mb-3 md:mb-4">
           <label className="block mb-2 font-space text-darkGray">
             Confirmar contraseña
           </label>
@@ -272,13 +172,22 @@ const Register = () => {
             type="checkbox"
             id="termsConditions"
             className="mr-2"
+            checked={values.acceptTerms}
+            onChange={(e) => {
+              clearError();
+              setValidationErrors((prev) => ({ ...prev, acceptTerms: '' }));
+              setValues((prev) => ({ ...prev, acceptTerms: e.target.checked }));
+            }}
           />
           <label style={{color: colors.darkGray}} htmlFor="termsConditions" className="font-space text-sm">
             Acepto los <span style={{ color: colors.primaryRed }} className="cursor-pointer">términos y condiciones</span>
           </label>
         </div>
+        {validationErrors.acceptTerms && (
+          <span className="text-red-500 text-sm mt-1 block">{validationErrors.acceptTerms}</span>
+        )}
         
-        <div className="mt-8">
+        <div className="mt-4 md:mt-8">
           <DesignButton
            className='w-full'
             variant="primary"
@@ -287,20 +196,22 @@ const Register = () => {
           >
             {isLoading ? 'Creando cuenta...' : 'Crear cuenta'}
           </DesignButton>
-        </div>     
+        </div>
         
-        <div className="flex justify-center my-4 font-space text-sm">
-          <span style={{color: colors.mediumGray}}>¿Ya tenés cuenta?</span>
+        <div className="flex justify-center mt-4 md:mt-6 font-space text-xs md:text-sm">
+          <span style={{color: colors.mediumGray}}>¿Ya tienes cuenta?</span>
           <span 
             className="ml-1 cursor-pointer"
             style={{ color: colors.primaryRed }}
             onClick={() => navigate('/login')}
           >
-            Iniciar sesión
+            Inicia sesión
           </span>
         </div>
       </form>
       </div>
+      </div>
+      <FooterHome />
     </div>
   );
 }

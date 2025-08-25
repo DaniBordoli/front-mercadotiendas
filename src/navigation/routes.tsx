@@ -7,6 +7,7 @@ import AccountActivation from '../screens/AccountActivation';
 import { ProtectedRoute } from '../components/utils/ProtectedRoute';
 import { ShopRequiredRoute } from '../components/utils/ShopRequiredRoute';
 import { NoShopRoute } from '../components/utils/NoShopRoute';
+import { HomeRedirect } from '../components/utils/HomeRedirect';
 import ResetPass from '../screens/ResetPass';
 import GoogleComplete from '../screens/GoogleComplete';
 import CreateShopAIScreen from '../screens/CreateShopAIScreen';
@@ -59,6 +60,16 @@ import MyApplicationsScreen from '../screens/MyApplicationsScreen';
 import UserDashboard from '../screens/UserDashboard';
 import BecomeInfluencerScreen from '../screens/BecomeInfluencerScreen';
 import InfluencerProfileScreen from '../screens/InfluencerProfileScreen';
+import BasicData from '../screens/BasicData';
+import RegisterData from '../screens/RegisterData';
+import DataSeller from '../screens/DataSeller';
+import DataInfluencer from '../screens/DataInfluencer';
+import RoleConfigurationScreen from '../screens/RoleConfigurationScreen';
+import Success from '../screens/Success';
+import CategoriesPage from '../screens/CategoriesPage';
+import SubcategoriesElectroAudio from '../screens/SubcategoriesElectroAudio';
+import SubcategoriaModa from '../screens/SubcategoriaModa';
+import HomeBuyer from '../screens/HomeBuyer';
 
 
 export const publicRoutes = [
@@ -91,8 +102,36 @@ export const publicRoutes = [
     element: <AccountActivation />
   },
   {
+    path: '/basic-data',
+    element: <BasicData />
+  },
+  {
+    path: '/register-data',
+    element: <RegisterData />
+  },
+  {
+    path: '/data-seller',
+    element: <DataSeller />
+  },
+  {
+    path: '/data-influencer',
+    element: <DataInfluencer />
+  },
+  {
+    path: '/success',
+    element: <Success />
+  },
+  {
+    path: '/role-configuration',
+    element: <RoleConfigurationScreen />
+  },
+  {
     path: '/dashboard', 
     element: <Dashboard />
+  },
+  {
+    path: '/homebuyer',
+    element: <HomeBuyer />
   },
   {
     path: '/complete-profile', 
@@ -286,6 +325,18 @@ export const publicRoutes = [
     path: '/campaigns/:id',
     element: <CampaignDetailScreen />
   },
+  {
+    path: '/categories',
+    element: <CategoriesPage />
+  },
+  {
+    path: '/subcategoriaelectroaudio',
+    element: <SubcategoriesElectroAudio />
+  },
+  {
+    path: '/subcategoriamoda',
+    element: <SubcategoriaModa />
+  },
 ];
 
 
@@ -341,7 +392,7 @@ export const privateRoutes = [
 export const redirectRoutes = [
   {
     path: '/',
-    element: <Navigate to="/dashboard" replace />
+    element: <HomeRedirect />
   },
   {
     path: '*',

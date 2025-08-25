@@ -5,14 +5,14 @@ import { useCartStore } from '../stores/cartStore';
 import { useFirstLayoutStore } from '../stores/firstLayoutStore';
 import { useCheckoutStepStore } from '../stores/checkoutStepStore';
 import { useShippingAddressStore } from '../stores/shippingAddressStore';
-import { Logo } from '../components/atoms/Logo';
 import { useNavigate } from 'react-router-dom';
 import { StatusTags } from '../components/atoms/StatusTags/StatusTags';
-import CartFooter from '../components/CartComponents/CartFooter';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 import { FaTruck, FaStore } from "react-icons/fa";
 import { colors } from '../design/colors';
 import { DesignButton } from '../components/atoms/DesignButton';
 import ProgressBar from '../components/molecules/ProgressBar';
+import { Navbar } from '../components/organisms/Navbar/Navbar';
 
 interface CheckoutState {
     shippingMethod: string;
@@ -68,15 +68,7 @@ export default function CartCheckout() {
 
     return (
         <>
-            <div
-                className="flex items-center px-6 py-3 border-b border-gray-200 bg-white cursor-pointer"
-                onClick={() => navigate('/dashboard')}
-            >
-                <Logo size={28}/>
-                <span className="ml-3 text-xl font-space tracking-wide">
-                    Mercado Tiendas
-                </span>
-            </div>
+            <Navbar />
             
             <div className="bg-[#f8f8f8] min-h-screen pt-8 pb-16">
                 <div className="max-w-7xl mx-auto px-6">
@@ -373,7 +365,7 @@ export default function CartCheckout() {
                     </div>
                 </div>
             </div>
-            <CartFooter />
+            <FooterHome />
         </>
     );
 }

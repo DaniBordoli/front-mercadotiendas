@@ -1,16 +1,20 @@
 import React from 'react';
-import logoTienda from '../../../public/assets/logoTienda.png'; // Import the logo
 import { LogoProps } from './types';
 
 export const Logo: React.FC<LogoProps> = ({ 
-  size = 28, 
+  size = 28,
+  width,
+  height, 
   className = "" 
 }) => {
+  const logoWidth = width || size;
+  const logoHeight = height || size;
+  
   return (
     <img 
-      src={logoTienda} 
-      alt="Logo Tienda" 
-      style={{ width: size, height: size }} 
+      src="/logonuevo.png" 
+      alt="MercadoTiendas Logo" 
+      style={{ width: logoWidth, height: logoHeight }} 
       className={className} 
     />
   );

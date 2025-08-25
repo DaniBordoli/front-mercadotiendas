@@ -7,6 +7,8 @@ import { DesignButton } from '../components/atoms/DesignButton';
 import { useAuthStore } from '../stores';
 import { updateUserProfile } from '../stores/slices/authSlice';
 import FullScreenLoader from '../components/molecules/FullScreenLoader';
+import { Navbar } from '../components/organisms/Navbar';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 
 const GoogleComplete = () => {
     const navigate = useNavigate();
@@ -79,11 +81,13 @@ const GoogleComplete = () => {
     };
 
     return (
-        <div className="bg-white h-screen flex flex-col items-center">
+        <div className="bg-white min-h-screen flex flex-col">
+            <Navbar />
             {isLoading && <FullScreenLoader />}
-            <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
-                <div className="flex items-center justify-center w-full">
-                    <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
+            <div className="flex-1 flex flex-col items-center justify-center px-4 md:px-0" style={{paddingTop: '10px', paddingBottom: '20px'}}>
+                <div className="rounded-[2.0rem] border border-gray-200 shadow bg-white px-4 py-6 md:px-8 md:py-10 flex flex-col items-center w-full max-w-lg">
+                    <div className="flex items-center justify-center w-full">
+                        <img src="/logonuevoalto.png" alt="MercadoTiendas Logo" className="w-32 md:w-48 h-auto" />
                 </div>
                 <div className="mt-6 w-full max-w-md px-4">
                     <h2 className="text-2xl font-bold mb-6 text-center">Completa tu perfil</h2>
@@ -186,6 +190,8 @@ const GoogleComplete = () => {
                     </form>
                 </div>
             </div>
+            </div>
+            <FooterHome />
         </div>
     );
 };

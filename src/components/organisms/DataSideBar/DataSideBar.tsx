@@ -126,14 +126,13 @@ const DataSideBar: React.FC = () => {
                 }}
             >
                 <div 
-                    className='p-4 flex items-center gap-2 cursor-pointer' 
+                    className='p-4 flex items-center justify-center cursor-pointer' 
                     onClick={() => {
                         navigate('/dashboard');
                         setSidebarOpen(false);
                     }}
                 >
-                    <Logo size={40} />
-                    <h2 className='text-xl font-space'>Mercado Tiendas</h2>
+                    <Logo width={165} height={40} />
                 </div>
                 <button
                     className="absolute top-4 right-4 md:hidden text-gray-500"

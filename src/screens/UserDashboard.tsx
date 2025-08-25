@@ -4,6 +4,7 @@ import { Navbar } from '../components/organisms/Navbar/Navbar';
 import { Footer } from '../components/organisms/Footer';
 import { useAuthStore } from '../stores';
 import { getUserApplications } from '../services/campaignService';
+
 import { FaPlus, FaClipboardList, FaStore, FaUser } from 'react-icons/fa';
 import Toast from '../components/atoms/Toast';
 
@@ -29,6 +30,7 @@ const UserDashboard: React.FC = () => {
     type: 'success' as 'success' | 'error' | 'info'
   });
 
+
   useEffect(() => {
     const loadUserData = async () => {
       if (!user) return;
@@ -40,6 +42,8 @@ const UserDashboard: React.FC = () => {
         if (!user.shop) {
           const response = await getUserApplications();
           setApplications(response.data.slice(0, 3)); // Mostrar solo las 3 más recientes
+          
+
         }
       } catch (error: any) {
         console.error('Error al cargar datos del usuario:', error);
@@ -55,6 +59,8 @@ const UserDashboard: React.FC = () => {
     
     loadUserData();
   }, [user]);
+
+
 
   // Formatear fecha
   const formatDate = (dateString: string) => {
@@ -150,7 +156,36 @@ const UserDashboard: React.FC = () => {
           </div>
           
           {/* Panel central y derecho - Contenido según el tipo de usuario */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 space-y-6">
+            
+            {/* Sección Datos Personales */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+                  <FaUser className="mr-2 text-blue-600" />
+                  Datos Personales
+                </h2>
+                <button 
+                  onClick={() => navigate('/profile')}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Editar →
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-gray-600">Nombre: <span className="font-medium text-gray-800">{user?.name}</span></p>
+                  <p className="text-gray-600">Email: <span className="font-medium text-gray-800">{user?.email}</span></p>
+                </div>
+                <div>
+                  <p className="text-gray-600">Tipo: <span className="font-medium text-gray-800">{user?.userType || (user?.shop ? 'Vendedor' : 'Influencer')}</span></p>
+                </div>
+              </div>
+            </div>
+
+
+
+            {/* Contenido principal según tipo de usuario */}
             {user?.shop ? (
               // Contenido para dueños de tiendas
               <div className="bg-white rounded-lg shadow-md p-6">
