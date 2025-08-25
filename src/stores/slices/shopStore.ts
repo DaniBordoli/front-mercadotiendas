@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { API_URL } from '../../services/api';
 import { Shop } from '../../types/auth';
-import { useAuthStore } from '../';
+import { useAuthStore } from './authSlice';
 import { getStorageItem, setStorageItem } from '../../utils/storage';
 import { authFetch } from '../../utils/authFetch';
 
@@ -109,7 +109,9 @@ export const useShopStore = create<ShopState>((set, get) => ({
     createShop: async (data: any) => {
         const token = getStorageItem('token');
         if (!token) throw new Error('No authentication token found');
+        
         set({ loading: true, error: null });
+        
         try {
             console.log("Sending data to backend for shop creation:", data);
             
@@ -118,9 +120,12 @@ export const useShopStore = create<ShopState>((set, get) => ({
                 'Authorization': `Bearer ${token}`
             };
 
+            // Manejar subida de imagen de forma más estable
             if (data.image) {
+                // Crear FormData para envío de datos e imagen
                 const formData = new FormData();
                 
+                // Agregar campos de datos primero
                 Object.keys(data).forEach(key => {
                     if (key !== 'image' && data[key] !== undefined) {
                         if (key === 'templateUpdate' && typeof data[key] === 'object') {
@@ -131,6 +136,7 @@ export const useShopStore = create<ShopState>((set, get) => ({
                     }
                 });
                 
+                // Agregar imagen al final
                 formData.append('image', data.image);
                 body = formData;
             } else {
@@ -158,12 +164,22 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
             const newShop = result.data.shop as Shop;
 
+            // Actualizar estado inmediatamente tras recibir respuesta exitosa
+            
             const authStore = useAuthStore.getState();
             if (authStore.user) {
                 const updatedUser = { ...authStore.user, shop: newShop };
                 setStorageItem('user', JSON.stringify(updatedUser));
                 useAuthStore.setState({ user: updatedUser });
                 console.log("Auth store user updated with new shop info.");
+            }
+
+            // Actualizar el logoUrl en firstLayoutStore si la tienda tiene imagen
+            if (newShop.imageUrl) {
+                const { useFirstLayoutStore } = await import('../firstLayoutStore');
+                const { updateEditableVariables } = useFirstLayoutStore.getState();
+                updateEditableVariables({ logoUrl: newShop.imageUrl });
+                console.log("Logo URL updated in firstLayoutStore:", newShop.imageUrl);
             }
 
             set({ shop: newShop, loading: false });

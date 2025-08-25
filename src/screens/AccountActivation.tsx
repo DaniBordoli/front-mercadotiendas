@@ -7,6 +7,8 @@ import { colors } from '../design/colors';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { FaKey } from 'react-icons/fa';
+import { Navbar } from '../components/organisms/Navbar';
+import FooterHome from '../components/organisms/FooterHome/FooterHome';
 
 function AccountActivation() {
   const navigate = useNavigate();
@@ -77,7 +79,7 @@ function AccountActivation() {
       if (data.data?.token && data.data?.user) {
         localStorage.setItem('user', JSON.stringify(data.data.user));
         setToken(data.data.token);
-        navigate('/dashboard');
+        navigate('/basic-data');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Error al activar la cuenta');
@@ -129,17 +131,19 @@ function AccountActivation() {
   }
 
   return (
-    <div className="bg-white h-screen flex flex-col items-center">
-      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 mt-4 flex flex-col items-center w-full max-w-lg">
+    <div className="bg-white min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex flex-col items-center justify-center" style={{paddingTop: '20px', paddingBottom: '50px'}}>
+      <div className="rounded-[2.5rem] border border-gray-200 shadow-lg bg-white px-8 py-10 flex flex-col items-center w-full max-w-lg">
         <div className="flex items-center justify-center w-full">
-          <img src="/logoLogin/logoLogin.png" alt="Logo MercadoTiendas" className="w-60 h-auto" />
+          <img src="/logonuevoalto.png" alt="MercadoTiendas Logo" className="w-48 h-auto" />
         </div>
         <div className="mt-6 w-full max-w-md px-4">
-          <h2 className="text-2xl font-space font-bold mb-4" style={{ color: colors.darkGray }}>
+          <h2 className="text-2xl font-space font-bold mb-4 text-center" style={{ color: colors.darkGray }}>
             Activación de Cuenta
           </h2>
           
-          <p className="mb-6 font-space text-sm" style={{ color: colors.mediumGray }}>
+          <p className="mb-6 font-space text-sm text-center" style={{ color: colors.mediumGray }}>
             Hemos enviado un código de activación a <strong>{email || 'tu correo'}</strong>. 
             Por favor, ingresa el código para activar tu cuenta.
           </p>
@@ -157,7 +161,7 @@ function AccountActivation() {
           )}
 
           <div className="mb-4">
-            <label className="block mb-2 font-space text-darkGray">
+            <label className="block mb-2 font-space text-darkGray text-center">
               Código de activación
             </label>
             <InputDefault
@@ -181,12 +185,13 @@ function AccountActivation() {
             </DesignButton>
 
             <div className="flex justify-center mt-4">
-              <button
+              <button 
                 onClick={handleResendCode}
                 disabled={resendLoading}
-                className="font-space text-sm"
-                style={{ color: colors.primaryRed }}
+                className="flex-1 h-11 bg-white border border-[#e5e5e7] text-[#1c1c1e] font-medium rounded-lg hover:bg-[#f8f8f8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ width: '218px', height: '44px' }}
               >
+                <i className="fa-solid fa-paper-plane"></i>
                 {resendLoading ? "Reenviando..." : "Reenviar código"}
               </button>
             </div>
@@ -204,8 +209,20 @@ function AccountActivation() {
           </div>
         </div>
       </div>
+      
+      {/* Help Text - Outside the card */}
+        <div className="text-center mt-6">
+          <p className="text-sm" style={{color: colors.mediumGray}}>
+            ¿No recibiste el email? Revisá tu carpeta de spam o{' '}
+            <span className="cursor-pointer hover:underline font-medium" style={{ color: colors.primaryRed }}>
+              contactanos
+            </span>
+          </p>
+        </div>
+      </div>
+      <FooterHome />
     </div>
-  );
-}
+    );
+ }
 
 export default AccountActivation;

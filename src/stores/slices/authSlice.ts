@@ -134,7 +134,7 @@ export const fetchUserProfile = async () => {
   }
 };
 
-export const updateUserProfile = async (profileData: Record<string, string>): Promise<void> => {
+export const updateUserProfile = async (profileData: Record<string, string | string[]>): Promise<void> => {
   const apiUrl = `${API_URL}/users/profile`;
   const token = getStorageItem('token');
 
@@ -320,6 +320,42 @@ export const clearAutoLogoutTimer = () => {
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
+  // Estado para el modo actual del usuario
+  currentUserMode: null as string | null,
+  
+  // Función para establecer el modo actual del usuario
+  setCurrentUserMode: (mode: string) => {
+    set({ currentUserMode: mode });
+    setStorageItem('currentUserMode', mode);
+  },
+  
+  // Función para obtener el modo actual del usuario
+  getCurrentUserMode: () => {
+    const { currentUserMode, user } = get();
+    
+    // Si ya hay un modo establecido, devolverlo
+    if (currentUserMode) {
+      return currentUserMode;
+    }
+    
+    // Si no hay modo establecido, intentar obtenerlo del localStorage
+    const storedMode = getStorageItem('currentUserMode');
+    if (storedMode && user?.userType?.includes(storedMode)) {
+      set({ currentUserMode: storedMode });
+      return storedMode;
+    }
+    
+    // Si no hay modo almacenado o no es válido, usar el primer tipo de usuario disponible
+    if (user?.userType && user.userType.length > 0) {
+      const defaultMode = user.userType[0];
+      set({ currentUserMode: defaultMode });
+      setStorageItem('currentUserMode', defaultMode);
+      return defaultMode;
+    }
+    
+    return null;
+  },
+  
   loadProfile: async () => {
     const token = get().token;
     console.log('[Auth] loadProfile llamado (posible origen: PaymentReturn). Token en store:', token);
@@ -561,11 +597,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         body: JSON.stringify({ 
           token: idToken,
           userData: {
-            fullName: data.fullName,
-            birthDate: data.birthDate,
-            city: data.city,
-            province: data.province,
-            country: data.country
+            ...(data.fullName && { fullName: data.fullName }),
+            ...(data.birthDate && { birthDate: data.birthDate }),
+            ...(data.city && { city: data.city }),
+            ...(data.province && { province: data.province }),
+            ...(data.country && { country: data.country })
           }
         }),
       });

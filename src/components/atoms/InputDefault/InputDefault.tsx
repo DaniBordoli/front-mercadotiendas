@@ -21,7 +21,7 @@ export const InputDefault: React.FC<InputDefaultProps> = ({
   icon,
 }) => {
   return (
-    <div className={`relative ${icon ? 'flex items-center' : ''}`} style={{ width: '382px', height: '44px' }}>
+    <div className={`relative ${icon ? 'flex items-center' : ''}`} style={{ width: '100%', maxWidth: '382px', height: '44px' }}>
       {icon && (
         <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
           {icon}

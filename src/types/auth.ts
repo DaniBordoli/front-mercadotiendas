@@ -5,7 +5,7 @@ export interface LoginCredentials {
 
 export interface RegisterData extends LoginCredentials {
   confirmPassword: string;
-  fullName: string;
+  fullName?: string;
   birthDate?: string;
   city?: string;
   province?: string;
@@ -71,6 +71,7 @@ export interface User {
   authMethod?: 'email' | 'google';
   isInfluencer?: boolean;
   imageUrl?: string;
+  userType?: string[];
 }
 
 export interface UserWithLoading extends User {
@@ -83,6 +84,7 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
   token: string | null;
+  currentUserMode: string | null;
 }
 
 export type AuthStore = AuthState & {
@@ -133,4 +135,6 @@ export type AuthStore = AuthState & {
     
   }) => Promise<any>;
   fetchProductById: (id: string) => Promise<any>;
+  setCurrentUserMode: (mode: string) => void;
+  getCurrentUserMode: () => string | null;
 }

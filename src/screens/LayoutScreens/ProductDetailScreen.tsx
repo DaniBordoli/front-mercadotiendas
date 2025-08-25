@@ -7,9 +7,10 @@ import { useFirstLayoutStore } from '../../stores/firstLayoutStore';
 import { useSearchStore } from '../../stores/searchStore';
 import { useCartStore } from '../../stores/cartStore';
 import { useAuthStore } from '../../stores/slices/authSlice';
+import { useShopStore } from '../../stores/slices/shopStore';
 import { getStorageItem } from '../../utils/storage';
 import { API_URL } from '../../config';
-import { ReviewForm } from '../../components/organisms/ReviewForm/ReviewForm';
+
 import FullScreenLoader from '../../components/molecules/FullScreenLoader';
 
 // Tipos adicionales para la interfaz de Product si es necesario
@@ -28,17 +29,17 @@ const ProductDetailScreen: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
-  const [tab, setTab] = useState<'description' | 'reviews'>('description');
   const [notification, setNotification] = useState<{show: boolean, message: string}>({show: false, message: ''});
   
-  // Review-related states
-  const [isWritingReview, setIsWritingReview] = useState(false);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
   
   const editableVariables = useFirstLayoutStore(state => state.editableVariables);
   
   // Auth state
   const { user, isAuthenticated } = useAuthStore();
+  
+  // Shop state
+  const { shop } = useShopStore();
   
   // Usar productId si está disponible (desde ShopView), sino usar id (desde rutas normales)
   const actualProductId = productId || id;
@@ -53,151 +54,66 @@ const ProductDetailScreen: React.FC = () => {
   
   const addToCart = useCartStore(state => state.addToCart);
 
-  // Estados locales para reviews (no usar el searchStore para reviews)
-  const [reviews, setReviews] = useState<any[]>([]);
-  const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+  // Estado para productos relacionados filtrados
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
-  // Función para cargar reseñas desde el backend
-  const fetchReviews = async (productId: string) => {
-    setIsLoadingReviews(true);
+  // Función para cargar y filtrar productos relacionados por tienda
+  const filterRelatedProductsByShop = async () => {
+    if (!selectedProduct) {
+      setRelatedProducts([]);
+      return;
+    }
     
-    try {
-      const response = await fetch(`${API_URL}/reviews/product/${productId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        
-        let reviewsData = [];
-        if (data.data && Array.isArray(data.data)) {
-          reviewsData = data.data;
-        } else if (data.message && Array.isArray(data.message)) {
-          reviewsData = data.message;
-        } else if (Array.isArray(data)) {
-          reviewsData = data;
-        }
-        
-        const reviewsArray = Array.isArray(reviewsData) ? reviewsData : [];
-        setReviews(reviewsArray);
-      } else {
-        setReviews([]);
-      }
-    } catch (error) {
-      console.error('Error al cargar reseñas:', error);
-      setReviews([]);
-    } finally {
-      setIsLoadingReviews(false);
-    }
-  };
-
-  // Función para enviar reseña al backend
-  const submitReview = async (reviewData: { rating: number; comment: string }) => {
-    if (!user || !isAuthenticated) {
-      setNotification({
-        show: true,
-        message: 'Debes iniciar sesión para escribir una reseña'
-      });
-      setTimeout(() => setNotification({show: false, message: ''}), 3000);
-      return;
-    }
-
-    const token = getStorageItem('token');
-    if (!token) {
-      setNotification({
-        show: true,
-        message: 'No tienes permisos para escribir una reseña'
-      });
-      setTimeout(() => setNotification({show: false, message: ''}), 3000);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/reviews`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          productId: actualProductId,
-          rating: reviewData.rating,
-          comment: reviewData.comment,
-        }),
-      });
-
-      if (response.ok) {
-        setNotification({
-          show: true,
-          message: 'Reseña enviada correctamente!'
-        });
-        
-        if (actualProductId) {
-          await fetchReviews(actualProductId);
-        }
-      } else {
-        const errorData = await response.json();
-        let errorMessage = 'Error al enviar la reseña';
-        
-        if (response.status === 400) {
-          errorMessage = errorData.message || 'Datos de la reseña inválidos';
-        } else if (response.status === 401) {
-          errorMessage = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente';
-        } else if (response.status === 404) {
-          errorMessage = 'Producto no encontrado';
-        } else if (response.status === 500) {
-          errorMessage = 'Error interno del servidor. Intenta nuevamente más tarde';
+    // Si estamos en ShopView, cargar productos de la tienda actual
+    if (shop && shop._id) {
+      try {
+        const response = await fetch(`${API_URL}/api/products/shop/${shop._id}`);
+        if (response.ok) {
+          const shopProducts = await response.json();
+          
+          // Filtrar productos de la tienda excluyendo el producto actual
+          const filtered = shopProducts.filter((product: any) => 
+            product._id !== selectedProduct.id
+          ).slice(0, 4).map((product: any) => ({
+            id: product._id,
+            name: product.name,
+            price: product.price,
+            imageUrls: product.imageUrls || [],
+            shop: product.shop
+          }));
+          
+          setRelatedProducts(filtered);
         } else {
-          errorMessage = errorData.message || 'Error desconocido al enviar la reseña';
+          setRelatedProducts([]);
         }
-        
-        setNotification({
-          show: true,
-          message: errorMessage
-        });
+      } catch (error) {
+        console.error('Error loading shop products:', error);
+        setRelatedProducts([]);
       }
-    } catch (error) {
-      console.error('Error al enviar reseña:', error);
-      setNotification({
-        show: true,
-        message: 'Error de conexión. Verifica tu conexión a internet'
-      });
+    } else {
+      // Si no estamos en ShopView, usar productos generales de baseSearchResults
+      if (baseSearchResults) {
+        const filtered = baseSearchResults.filter(product => 
+          product.id !== selectedProduct.id
+        ).slice(0, 4);
+        
+        setRelatedProducts(filtered);
+      } else {
+        setRelatedProducts([]);
+      }
     }
-    
-    setTimeout(() => setNotification({show: false, message: ''}), 3000);
   };
+  // useEffect para filtrar productos relacionados cuando cambian los datos
+  useEffect(() => {
+    const loadRelatedProducts = async () => {
+      await filterRelatedProductsByShop();
+    };
+    loadRelatedProducts();
+  }, [selectedProduct, baseSearchResults, shop]);
+        
 
-  // Funciones para manejar reseñas
-  const handleOpenReviewForm = () => {
-    if (!user || !isAuthenticated) {
-      setNotification({
-        show: true,
-        message: 'Debes iniciar sesión para escribir una reseña'
-      });
-      setTimeout(() => setNotification({show: false, message: ''}), 3000);
-      return;
-    }
-    setIsWritingReview(true);
-  };
 
-  const handleCancelReview = () => {
-    setIsWritingReview(false);
-  };
 
-  const handleReviewSubmit = async (reviewData: { rating: number; text: string }) => {
-    if (!actualProductId) return;
-    await submitReview({ rating: reviewData.rating, comment: reviewData.text });
-    setIsWritingReview(false);
-  };
-
-  // Calcular estadísticas de reseñas
-  const totalReviews = Array.isArray(reviews) ? reviews.length : 0;
-  const averageRating = totalReviews > 0
-    ? reviews.reduce((sum: number, review: any) => sum + (review.rating || 0), 0) / totalReviews
-    : selectedProduct?.rating || 0;
 
   // Cargar los datos del producto cuando se monta el componente
   useEffect(() => {
@@ -206,7 +122,7 @@ const ProductDetailScreen: React.FC = () => {
         fetchProductById(actualProductId);
       }
       
-      fetchReviews(actualProductId);
+      
       
       setSelectedImage(0);
       setQuantity(1);
@@ -346,7 +262,7 @@ const ProductDetailScreen: React.FC = () => {
                 <img
                   src={selectedProduct?.imageUrls?.[selectedImage] || "https://via.placeholder.com/600x600?text=No+Image"}
                   alt={selectedProduct?.name || "Producto"}
-                  className="w-full h-[600px] object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
+                  className="w-full h-[292px] md:h-[600px] object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in"
                   onClick={() => setIsZoomModalOpen(true)}
                 />
                 <button className="absolute top-4 right-4 w-14 h-14 bg-white rounded-full flex items-center justify-center hover:bg-red-50 hover:text-[#ff4f41] transition-colors shadow-lg border-2 border-transparent hover:border-[#ff4f41]">
@@ -359,7 +275,7 @@ const ProductDetailScreen: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => setSelectedImage(index)}
-                      className={`w-full h-24 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 ${
+                      className={`w-full h-16 md:h-24 object-cover rounded-lg cursor-pointer border-2 transition-all duration-200 ${
                         index === selectedImage 
                           ? 'border-[#ff4f41] opacity-100' 
                           : 'border-transparent hover:border-[#ff4f41] opacity-60 hover:opacity-100'
@@ -405,7 +321,7 @@ const ProductDetailScreen: React.FC = () => {
                 <FaRegStar key={i} className="text-yellow-400 mr-1" />
               )
             )}
-            <span className="ml-2 text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>({totalReviews} Reseñas)</span>
+            <span className="ml-2 text-sm" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#666' }}>(0 Reseñas)</span>
           </div>
 
           <div className="text-2xl font-bold mb-2" style={{ color: editableVariables.productPageTextColor || editableVariables.textColor || '#333' }}>${selectedProduct?.price?.toLocaleString() || "0.00"}</div>
@@ -574,9 +490,9 @@ const ProductDetailScreen: React.FC = () => {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center">
-                    <img className="w-10 h-10 rounded-full object-cover mr-3" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="TechStore" />
+                    <img className="w-10 h-10 rounded-full object-cover mr-3" src={shop?.imageUrl || "https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg"} alt={shop?.name || "Tienda"} />
                     <div>
-                      <h4 className="font-semibold text-[#1c1c1e] text-sm">TechStore Pro</h4>
+                      <h4 className="font-semibold text-[#1c1c1e] text-sm">{shop?.name || "TechStore Pro"}</h4>
                       <div className="flex items-center">
                         <div className="flex text-yellow-400 text-xs mr-2">
                           <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
@@ -606,22 +522,12 @@ const ProductDetailScreen: React.FC = () => {
               <button
               className="px-4 py-2 text-sm font-medium border-b-2"
               type="button"
-              style={{ color: tab === 'description' ? editableVariables.textColor : editableVariables.textColor, borderColor: tab === 'description' ? editableVariables.textColor : 'transparent' }}
-              onClick={() => setTab('description')}
+              style={{ color: editableVariables.textColor, borderColor: editableVariables.textColor }}
             >
               Descripción
             </button>
-            <button
-                className="px-4 py-2 text-sm font-medium border-b-2"
-                type="button"
-                style={{ color: tab === 'reviews' ? editableVariables.textColor : editableVariables.textColor, borderColor: tab === 'reviews' ? editableVariables.textColor : 'transparent' }}
-                onClick={() => setTab('reviews')}
-              >
-                Reviews ({totalReviews})
-              </button>
             </div>
             <div>
-              {tab === 'description' && (
               <>
                 <h3 className="text-lg font-semibold mb-2" style={{ color: editableVariables.textColor }}>Descripción del Producto</h3>
                 <p className="mb-4" style={{ color: editableVariables.textColor }}>
@@ -641,53 +547,6 @@ const ProductDetailScreen: React.FC = () => {
                   )}
                 </div>
               </>
-            )}            {tab === 'reviews' && (
-              <div style={{ color: editableVariables.textColor }}>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold">Reviews ({totalReviews})</h3>
-                  {!isWritingReview && (
-                    <button
-                      onClick={handleOpenReviewForm}
-                      className="px-4 py-2 text-white rounded text-sm"
-                      style={{ backgroundColor: editableVariables.primaryColor }}
-                    >
-                      Escribir Reseña
-                    </button>
-                  )}
-                </div>
-                
-                {isLoadingReviews ? (
-                  <div className="text-center py-4">
-                    <span style={{ color: editableVariables.textColor }}>Cargando reseñas...</span>
-                  </div>
-                ) : reviews && reviews.length > 0 ? (
-                  <div className="space-y-4">
-                    {reviews.map((review: any) => (
-                      <div key={review._id || review.id} className="border rounded-md p-4 bg-gray-50">
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="font-semibold text-sm">{review.userName || 'Usuario Anónimo'}</span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center mb-2">
-                          {[1,2,3,4,5].map(i =>
-                            i <= review.rating ? (
-                              <FaStar key={i} className="text-yellow-400 mr-1" />
-                            ) : (
-                              <FaRegStar key={i} className="text-yellow-400 mr-1" />
-                            )
-                          )}
-                        </div>
-                        <p className="text-sm">{review.comment || review.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p>Este producto aún no tiene reseñas.</p>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
@@ -695,7 +554,7 @@ const ProductDetailScreen: React.FC = () => {
         <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7] mt-8 max-w-7xl mx-auto">
           <h3 className="text-lg font-semibold mb-6">También te puede interesar</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          {baseSearchResults.slice(0, 4).map((relatedProduct) => (
+          {relatedProducts.map((relatedProduct) => (
             <div
               key={relatedProduct.id}
               className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch bg-white"
@@ -728,30 +587,11 @@ const ProductDetailScreen: React.FC = () => {
               </div>
             </div>
           ))}
-          {baseSearchResults.length === 0 && [1, 2, 3, 4].map((idx) => (
-            <div
-              key={idx}
-              className="relative rounded-lg overflow-hidden shadow group h-96 flex items-stretch bg-white"
-            >
-              <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                <img
-                  src={`https://via.placeholder.com/300x400?text=Product+${idx}`}
-                  alt={`Product ${idx}`}
-                  className="object-cover w-full h-full"
-                />
-              </div>
-
-              <div className="relative z-10 flex flex-col justify-end h-full w-full p-4">
-                <h3 className="text-lg font-semibold text-left mb-1 drop-shadow">Product {idx}</h3>
-                <span className="font-bold text-lg mb-2 text-left block">$99.99</span>
-                <div className="flex justify-center">                  <button className="px-4 w-full py-2 text-white rounded transition text-sm"
-                    style={{ backgroundColor: editableVariables.primaryColor }}>
-                    Añadir al Carrito
-                  </button>
-                </div>
-              </div>
+          {relatedProducts.length === 0 && (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-500">No hay productos relacionados disponibles en esta tienda.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>
@@ -763,13 +603,7 @@ const ProductDetailScreen: React.FC = () => {
         footerDescription={editableVariables.footerDescription}
       />
       
-      {isWritingReview && actualProductId && (
-        <ReviewForm
-          productId={actualProductId}
-          onCancel={handleCancelReview}
-          onSubmit={handleReviewSubmit}
-        />
-      )}
+
       
       {/* Modal de Zoom */}
       {isZoomModalOpen && (

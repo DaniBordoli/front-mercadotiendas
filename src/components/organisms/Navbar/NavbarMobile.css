@@ -6,37 +6,172 @@
   .navbar-mobile {
     display: flex !important;
   }
+  
+  /* Eliminar cualquier espacio en blanco arriba del navbar móvil */
+  body {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  html {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  /* Forzar que el navbar móvil esté pegado al borde superior */
+  .navbar-mobile {
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  /* Eliminar cualquier margen del primer elemento */
+  .container:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  /* Eliminar cualquier espacio del primer elemento visible, excepto ProductListItem */
+  *:first-child:not(.product-list-item) {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+  
+  /* Forzar que no haya espacio arriba del contenido principal */
+  .flex.flex-col.min-h-screen {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
 }
 
 .navbar-mobile {
   display: none;
-  align-items: center;
-  justify-content: space-between;
   width: 100%;
-  padding: 0.5rem 1rem;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   position: relative;
   z-index: 50;
+  top: 0;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 .navbar-mobile-logo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .navbar-mobile-actions {
   display: flex;
   align-items: center;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .navbar-mobile-profile {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 9999px;
   object-fit: cover;
   background: #eee;
   border: 1px solid #e5e7eb;
+  cursor: pointer;
+}
+
+/* Estilos para el menú desplegable */
+.navbar-mobile .absolute {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para los elementos del menú */
+.navbar-mobile .hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.navbar-mobile .cursor-pointer {
+  transition: all 0.2s ease;
+}
+
+.navbar-mobile .cursor-pointer:hover {
+  transform: translateX(4px);
+}
+
+/* Estilos para los dropdowns */
+.navbar-mobile .space-y-2 {
+  animation: expandDropdown 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes expandDropdown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 200px;
+    opacity: 1;
+  }
+}
+
+/* Estilos para los nuevos dropdowns móviles */
+.navbar-mobile-dropdown {
+  animation: slideDown 0.3s ease-out;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Estilos para las flechas de los dropdowns */
+.navbar-mobile .transition-transform {
+  transition: transform 0.2s ease;
+}
+
+.navbar-mobile .rotate-180 {
+  transform: rotate(180deg);
+}
+
+/* Estilos para los dropdowns de filtros móviles */
+@media (max-width: 768px) {
+  /* Asegurar que los dropdowns estén por encima de todo */
+  .absolute.z-\[9999\] {
+    z-index: 9999 !important;
+    position: absolute !important;
+  }
+  
+  /* Mejorar la sombra y visibilidad */
+  .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+  }
+  
+  /* Asegurar que los dropdowns no se corten */
+  .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
 }

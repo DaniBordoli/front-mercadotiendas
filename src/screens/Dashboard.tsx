@@ -163,6 +163,17 @@ const Dashboard: React.FC = () => {
                         </div>
                     </section>
                     
+                    {/* Sección Tendencias de Hoy - Móvil */}
+                    <section className="py-16 bg-white px-4">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold font-space text-[#1c1c1e] mb-4">🔥 Tendencias de Hoy</h2>
+                            <p className="text-lg text-[#666666]">Basado en clics de tu región</p>
+                        </div>
+                        <div>
+                            <CardList />
+                        </div>
+                    </section>
+                    
                     {/* Sección En Vivo Ahora - Móvil */}
                     <section className="py-16 bg-white px-4">
                         <div className="text-center mb-12">
@@ -313,12 +324,66 @@ const Dashboard: React.FC = () => {
                                         </div>
                                         <h3 className="text-base font-semibold text-[#1c1c1e] mb-1">{category.name}</h3>
                                         <p className="text-xs text-[#666666]">{formatProductCount(category.count)}</p>
-                    </div>
+                                    </div>
                                 ))}
-                    </div>
+                            </div>
                         )}
                     </section>
 
+                    {/* Sección Casos de Éxito - Móvil */}
+                    <section className="py-16 bg-[#f8f8f8] px-4">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold font-space text-[#1c1c1e] mb-4">Casos de éxito</h2>
+                            <p className="text-lg text-[#666666]">Lo que dicen nuestros usuarios</p>
+                        </div>
+                        
+                        <div className="space-y-6">
+                            <div className="bg-white rounded-xl p-6 border border-[#e5e5e7]">
+                                <div className="flex items-center mb-4">
+                                    <img className="w-12 h-12 rounded-full mr-3 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-6.jpg" alt="Laura Mendez" />
+                                    <div>
+                                        <h4 className="text-base font-bold text-[#1c1c1e]">Laura Mendez</h4>
+                                        <p className="text-sm text-[#666666]">Propietaria de "Estilo Urbano"</p>
+                                    </div>
+                                </div>
+                                <p className="text-[#666666] italic leading-relaxed text-sm">"Desde que me uní a Mercado Tiendas, mis ventas aumentaron un 300%. La colaboración con influencers me permitió llegar a audiencias que nunca había alcanzado antes."</p>
+                            </div>
+                            
+                            <div className="bg-white rounded-xl p-6 border border-[#e5e5e7]">
+                                <div className="flex items-center mb-4">
+                                    <img className="w-12 h-12 rounded-full mr-3 object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-3.jpg" alt="Martín Rodriguez" />
+                                    <div>
+                                        <h4 className="text-base font-bold text-[#1c1c1e]">Martín Rodriguez</h4>
+                                        <p className="text-sm text-[#666666]">Influencer de tecnología</p>
+                                    </div>
+                                </div>
+                                <p className="text-[#666666] italic leading-relaxed text-sm">"La plataforma me permite monetizar mi contenido de forma transparente. Ahora puedo recomendar productos que realmente uso y ganar por cada venta que genero."</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Sección CTA Final - Móvil */}
+                    <section className="py-16 bg-gradient-to-r from-[#ff4f41] to-[#ff4f41]/80 px-4">
+                        <div className="text-center">
+                            <h2 className="text-4xl font-bold font-space text-white mb-6">¿Listo para empezar?</h2>
+                            <p className="text-lg text-white/90 mb-8">Únete a miles de tiendas, influencers y compradores que ya forman parte de nuestra comunidad</p>
+                            
+                            <div className="flex flex-col gap-4 items-center">
+                                <button 
+                                    onClick={() => navigate('/register')}
+                                    className="w-full max-w-xs px-8 py-4 bg-white text-[#ff4f41] rounded-lg hover:bg-gray-100 transition-colors font-medium text-lg"
+                                >
+                                    Registrate gratis
+                                </button>
+                                <span className="text-white hover:text-white/80 transition-colors font-medium text-lg underline cursor-pointer">
+                                    ¿Sos influencer? Sumate a nuestra red
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Footer - Móvil */}
+                    <FooterHome />
 
                 </div>
 
