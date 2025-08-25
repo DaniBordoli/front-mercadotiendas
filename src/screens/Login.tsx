@@ -31,9 +31,11 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // MT-30: Include selected role in login credentials
     await login({
       email,
-      password
+      password,
+      role: selectedRole
     });
   };
 
@@ -109,6 +111,37 @@ function Login() {
               className='w-full'
               icon={<AiOutlineQuestionCircle style={{ color: colors.mediumGray }} />}
             />
+          </div>
+          
+          {/* MT-30: Role Selection Component */}
+          <div className="mb-3 md:mb-4">
+            <label className="block mb-2 font-space text-darkGray">
+              Tipo de cuenta
+            </label>
+            <div className="flex space-x-2">
+              <button
+                type="button"
+                onClick={() => setSelectedRole('user')}
+                className={`flex-1 py-2 px-4 rounded-lg border font-space text-sm transition-colors ${
+                  selectedRole === 'user'
+                    ? 'border-red-500 bg-red-50 text-red-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Usuario
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelectedRole('admin')}
+                className={`flex-1 py-2 px-4 rounded-lg border font-space text-sm transition-colors ${
+                  selectedRole === 'admin'
+                    ? 'border-red-500 bg-red-50 text-red-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Administrador
+              </button>
+            </div>
           </div>
           
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mt-3 md:mt-4 space-y-2 md:space-y-0">

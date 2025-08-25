@@ -541,6 +541,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       const { accessToken, refreshToken, user } = responseData.data;
       
+      // MT-30: Validate user role if specified
+      if (credentials.role && user.role !== credentials.role) {
+        throw new Error(`Acceso denegado. Este usuario no tiene permisos de ${credentials.role === 'admin' ? 'administrador' : 'usuario'}.`);
+      }
+      
       const isActivated = user?.isActivated === true;
       
       if (isActivated) {
