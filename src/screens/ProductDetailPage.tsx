@@ -371,9 +371,9 @@ const ProductDetailPage: React.FC = () => {
 
           {/* Sticky Product Info */}
           <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7]">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7] md:pt-8 pt-4">
               {/* Badges de estado del producto */}
-               <div className="flex items-center gap-2 mb-3 md:mt-0 mt-6">
+               <div className="flex items-center gap-2 mb-3">
               {selectedProduct.condition === 'new' && (
                 <span className="px-3 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-sm font-semibold">Nuevo</span>
               )}
@@ -492,7 +492,7 @@ const ProductDetailPage: React.FC = () => {
                             // Lógica básica para comprar ahora (por ahora solo añade al carrito)
                             handleAddToCart();
                         }}
-                        className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors flex items-center justify-center"
+                        className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors flex items-center justify-center md:w-full md:h-auto max-md:w-[277px] max-md:h-[64px] max-md:mx-auto"
                     >
                         <span className="pt-0.5">Comprar ahora</span>
                     </button>
@@ -857,16 +857,16 @@ const ProductDetailPage: React.FC = () => {
                 </div>
             ) : (
                 <div className={`grid gap-0 md:gap-4 ${
-                    isMobile ? 'grid-cols-2' : 'grid-cols-3 lg:grid-cols-6'
+                    isMobile ? 'grid-cols-2 justify-center justify-items-center' : 'grid-cols-3 lg:grid-cols-6'
                 }`}>
                     {getVisibleProducts().map((product) => (
                         <div 
                             key={product.id} 
-                            className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                            className="bg-white md:rounded-xl max-md:rounded-none shadow-sm border border-[#e5e5e7] overflow-hidden hover:shadow-md transition-shadow cursor-pointer max-md:w-[140px] max-md:h-[169px]"
                             onClick={() => navigate(`/product/${product.id}`)}
                         >
                             <img 
-                                className="w-full h-36 object-cover" 
+                                className="w-full md:h-36 max-md:h-20 object-cover" 
                                 src={product.imageUrls?.[0] || product.imagen || product.images?.[0] || '/placeholder-image.jpg'} 
                                 alt={product.name || product.nombre || 'Producto'}
                                 onError={(e) => {
@@ -874,11 +874,11 @@ const ProductDetailPage: React.FC = () => {
                                     target.src = '/placeholder-image.jpg';
                                 }}
                             />
-                            <div className="p-3">
-                                <h4 className="font-semibold text-[#1c1c1e] mb-1 text-sm line-clamp-2">
+                            <div className="md:p-3 max-md:p-2">
+                                <h4 className="font-semibold text-[#1c1c1e] mb-1 md:text-sm max-md:text-xs line-clamp-2">
                                     {product.name || product.nombre || 'Producto sin nombre'}
                                 </h4>
-                                <div className="text-base font-bold text-[#1c1c1e] mb-2">
+                                <div className="md:text-base max-md:text-sm font-bold text-[#1c1c1e] mb-2">
                                     ${product.price || product.precio || '0.00'}
                                 </div>
                                 <button 
@@ -896,7 +896,7 @@ const ProductDetailPage: React.FC = () => {
                                         };
                                         addToCart(productToAdd, 1);
                                     }}
-                                    className="w-full py-1.5 bg-[#ff4f41] text-white rounded-lg hover:bg-[#ff4f41]/80 transition-colors text-xs"
+                                    className="w-full md:py-1.5 max-md:py-1 bg-[#ff4f41] text-white md:rounded-lg max-md:rounded hover:bg-[#ff4f41]/80 transition-colors md:text-xs max-md:text-xs"
                                 >
                                     Agregar
                                 </button>
@@ -906,19 +906,7 @@ const ProductDetailPage: React.FC = () => {
                 </div>
             )}
             
-            {/* Indicador de productos (solo en mobile si hay más de 2) */}
-            {isMobile && relatedProducts.length > 2 && (
-                <div className="flex justify-center mt-4 gap-1">
-                    {Array.from({ length: Math.ceil(relatedProducts.length / 2) }).map((_, index) => (
-                        <div 
-                            key={index}
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                                Math.floor(currentRelatedIndex / 2) === index ? 'bg-[#ff4f41]' : 'bg-gray-300'
-                            }`}
-                        />
-                    ))}
-                </div>
-            )}
+
         </div>
 
       </main>

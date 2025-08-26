@@ -325,22 +325,35 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   
   // Función para establecer el modo actual del usuario
   setCurrentUserMode: (mode: string) => {
+    console.log('[AuthStore] setCurrentUserMode llamado con modo:', mode);
+    console.log('[AuthStore] Modo anterior:', get().currentUserMode);
+    
     set({ currentUserMode: mode });
     setStorageItem('currentUserMode', mode);
+    
+    console.log('[AuthStore] Modo actualizado en store:', get().currentUserMode);
+    console.log('[AuthStore] Modo guardado en localStorage:', localStorage.getItem('currentUserMode'));
   },
   
   // Función para obtener el modo actual del usuario
   getCurrentUserMode: () => {
     const { currentUserMode, user } = get();
     
+    console.log('[AuthStore] getCurrentUserMode - currentUserMode en store:', currentUserMode);
+    console.log('[AuthStore] getCurrentUserMode - user.userType:', user?.userType);
+    
     // Si ya hay un modo establecido, devolverlo
     if (currentUserMode) {
+      console.log('[AuthStore] getCurrentUserMode - devolviendo modo del store:', currentUserMode);
       return currentUserMode;
     }
     
     // Si no hay modo establecido, intentar obtenerlo del localStorage
     const storedMode = getStorageItem('currentUserMode');
+    console.log('[AuthStore] getCurrentUserMode - modo en localStorage:', storedMode);
+    
     if (storedMode && user?.userType?.includes(storedMode)) {
+      console.log('[AuthStore] getCurrentUserMode - usando modo del localStorage:', storedMode);
       set({ currentUserMode: storedMode });
       return storedMode;
     }
@@ -348,11 +361,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     // Si no hay modo almacenado o no es válido, usar el primer tipo de usuario disponible
     if (user?.userType && user.userType.length > 0) {
       const defaultMode = user.userType[0];
+      console.log('[AuthStore] getCurrentUserMode - usando modo por defecto:', defaultMode);
       set({ currentUserMode: defaultMode });
       setStorageItem('currentUserMode', defaultMode);
       return defaultMode;
     }
     
+    console.log('[AuthStore] getCurrentUserMode - devolviendo null');
     return null;
   },
   

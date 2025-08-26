@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaUser, FaStore, FaStar, FaChevronDown } from 'react-icons/fa';
 import { useAuthStore } from '../../../stores';
 import Toast from '../../atoms/Toast';
@@ -10,6 +11,7 @@ interface UserModeSelectorProps {
 
 const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) => {
   const { user, getCurrentUserMode, setCurrentUserMode } = useAuthStore();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [pendingMode, setPendingMode] = useState<string | null>(null);
@@ -17,7 +19,13 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const currentMode = getCurrentUserMode();
-  const availableModes = user?.userType || [];
+  // Permitir todos los modos disponibles, no solo los del userType
+  const availableModes = ['comprador', 'vendedor', 'influencer'];
+  
+  console.log('[UserModeSelector] Usuario actual:', user);
+  console.log('[UserModeSelector] Modo actual:', currentMode);
+  console.log('[UserModeSelector] Modos disponibles:', availableModes);
+  console.log('[UserModeSelector] Cantidad de modos:', availableModes.length);
 
   // Mapeo de tipos de usuario a configuración de display
   const modeConfig = {
@@ -76,12 +84,27 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
 
   const confirmModeChange = () => {
     if (pendingMode) {
+      console.log('[UserModeSelector] Cambiando modo a:', pendingMode);
+      console.log('[UserModeSelector] Modo actual antes del cambio:', currentMode);
+      
       setCurrentUserMode(pendingMode);
+      
+      console.log('[UserModeSelector] setCurrentUserMode ejecutado');
+      
       setToast({
         show: true,
         message: `Modo cambiado a ${getModeLabel(pendingMode)}`,
         type: 'success'
       });
+      
+      // Redireccionar según el modo seleccionado
+      if (pendingMode === 'comprador') {
+        console.log('[UserModeSelector] Redirigiendo a /homebuyer');
+        navigate('/homebuyer');
+      } else if (pendingMode === 'vendedor' || pendingMode === 'influencer') {
+        console.log('[UserModeSelector] Redirigiendo a /dashboard');
+        navigate('/dashboard');
+      }
     }
     setShowModal(false);
     setPendingMode(null);
@@ -92,10 +115,13 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
     setPendingMode(null);
   };
 
-  // No mostrar el selector si el usuario no tiene tipos de usuario o solo tiene uno
-  if (!availableModes.length || availableModes.length === 1) {
+  // Mostrar el selector siempre que haya usuario autenticado
+  if (!user) {
+    console.log('[UserModeSelector] No se muestra el selector - usuario no autenticado');
     return null;
   }
+  
+  console.log('[UserModeSelector] Mostrando selector de modo');
 
   const currentModeConfig = modeConfig[currentMode as keyof typeof modeConfig];
 

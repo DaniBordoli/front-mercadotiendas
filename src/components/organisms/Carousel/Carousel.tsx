@@ -141,8 +141,8 @@ const Carousel: React.FC = () => {
                 </div>
                 
                 {/* Contenido del Hero */}
-                <div className="relative z-30 max-w-7xl mx-auto px-6 h-full flex items-center">
-                    <div className="max-w-2xl relative z-40">
+                <div className="relative z-30 max-w-7xl mx-auto px-6 h-full flex items-center max-md:justify-center">
+                    <div className="max-w-2xl relative z-40 max-md:flex max-md:flex-col max-md:items-center max-md:text-center">
                         <h1 className="text-6xl md:text-6xl font-bold font-space text-white mb-10 leading-tight drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)] max-md:text-[36px] max-md:w-[292px] max-md:h-[135px] max-md:leading-[1.2] max-md:mx-auto max-md:flex max-md:items-center max-md:justify-center max-md:text-center max-md:mb-8">
                             Comprá, vendé y colaborá con influencers
                         </h1>

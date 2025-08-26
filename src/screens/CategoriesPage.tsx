@@ -68,6 +68,8 @@ const CategoriesPage: React.FC = () => {
     // Navegar a páginas específicas para ciertas categorías
     if (categoryTitle === 'Electrónica & Audio') {
       navigate('/subcategoriaelectroaudio');
+    } else if (categoryTitle === 'Moda & Accesorios') {
+      navigate('/subcategoriamoda');
     } else {
       // Navegar a la página de búsqueda con la categoría seleccionada
       navigate(`/search?category=${encodeURIComponent(categoryTitle)}`);

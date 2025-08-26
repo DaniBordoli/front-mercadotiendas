@@ -291,7 +291,7 @@ const ProductDetailScreen: React.FC = () => {
 
           {/* Sticky Product Info */}
           <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7]">
+            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7] md:pt-8 pt-16">
           {/* Badges de estado del producto */}
           <div className="flex gap-2 mb-3">
             {selectedProduct?.condition === 'new' && (

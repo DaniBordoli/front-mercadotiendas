@@ -17,11 +17,39 @@ export default function CartList() {
     const editableVariables = useFirstLayoutStore(state => state.editableVariables);
     const navigate = useNavigate();
     const [showLoginModal, setShowLoginModal] = React.useState(false);
+    const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set());
     const isAuthenticated = useAuthStore(state => state.isAuthenticated);
     const cartItems = useCartStore(state => state.items);
     const removeFromCart = useCartStore(state => state.removeFromCart);
     const updateQuantity = useCartStore(state => state.updateQuantity);
     const setCurrentStep = useCheckoutStepStore(state => state.setCurrentStep);
+    
+    // Initialize all items as selected
+    React.useEffect(() => {
+        const allItemIds = new Set(cartItems.map(item => item.product.id));
+        setSelectedItems(allItemIds);
+    }, [cartItems]);
+    
+    const toggleItemSelection = (productId: string) => {
+        setSelectedItems(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(productId)) {
+                newSet.delete(productId);
+            } else {
+                newSet.add(productId);
+            }
+            return newSet;
+        });
+    };
+    
+    const toggleSelectAll = () => {
+        if (selectedItems.size === cartItems.length) {
+            setSelectedItems(new Set());
+        } else {
+            const allItemIds = new Set(cartItems.map(item => item.product.id));
+            setSelectedItems(allItemIds);
+        }
+    };
     
     React.useEffect(() => {
         setCurrentStep(1);
@@ -32,6 +60,10 @@ export default function CartList() {
         (sum, item) => sum + item.product.price * item.quantity,
         0
     );
+     
+    const selectedTotal = cartItems
+        .filter(item => selectedItems.has(item.product.id))
+        .reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 
     return(
         <>
@@ -55,6 +87,21 @@ export default function CartList() {
                         <div className="grid lg:grid-cols-10 gap-4 md:gap-8">
                             {/* Cart Items - Left Column */}
                             <div className="lg:col-span-7">
+                                {/* Select All Checkbox */}
+                                <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-[#e5e5e7] mb-4 md:mb-6">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id="select-all"
+                                            checked={selectedItems.size === cartItems.length && cartItems.length > 0}
+                                            onChange={toggleSelectAll}
+                                            className="w-4 h-4 text-[#ff4f41] bg-gray-100 border-gray-300 rounded focus:ring-[#ff4f41] focus:ring-2"
+                                        />
+                                        <label htmlFor="select-all" className="ml-3 text-sm md:text-base font-medium text-[#1c1c1e]">
+                                            Seleccionar todos los productos ({cartItems.length})
+                                        </label>
+                                    </div>
+                                </div>
                                 {cartItems.map((item) => (
                                     <div key={item.product.id} className="bg-white rounded-xl shadow-sm border border-[#e5e5e7] mb-4 md:mb-6">
                                         {/* Store Header */}
@@ -73,25 +120,73 @@ export default function CartList() {
                                         {/* Store Products */}
                                         <div className="p-3 md:p-6">
                                             <div className="flex items-start gap-3 md:gap-4 mb-4">
-                                                <input type="checkbox" checked className="w-4 h-4 md:w-5 md:h-5 text-[#ff4f41] border-2 border-[#e5e5e7] rounded focus:ring-[#ff4f41] mt-1" />
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={selectedItems.has(item.product.id)}
+                                                    onChange={() => toggleItemSelection(item.product.id)}
+                                                    className="w-4 h-4 md:w-5 md:h-5 text-[#ff4f41] border-2 border-[#e5e5e7] rounded focus:ring-[#ff4f41] mt-1" 
+                                                />
                                                 <img
                                                     src={item.product.imageUrls?.[0] || ''}
                                                     alt={item.product.name}
                                                     className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <h4 className="text-sm md:text-base font-semibold text-[#1c1c1e] mb-1 hover:text-[#ff4f41] cursor-pointer line-clamp-2">{item.product.name}</h4>
-                                                    <p className="text-[#666666] text-xs md:text-sm mb-2">Producto disponible | Garantía incluida</p>
-                                                    <div className="flex flex-wrap items-center gap-1 md:gap-2">
-                                                        <span className="px-2 py-1 bg-[#00a699]/10 text-[#00a699] rounded-full text-xs font-medium">Envío gratis</span>
-                                                        <span className="px-2 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-xs font-medium">Oferta</span>
+                                                    {/* Mobile: Product info only */}
+                                                    <div className="md:hidden">
+                                                        <h4 className="text-sm font-semibold text-[#1c1c1e] mb-1 hover:text-[#ff4f41] cursor-pointer line-clamp-2">{item.product.name}</h4>
+                                                        <p className="text-[#666666] text-xs mb-2">Producto disponible | Garantía incluida</p>
+                                                        <div className="flex flex-wrap items-center gap-1">
+                                                            <span className="px-2 py-1 bg-[#00a699]/10 text-[#00a699] rounded-full text-xs font-medium">Envío gratis</span>
+                                                            <span className="px-2 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-xs font-medium">Oferta</span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {/* Desktop: Product info with controls inline */}
+                                                    <div className="hidden md:flex md:items-center md:justify-between">
+                                                        <div className="flex-1">
+                                                            <h4 className="text-base font-semibold text-[#1c1c1e] mb-1 hover:text-[#ff4f41] cursor-pointer line-clamp-2">{item.product.name}</h4>
+                                                            <p className="text-[#666666] text-sm mb-2">Producto disponible | Garantía incluida</p>
+                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                <span className="px-2 py-1 bg-[#00a699]/10 text-[#00a699] rounded-full text-xs font-medium">Envío gratis</span>
+                                                                <span className="px-2 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-xs font-medium">Oferta</span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* Desktop: Controls at product name level */}
+                                                        <div className="flex items-center gap-3 ml-4">
+                                                            <div className="flex items-center border border-[#e5e5e7] rounded-lg">
+                                                                <button 
+                                                                    className="p-2 hover:bg-[#f8f8f8] transition-colors"
+                                                                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                                                                    disabled={item.quantity <= 1}
+                                                                >
+                                                                    <i className="fa-solid fa-minus text-[#666666] text-sm"></i>
+                                                                </button>
+                                                                <span className="px-3 py-2 text-[#1c1c1e] font-medium">{item.quantity}</span>
+                                                                <button 
+                                                                    className="p-2 hover:bg-[#f8f8f8] transition-colors"
+                                                                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                                                >
+                                                                    <i className="fa-solid fa-plus text-[#666666] text-sm"></i>
+                                                                </button>
+                                                            </div>
+                                                            <div className="text-right min-w-[80px]">
+                                                                <div className="font-bold text-[#1c1c1e]">${item.product.price.toFixed(2)}</div>
+                                                            </div>
+                                                            <button 
+                                                                className="w-8 h-8 bg-[#f8f8f8] rounded-lg flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-colors"
+                                                                onClick={() => removeFromCart(item.product.id)}
+                                                            >
+                                                                <i className="fa-solid fa-trash text-sm"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             
-                                            {/* Mobile: Price and Controls Row */}
+                                            {/* Mobile: Counter and Price Row (swapped positions) */}
                                             <div className="flex items-center justify-between mt-3 md:hidden">
-                                                <div className="font-bold text-[#1c1c1e] text-lg">${item.product.price.toFixed(2)}</div>
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex items-center border border-[#e5e5e7] rounded-lg">
                                                         <button 
@@ -116,36 +211,10 @@ export default function CartList() {
                                                         <i className="fa-solid fa-trash text-xs"></i>
                                                     </button>
                                                 </div>
+                                                <div className="font-bold text-[#1c1c1e] text-lg">${item.product.price.toFixed(2)}</div>
                                             </div>
                                             
-                                            {/* Desktop: Controls on the right */}
-                                            <div className="hidden md:flex items-center gap-3">
-                                                <div className="flex items-center border border-[#e5e5e7] rounded-lg">
-                                                    <button 
-                                                        className="p-2 hover:bg-[#f8f8f8] transition-colors"
-                                                        onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
-                                                        disabled={item.quantity <= 1}
-                                                    >
-                                                        <i className="fa-solid fa-minus text-[#666666] text-sm"></i>
-                                                    </button>
-                                                    <span className="px-3 py-2 text-[#1c1c1e] font-medium">{item.quantity}</span>
-                                                    <button 
-                                                        className="p-2 hover:bg-[#f8f8f8] transition-colors"
-                                                        onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                                                    >
-                                                        <i className="fa-solid fa-plus text-[#666666] text-sm"></i>
-                                                    </button>
-                                                </div>
-                                                <div className="text-right min-w-[80px]">
-                                                    <div className="font-bold text-[#1c1c1e]">${item.product.price.toFixed(2)}</div>
-                                                </div>
-                                                <button 
-                                                    className="w-8 h-8 bg-[#f8f8f8] rounded-lg flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-colors"
-                                                    onClick={() => removeFromCart(item.product.id)}
-                                                >
-                                                    <i className="fa-solid fa-trash text-sm"></i>
-                                                </button>
-                                            </div>
+
                                         </div>
                                         
                                         {/* Store Totals */}
@@ -181,8 +250,8 @@ export default function CartList() {
                                     {/* Order Details */}
                                     <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                                         <div className="flex justify-between">
-                                            <span className="text-[#666666] text-sm md:text-base">Subtotal ({cartItems.length} productos)</span>
-                                            <span className="text-[#1c1c1e] font-medium text-sm md:text-base">${total.toFixed(2)}</span>
+                                            <span className="text-[#666666] text-sm md:text-base">Subtotal ({selectedItems.size} productos seleccionados)</span>
+                                            <span className="text-[#1c1c1e] font-medium text-sm md:text-base">${selectedTotal.toFixed(2)}</span>
                                         </div>
                                         
                                         {/* Shipping Calculator */}
@@ -205,7 +274,7 @@ export default function CartList() {
                                         
                                         <div className="flex justify-between">
                                             <span className="text-[#666666] text-sm md:text-base">Impuestos</span>
-                                            <span className="text-[#1c1c1e] font-medium text-sm md:text-base">${(total * 0.04).toFixed(2)}</span>
+                                            <span className="text-[#1c1c1e] font-medium text-sm md:text-base">${(selectedTotal * 0.04).toFixed(2)}</span>
                                         </div>
                                     </div>
                                     
@@ -213,14 +282,20 @@ export default function CartList() {
                                     <div className="border-t border-[#e5e5e7] pt-3 md:pt-4 mb-4 md:mb-6">
                                         <div className="flex justify-between">
                                             <span className="text-base md:text-lg font-semibold text-[#1c1c1e]">Total</span>
-                                            <span className="text-xl md:text-2xl font-bold text-[#ff4f41]">${(total + 5.99 + (total * 0.04)).toFixed(2)}</span>
+                                            <span className="text-xl md:text-2xl font-bold text-[#ff4f41]">${(selectedTotal + 5.99 + (selectedTotal * 0.04)).toFixed(2)}</span>
                                         </div>
                                     </div>
                                     
                                     {/* Checkout Button */}
                                     <button 
-                                        className="w-full bg-[#ff4f41] text-white py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg hover:bg-[#ff4f41]/90 transition-colors mb-4 md:mb-6"
+                                        className={`w-full py-3 md:py-4 rounded-lg font-semibold text-base md:text-lg transition-colors mb-4 md:mb-6 ${
+                                            selectedItems.size > 0 
+                                                ? 'bg-[#ff4f41] text-white hover:bg-[#ff4f41]/90' 
+                                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        }`}
+                                        disabled={selectedItems.size === 0}
                                         onClick={() => {
+                                            if (selectedItems.size === 0) return;
                                             if (!isAuthenticated) {
                                                 setShowLoginModal(true);
                                             } else {
@@ -228,7 +303,10 @@ export default function CartList() {
                                             }
                                         }}
                                     >
-                                        Continuar con la compra
+                                        {selectedItems.size > 0 
+                                            ? `Continuar con la compra (${selectedItems.size} productos)` 
+                                            : 'Selecciona productos para continuar'
+                                        }
                                     </button>
                                     
                                     {/* Trust Messages */}

@@ -18,12 +18,20 @@ interface CategoryCount {
 }
 
 const Dashboard: React.FC = () => {
-    const { forceLoadProfile, token, isAuthenticated } = useAuthStore();
+    const { forceLoadProfile, token, isAuthenticated, getCurrentUserMode } = useAuthStore();
     const { setShop } = useShopStore();
     const navigate = useNavigate();
     const { fetchResultsByCategory } = useSearchStore();
     const [categoryCounts, setCategoryCounts] = useState<CategoryCount[]>([]);
     const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+    // Redirección automática a /homebuyer si el modo es 'comprador'
+    useEffect(() => {
+        const currentMode = getCurrentUserMode();
+        if (currentMode === 'comprador') {
+            navigate('/homebuyer');
+        }
+    }, [getCurrentUserMode, navigate]);
 
     const handleCategorySearch = (categoryTerm: string) => {
         fetchResultsByCategory(categoryTerm);

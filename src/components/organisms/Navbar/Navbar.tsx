@@ -651,7 +651,7 @@ export const Navbar: React.FC = () => {
         
         {/* Mobile Dropdowns */}
         {isSearchDropdownVisible && (
-          <div className="navbar-mobile-dropdown search-dropdown fixed top-14 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
+          <div className="navbar-mobile-dropdown search-dropdown fixed top-[48px] left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
             <div className="p-4">
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
@@ -689,7 +689,7 @@ export const Navbar: React.FC = () => {
         )}
 
         {isCartDropdownVisible && (
-          <div className="navbar-mobile-dropdown cart-dropdown fixed top-14 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
+          <div className="navbar-mobile-dropdown cart-dropdown fixed top-[48px] left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
             <div className="p-4">
               <h3 className="font-bold text-lg mb-2">Tu Carrito</h3>
               {cartItems.length > 0 ? (
@@ -732,7 +732,7 @@ export const Navbar: React.FC = () => {
         )}
 
         {isUserDropdownVisible && (
-          <div className="navbar-mobile-dropdown user-dropdown fixed top-14 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
+          <div className="navbar-mobile-dropdown user-dropdown fixed top-[48px] left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-40 animate-slideDown">
             <div className="p-4">
               {isAuthenticated ? (
                 <div>
