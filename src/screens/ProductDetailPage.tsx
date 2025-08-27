@@ -371,9 +371,9 @@ const ProductDetailPage: React.FC = () => {
 
           {/* Sticky Product Info */}
           <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-fit">
-            <div className="bg-white rounded-xl p-8 shadow-sm border border-[#e5e5e7] md:pt-8 pt-4">
+            <div className="bg-white rounded-xl p-4 md:p-8 shadow-sm border border-[#e5e5e7] md:pt-8 pt-6">
               {/* Badges de estado del producto */}
-               <div className="flex items-center gap-2 mb-3">
+               <div className="flex items-center gap-2 mb-3 md:px-0 px-2">
               {selectedProduct.condition === 'new' && (
                 <span className="px-3 py-1 bg-[#ff4f41]/10 text-[#ff4f41] rounded-full text-sm font-semibold">Nuevo</span>
               )}
@@ -470,7 +470,7 @@ const ProductDetailPage: React.FC = () => {
                 </div>
                 
                 {/* Trust Badges */}
-                <div className="space-y-2 mb-6" id="trust-badges">
+                <div className="space-y-2 mb-8" id="trust-badges">
                     <div className="flex items-center text-sm text-[#00a699]">
                         <FaTruck className="mr-2" />
                         <span className="font-semibold">Envío gratis</span>
@@ -486,7 +486,7 @@ const ProductDetailPage: React.FC = () => {
                 </div>
 
                 {/* Purchase Buttons */}
-                <div className="space-y-3 mb-6" id="purchase-buttons">
+                <div className="space-y-3 mt-4 mb-6" id="purchase-buttons">
                     <button 
                         onClick={() => {
                             // Lógica básica para comprar ahora (por ahora solo añade al carrito)
@@ -823,7 +823,7 @@ const ProductDetailPage: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
                 <h3 className="text-2xl font-bold font-space text-[#1c1c1e]">También te puede interesar</h3>
                 {!isMobile && relatedProducts.length > 6 && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 mb-3 md:px-0 px-2">
                         <button 
                             onClick={handlePrevRelated}
                             disabled={!canGoPrev}

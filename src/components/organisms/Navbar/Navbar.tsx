@@ -480,7 +480,7 @@ export const Navbar: React.FC = () => {
               )}
               <FaShoppingCart className="text-xl" />
             </span>
-            <span>Ver mi carrito</span>
+
           </div>
           <CartPreview 
             isVisible={isCartPreviewVisible} 

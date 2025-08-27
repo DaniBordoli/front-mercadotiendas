@@ -46,11 +46,11 @@ export const Card: React.FC<CardProps> = ({
         setLoadingProductId(productId);
         // Precargar el producto antes de navegar
         await fetchProductById(productId);
-        navigate(`/shop/${shopId}/producto/${productId}`);
+        navigate(`/producto/${productId}`);
       } catch (error) {
         console.error('Error al precargar producto:', error);
         // Si hay error, navegar de todas formas
-        navigate(`/shop/${shopId}/producto/${productId}`);
+        navigate(`/producto/${productId}`);
       } finally {
         setLoadingProductId(null);
       }
