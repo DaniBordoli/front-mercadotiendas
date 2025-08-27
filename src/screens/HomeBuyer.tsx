@@ -13,8 +13,8 @@ const HomeBuyer: React.FC = () => {
             <img className="absolute inset-0 w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/c7d3526dd6-ee55f01e71bcdda22e5b.png" alt="online shopping ecommerce virtual marketplace people using computers smartphones tablets buying products digital commerce technology modern bright clean professional photography workspace" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#ff4f41]/85 via-[#ff4f41]/65 to-black/45"></div>
             <div className="relative h-full flex items-center">
-              <div className="w-full grid grid-cols-12 gap-8 px-12">
-                <div className="col-span-7 flex flex-col justify-center py-8">
+              <div className="w-full flex flex-col md:grid md:grid-cols-12 gap-8 px-4 md:px-12">
+                <div className="col-span-12 md:col-span-7 flex flex-col justify-center py-8">
                   <h1 className="text-6xl font-bold text-white mb-6 leading-tight font-space">
                     Hot Sale hasta<br /><span className="text-white/90">50% OFF</span>
                   </h1>
@@ -30,7 +30,7 @@ const HomeBuyer: React.FC = () => {
                     </button>
                   </div>
                 </div>
-                <div className="col-span-5 flex items-center justify-center py-8">
+                <div className="col-span-12 md:col-span-5 flex items-center justify-center py-8">
                   <div className="relative">
                     <div className="absolute -top-4 -right-4 w-20 h-20 bg-[#00a699]/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-xl z-10 border border-white/30">
                       <span className="text-2xl font-bold text-white">50%</span>
@@ -55,7 +55,7 @@ const HomeBuyer: React.FC = () => {
       {/* Trust Row */}
       <section className="py-6 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div className="flex items-center justify-center">
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-[#00a699]/10 rounded-full flex items-center justify-center mr-3">
@@ -108,7 +108,7 @@ const HomeBuyer: React.FC = () => {
       <section className="py-8 bg-[#f8f8f8]">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-[#1c1c1e] mb-6">Categorías destacadas</h2>
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <div className="relative bg-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-48">
               <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/bbf11b7c58-57a4fb451d137f146736.png" alt="smartphones electronics technology modern devices" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -126,7 +126,7 @@ const HomeBuyer: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-6 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mt-6">
             <div className="relative bg-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-48">
               <img className="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/d6a5c65d0d-ef3c9139af93f437c1df.png" alt="fashion clothing trendy modern style" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -154,7 +154,7 @@ const HomeBuyer: React.FC = () => {
             <h2 className="text-2xl font-bold text-[#1c1c1e]">Ofertas del día</h2>
             <a href="#" className="text-[#ff4f41] hover:underline font-semibold">Ver todas</a>
           </div>
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             <div className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="relative">
                 <img className="w-full h-48 object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/99c2ad4254-156c47070bd989c5f603.png" alt="smartphone" />
@@ -262,7 +262,7 @@ const HomeBuyer: React.FC = () => {
             <h2 className="text-2xl font-bold text-[#1c1c1e]">Recomendado para ti</h2>
             <a href="#" className="text-[#ff4f41] hover:underline font-semibold">Ver más</a>
           </div>
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-white rounded-lg border border-gray-200 hover:shadow-lg transition-shadow cursor-pointer">
               <img className="w-full h-32 object-cover rounded-t-lg" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/bc5e5716ca-eb5e036f7d4072a67b8d.png" alt="smartwatch" />
               <div className="p-3">

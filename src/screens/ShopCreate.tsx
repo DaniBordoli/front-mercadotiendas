@@ -48,7 +48,35 @@ const ShopCreate: React.FC = () => {
     const [subdomainError, setSubdomainError] = React.useState<string | null>(null);
 
     const navigate = useNavigate();
-    const { createShop, setShop, loading, error } = useShopStore();
+    const { createShop, setShop, loading, error, getShop, shop } = useShopStore();
+
+    // Load existing shop data to prefill the form
+    React.useEffect(() => {
+        const fetchShop = async () => {
+            try {
+                if (!shop) {
+                    await getShop();
+                }
+            } catch (err) {
+                console.error('Error fetching shop:', err);
+            }
+        };
+        fetchShop();
+    }, [getShop, shop]);
+
+    // When shop is available, prefill form fields
+    React.useEffect(() => {
+        if (shop) {
+            setFormData(prev => ({
+                ...prev,
+                storeName: shop.name || prev.storeName,
+                email: shop.contactEmail || prev.email,
+                address: shop.address || prev.address,
+                shopPhone: shop.shopPhone || prev.shopPhone,
+                layoutDesign: (shop as any).layoutDesign || prev.layoutDesign,
+            }));
+        }
+    }, [shop]);
 
     const handleNextStep = (data: Partial<FormData>) => {
         setFormData((prev) => ({ ...prev, ...data }));

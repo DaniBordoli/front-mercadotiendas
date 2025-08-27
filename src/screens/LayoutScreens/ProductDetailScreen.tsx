@@ -460,7 +460,7 @@ const ProductDetailScreen: React.FC = () => {
                   console.log('No hay producto seleccionado');
                 }
               }} 
-              className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors"
+              className="w-full py-4 bg-[#ff4f41] border-2 border-[#ff4f41] text-white rounded-lg font-semibold text-lg text-center hover:bg-[#ff4f41]/80 transition-colors"
             >
               Comprar ahora
             </button>

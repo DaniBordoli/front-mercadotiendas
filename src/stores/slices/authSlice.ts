@@ -134,7 +134,7 @@ export const fetchUserProfile = async () => {
   }
 };
 
-export const updateUserProfile = async (profileData: Record<string, string | string[]>): Promise<void> => {
+export const updateUserProfile = async (profileData: Record<string, any>): Promise<void> => {
   const apiUrl = `${API_URL}/users/profile`;
   const token = getStorageItem('token');
 
@@ -554,13 +554,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         throw new Error('Respuesta inválida del servidor');
       }
       
-      const { accessToken, refreshToken, user } = responseData.data;
+      const { token: accessToken, user } = responseData.data;
       
       const isActivated = user?.isActivated === true;
       
       if (isActivated) {
         setStorageItem('token', accessToken);
-        setStorageItem('refreshToken', refreshToken);
+        
         set({
           isAuthenticated: true,
           token: accessToken,
@@ -575,7 +575,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
           authMethod: 'email'
         };
         setStorageItem('token', accessToken);
-        setStorageItem('refreshToken', refreshToken);
+        
         setStorageItem('user', JSON.stringify(userWithAuthMethod));
         set({
           isAuthenticated: false,

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores';
+import { getInfluencerData } from '../services/userService';
 import { DesignButton } from '../components/atoms/DesignButton';
 import { InputDefault } from '../components/atoms/InputDefault/InputDefault';
 import Toast from '../components/atoms/Toast';
@@ -38,6 +39,30 @@ export const BecomeInfluencerScreen: React.FC = () => {
       { platform: 'twitter', username: '', followers: '' },
     ],
   });
+  
+  // Prefill form with existing influencer data
+  useEffect(() => {
+    const loadInfluencerData = async () => {
+      try {
+        const data = await getInfluencerData();
+        if (data) {
+          setFormData({
+            niche: (data as any).niche || '',
+            bio: (data as any).bio || '',
+            socialMedia: [
+              { platform: 'instagram', username: (data as any).influencerInstagram || '', followers: ((data as any).influencerInstagramFollowers || '').toString() },
+              { platform: 'tiktok', username: (data as any).influencerTiktok || '', followers: ((data as any).influencerTiktokFollowers || '').toString() },
+              { platform: 'youtube', username: (data as any).influencerYoutube || '', followers: ((data as any).influencerYoutubeFollowers || '').toString() },
+              { platform: 'twitter', username: '', followers: '' },
+            ],
+          });
+        }
+      } catch (err) {
+        console.error('Error loading influencer data:', err);
+      }
+    };
+    loadInfluencerData();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.currentTarget;

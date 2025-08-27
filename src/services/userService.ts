@@ -1,4 +1,6 @@
 import { updateUserProfile } from '../stores/slices/authSlice';
+import { authFetch } from '../utils/authFetch';
+import { API_URL } from './api';
 
 export interface BasicDataForm {
   fullName: string;
@@ -195,11 +197,38 @@ export const updateInfluencerData = async (formData: InfluencerDataForm): Promis
  */
 export const getInfluencerData = async (): Promise<InfluencerDataForm | null> => {
   try {
-    // Esta función debería obtener los datos del store o hacer una llamada a la API
-    // Por ahora retornamos null, pero se puede implementar según la estructura del store
-    return null;
+    const response = await authFetch(`${API_URL}/users/influencer-profile`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      return null;
+    }
+    const data = await response.json();
+
+    // Depending on backend response shape, extract profile
+    const profile = data.profile || data.data || data; // flexible parsing
+
+    if (!profile) return null;
+
+    // Map social media array to individual fields
+    const socialMedia = profile.socialMedia || [];
+    const findPlatform = (platform: string) => {
+      const sm = socialMedia.find((s: any) => s.platform === platform);
+      return sm ? sm.username || '' : '';
+    };
+
+    const influencerData: InfluencerDataForm = {
+      username: profile.username || '',
+      instagram: findPlatform('instagram'),
+      tiktok: findPlatform('tiktok'),
+      youtube: findPlatform('youtube'),
+      category: profile.niche || profile.category || '',
+      niches: profile.niches || [],
+    };
+
+    return influencerData;
   } catch (error) {
-    console.error('Error al obtener datos de influencer:', error);
-    throw error;
+    console.error('Error fetching influencer data:', error);
+    return null;
   }
 };

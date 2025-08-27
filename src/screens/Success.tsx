@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Navbar } from '../components/organisms/Navbar';
 import FooterHome from '../components/organisms/FooterHome/FooterHome';
@@ -7,7 +7,7 @@ import { useAuthStore } from '../stores/slices/authSlice';
 function Success() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuthStore();
+  const { user, setCurrentUserMode } = useAuthStore();
   
   // Obtener roles del state de navegación o del usuario autenticado
   const getUserTypes = () => {
@@ -41,6 +41,14 @@ function Success() {
     // Implementar navegación a la guía para influencers
     console.log('Navegando a la guía para influencers');
   };
+
+  // Sincronizar modo actual en el header sin navegar
+  useEffect(() => {
+    const roles = getUserTypes();
+    if (user?.isActivated && roles.length > 0) {
+      setCurrentUserMode(roles[0]);
+    }
+  }, [user, location]);
 
   // Función para obtener el mensaje personalizado según el tipo de usuario
   const getSuccessMessage = () => {

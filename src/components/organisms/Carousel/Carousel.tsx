@@ -84,7 +84,7 @@ const Carousel: React.FC = () => {
     }, [currentVideo, videos, activeVideoIndex, isTransitioning]);
 
     const handleStartBuying = () => {
-        navigate('/dashboard');
+        navigate('/categories');
     };
 
     const handleOpenStore = () => {

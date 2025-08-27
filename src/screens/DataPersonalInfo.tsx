@@ -85,6 +85,21 @@ const DataPersonalInfo: React.FC = () => {
                     const selectedCountryOption = getCountryByCode(user.country);
                     setSelectedCountry(selectedCountryOption || null);
                 }
+
+                // Prefill Dirección preferida si existe
+                if (user.preferredAddress) {
+                    setPreferredAddress({
+                        country: user.preferredAddress.country || '',
+                        province: user.preferredAddress.province || '',
+                        city: user.preferredAddress.city || '',
+                        postalCode: user.preferredAddress.postalCode || '',
+                        streetAndNumber: user.preferredAddress.streetAndNumber || ''
+                    });
+                    if (user.preferredAddress.country) {
+                        const prefCountryOption = getCountryByCode(user.preferredAddress.country);
+                        setSelectedPreferredCountry(prefCountryOption || null);
+                    }
+                }
                 
                 // Cargar datos de influencer si no tiene tienda
                 if (!user.shop) {

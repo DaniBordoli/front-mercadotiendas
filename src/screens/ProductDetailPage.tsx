@@ -492,9 +492,9 @@ const ProductDetailPage: React.FC = () => {
                             // Lógica básica para comprar ahora (por ahora solo añade al carrito)
                             handleAddToCart();
                         }}
-                        className="w-full py-4 bg-[#ff4f41] text-white rounded-lg font-semibold text-lg hover:bg-[#ff4f41]/80 transition-colors flex items-center justify-center md:w-full md:h-auto max-md:w-[277px] max-md:h-[64px] max-md:mx-auto"
+                        className="w-full py-4 bg-[#ff4f41] border-2 border-[#ff4f41] text-white rounded-lg font-semibold text-lg text-center hover:bg-[#ff4f41]/80 transition-colors"
                     >
-                        <span className="pt-0.5">Comprar ahora</span>
+                        Comprar ahora
                     </button>
                     <button 
                         onClick={handleAddToCart}

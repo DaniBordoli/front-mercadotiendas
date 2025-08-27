@@ -241,8 +241,8 @@ export const Navbar: React.FC = () => {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="navbar-desktop w-full bg-white px-4 py-2 flex items-start justify-center z-50 fixed top-0 left-0 border-b border-gray-200">
-        <div className="container flex w-full max-w-3xl mx-auto">
+      <nav className="navbar-desktop w-full bg-white px-4 py-2 flex items-center justify-between flex-nowrap z-50 fixed top-0 left-0 border-b border-gray-200">
+        <div className="container flex w-full max-w-full mx-auto">
           <div className="flex flex-col w-full">
             <div className="flex items-center gap-4 mb-1 w-full">
               <div className="flex items-center cursor-pointer" onClick={() => navigate('/dashboard')}>
@@ -268,8 +268,8 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-6 mt-1 pr-4">
-          <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-6 whitespace-nowrap mt-1 pr-4">
+          <div className="flex items-center space-x-6 whitespace-nowrap">
             <div className="relative group" onMouseEnter={openCategoryMenu} onMouseLeave={closeCategoryMenu}>
               <span className="cursor-pointer hover:text-red-500 transition-colors flex items-center font-medium">
                 Categorías
@@ -401,14 +401,14 @@ export const Navbar: React.FC = () => {
                 </div>
               )}
               
-              {/* Selector de modo de usuario */}
-              <UserModeSelector className="mr-4" />
+              <UserModeSelector className="mx-4" />
               
               <div className={`relative flex items-center cursor-pointer transition-colors ${isDropdownOpen ? 'text-red-500' : 'hover:text-red-500'}`} onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
                 <FaRegUserCircle className="text-xl mr-2" />
                 <span>Mi cuenta</span>
                 {isDropdownOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2">
+                  <div className="absolute top-full right-0 mt-2 w-60 bg-white shadow-lg rounded-md border border-gray-200 transition-transform duration-300 ease-in-out transform origin-top scale-y-100" style={{ transform: isDropdownOpen ? 'scaleY(1)' : 'scaleY(0)' }}>                    <ul className="py-2" onClick={(e) => e.stopPropagation()}>
+                      
                       <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-black" onClick={() => navigate('/user-dashboard')}>
                         Mi Dashboard
                       </li>
@@ -663,9 +663,7 @@ export const Navbar: React.FC = () => {
                     icon={<FaSearch className="text-[#666666]" />}
                     className="w-full h-11 pl-4 pr-12 bg-[#f8f8f8] rounded-lg border border-[#e5e5e7] text-[#1c1c1e] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#ff4f41]/20 focus:border-[#ff4f41]"
                   />
-                  <button type="submit" className="absolute right-3 top-1/2 transform -translate-y-1/2 bg-[#ff4f41] text-white p-1.5 rounded-md">
-                    <FaSearch />
-                  </button>
+
                 </div>
               </form>
               {suggestions.length > 0 && (

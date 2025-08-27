@@ -6,7 +6,7 @@ import { Navbar } from '../components/organisms/Navbar';
 import FooterHome from '../components/organisms/FooterHome/FooterHome';
 import { FaCheck, FaChevronDown, FaShoppingCart, FaStore, FaStar, FaUser, FaExchangeAlt, FaSignOutAlt, FaInfoCircle, FaCloudUploadAlt, FaInstagram, FaTiktok, FaYoutube, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
 import { getCountryOptions, getCountryByCode, getCountryOptionLabel, type CountryOption } from '../utils/countriesLibrary';
-import { fetchMainCategories } from '../stores/slices/authSlice';
+import { fetchMainCategories, updateUserProfile } from '../stores/slices/authSlice';
 
 type UserType = 'buyer' | 'seller' | 'influencer';
 
@@ -169,7 +169,7 @@ function RoleConfigurationScreen() {
         };
         
         // Aquí iría la llamada a la API para guardar los datos
-        // await updateUserProfile(payload);
+        await updateUserProfile(payload);
         console.log('Guardando dirección preferida:', payload);
       }
       

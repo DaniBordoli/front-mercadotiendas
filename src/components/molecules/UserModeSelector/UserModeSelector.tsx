@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaStore, FaStar, FaChevronDown } from 'react-icons/fa';
 import { useAuthStore } from '../../../stores';
@@ -10,17 +11,26 @@ interface UserModeSelectorProps {
 }
 
 const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) => {
-  const { user, getCurrentUserMode, setCurrentUserMode } = useAuthStore();
+  const { user, isAuthenticated, getCurrentUserMode, setCurrentUserMode } = useAuthStore();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{top:number,left:number}>({top:0,left:0});
   const [showModal, setShowModal] = useState(false);
   const [pendingMode, setPendingMode] = useState<string | null>(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' as 'success' | 'error' | 'info' });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
 
   const currentMode = getCurrentUserMode();
-  // Permitir todos los modos disponibles, no solo los del userType
-  const availableModes = ['comprador', 'vendedor', 'influencer'];
+  // Usar únicamente los modos que el usuario eligió al registrarse
+  const availableModes = (user?.userType && user.userType.length > 0)
+    ? user.userType.map((t: string) => {
+        // normalizar posibles valores en inglés ↔ español
+        if (t === 'buyer') return 'comprador';
+        if (t === 'seller') return 'vendedor';
+        return t; // influencer / comprador / vendedor
+      })
+    : [];
   
   console.log('[UserModeSelector] Usuario actual:', user);
   console.log('[UserModeSelector] Modo actual:', currentMode);
@@ -59,7 +69,11 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(target) &&
+        portalRef.current && !portalRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     };
@@ -72,6 +86,14 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
 
   const getModeLabel = (mode: string) => {
     return modeConfig[mode as keyof typeof modeConfig]?.label || mode;
+  };
+
+  const toggleDropdown = () => {
+    if (!isOpen && dropdownRef.current) {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + window.scrollY, left: rect.right + window.scrollX - 240 }); // 240 = w-60
+    }
+    setIsOpen(!isOpen);
   };
 
   const handleModeChange = (mode: string) => {
@@ -115,9 +137,9 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
     setPendingMode(null);
   };
 
-  // Mostrar el selector siempre que haya usuario autenticado
-  if (!user) {
-    console.log('[UserModeSelector] No se muestra el selector - usuario no autenticado');
+  // Mostrar el selector únicamente cuando el usuario esté autenticado, activado y con roles válidos
+  if (!isAuthenticated || !user || !user.userType || user.userType.length === 0) {
+    console.log('[UserModeSelector] No se muestra el selector - condiciones no cumplidas');
     return null;
   }
   
@@ -130,13 +152,13 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
       <div className={`relative ${className}`} ref={dropdownRef}>
         <div 
           className="flex items-center cursor-pointer hover:text-red-500 transition-colors px-2 py-1 rounded-md hover:bg-gray-50"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleDropdown}
         >
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-500">Modo actual:</span>
+
             <div className={`flex items-center space-x-1 ${currentModeConfig?.color || 'text-gray-700'}`}>
               {currentModeConfig?.icon}
-              <span className="font-medium text-sm">
+              <span className="font-medium text-sm whitespace-nowrap">
                 {currentModeConfig?.label || currentMode}
               </span>
             </div>
@@ -144,8 +166,8 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
           </div>
         </div>
 
-        {isOpen && (
-          <div className="absolute top-full right-0 mt-2 w-48 bg-white shadow-lg rounded-md border border-gray-200 z-50">
+        {isOpen && createPortal(
+          <div ref={portalRef} className="fixed w-60 bg-white shadow-lg rounded-md border border-gray-200 z-[200]" style={{ top: dropdownPos.top, left: dropdownPos.left }} onClick={(e) => e.stopPropagation()}>
             <div className="py-1">
               <div className="px-3 py-2 text-xs text-gray-500 border-b border-gray-100">
                 Cambiar modo
@@ -176,7 +198,8 @@ const UserModeSelector: React.FC<UserModeSelectorProps> = ({ className = '' }) =
                 );
               })}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
 
