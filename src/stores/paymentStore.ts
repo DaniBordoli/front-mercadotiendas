@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { getStorageItem } from '../utils/storage';
 import { authFetch } from '../utils/authFetch';
 
 export interface PaymentData {
@@ -79,30 +78,16 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const token = getStorageItem('token');
-      console.log('=== PAYMENT STORE: Token de autenticación ===');
-      console.log('Token existe:', !!token);
-      console.log('Token (primeros 20 chars):', token ? token.substring(0, 20) + '...' : 'No token');
-      
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
       const apiUrl = `${process.env.REACT_APP_API_URL}/payments/checkout`;
       console.log('=== PAYMENT STORE: Preparando request ===');
       console.log('URL:', apiUrl);
       console.log('Method: POST');
-      console.log('Headers:', {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token.substring(0, 20)}...`
-      });
       console.log('Body:', JSON.stringify(paymentData, null, 2));
 
       const response = await authFetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(paymentData),
       });
@@ -148,16 +133,8 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     set({ isLoading: true, error: null });
     
     try {
-      const token = getStorageItem('token');
-      if (!token) {
-        throw new Error('No se encontró token de autenticación');
-      }
-
       const response = await authFetch(`${process.env.REACT_APP_API_URL}/payments/status/${paymentId}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) {

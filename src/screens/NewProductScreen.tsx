@@ -77,21 +77,22 @@ const NewProductScreen: React.FC = () => {
 
   // Función para cargar subcategorías según la categoría seleccionada
   const loadSubcategories = async (categoryName: string) => {
+    console.log('loadSubcategories called with:', categoryName);
     if (!categoryName) {
       setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
       return;
     }
 
     try {
-      // Encontrar la categoría seleccionada en los datos
       const selectedCategory = categoriesData.find(cat => cat.name === categoryName);
+      console.log('Selected category object:', selectedCategory);
       if (!selectedCategory) {
         setSubcategoryOptions([{ value: '', label: 'Seleccionar subcategoría' }]);
         return;
       }
 
-      // Obtener subcategorías de esta categoría
       const subcategories = await fetchSubcategoriesByParent(selectedCategory._id);
+      console.log('Fetched subcategories:', subcategories);
       setSubcategoryOptions([
         { value: '', label: 'Seleccionar subcategoría' },
         ...subcategories.map((subcat: any) => ({ value: subcat.name, label: subcat.name }))
@@ -190,6 +191,13 @@ const NewProductScreen: React.FC = () => {
     };
     loadCategories();
   }, []);
+
+  // Nuevo efecto para recargar subcategorías si las categorías se cargan después de haber seleccionado una categoría
+  React.useEffect(() => {
+    if (basicInfo.categoria && categoriesData.length > 0) {
+      loadSubcategories(basicInfo.categoria);
+    }
+  }, [categoriesData, basicInfo.categoria]);
 
   return (
     <div className="min-h-screen flex relative">

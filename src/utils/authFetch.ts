@@ -6,12 +6,15 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   let token = getStorageItem('token');
   let refreshToken = getStorageItem('refreshToken');
 
-  // Añade el token al header
+  // Determinar si el cuerpo es FormData para evitar forzar Content-Type JSON
+  const isFormData = init.body instanceof FormData;
+
+  // Añade el token al header solo si es necesario, y Content-Type cuando NO es FormData
   init.headers = {
     ...init.headers,
     Authorization: token ? `Bearer ${token}` : '',
-    'Content-Type': 'application/json',
-  };
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+  } as Record<string, string>;
 
   let response = await fetch(input, init);
 
@@ -33,7 +36,7 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
         init.headers = {
           ...init.headers,
           Authorization: `Bearer ${newToken}`,
-        };
+        } as Record<string, string>;
         response = await fetch(input, init);
       }
     } else {
@@ -46,4 +49,4 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   }
 
   return response;
-} 
+}

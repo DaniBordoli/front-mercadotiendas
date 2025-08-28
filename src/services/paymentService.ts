@@ -1,4 +1,3 @@
-import { getStorageItem } from '../utils/storage';
 import { PaymentData, PaymentResponse, PaymentStatus } from '../stores/paymentStore';
 import { authFetch } from '../utils/authFetch';
 
@@ -13,18 +12,9 @@ const handleResponse = async (response: Response) => {
 };
 
 export const createMobbexCheckout = async (paymentData: PaymentData): Promise<PaymentResponse> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
   try {
     const response = await authFetch(`${API_URL}/api/payments/checkout`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
       body: JSON.stringify(paymentData),
     });
 
@@ -36,17 +26,9 @@ export const createMobbexCheckout = async (paymentData: PaymentData): Promise<Pa
 };
 
 export const getPaymentStatus = async (paymentId: string): Promise<PaymentStatus> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
   try {
     const response = await authFetch(`${API_URL}/api/payments/status/${paymentId}`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
 
     return await handleResponse(response);
@@ -57,17 +39,9 @@ export const getPaymentStatus = async (paymentId: string): Promise<PaymentStatus
 };
 
 export const getPaymentHistory = async (): Promise<any[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No authentication token found');
-  }
-
   try {
     const response = await authFetch(`${API_URL}/api/payments/history`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
 
     return await handleResponse(response);

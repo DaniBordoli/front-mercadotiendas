@@ -189,7 +189,7 @@ const Register = () => {
         
         <div className="mt-4 md:mt-8">
           <DesignButton
-           className='w-full'
+           className='w-full [&>span]:self-end md:[&>span]:self-center'
             variant="primary"
             type="submit"
             disabled={isLoading}

@@ -1,5 +1,5 @@
-import { getStorageItem } from '../utils/storage';
 import { API_URL, DEFAULT_CAMPAIGN_IMAGE } from '../config';
+import { authFetch } from '../utils/authFetch';
 
 // Interfaces
 export interface Campaign {
@@ -73,11 +73,6 @@ export const getCampaignById = async (id: string) => {
 
 // Subir imagen de campaña
 export const uploadCampaignImage = async (imageFile: File, campaignId?: string): Promise<{ success: boolean; imageUrl: string; message: string }> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-
   console.log('Iniciando subida de imagen...', {
     nombre: imageFile.name,
     tipo: imageFile.type,
@@ -97,11 +92,8 @@ export const uploadCampaignImage = async (imageFile: File, campaignId?: string):
 
   try {
     console.log(`Enviando solicitud a ${API_URL}/uploads/campaign...`);
-    const response = await fetch(`${API_URL}/uploads/campaign`, {
+    const response = await authFetch(`${API_URL}/uploads/campaign`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      },
       body: formData
     });
 
@@ -167,11 +159,6 @@ export const createCampaign = async (
   campaignData: Omit<Campaign, '_id' | 'createdAt' | 'updatedAt' | 'applicationsCount'>, 
   imageFile?: File
 ): Promise<any> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-
   console.log('Iniciando creación de campaña en el servicio');
   console.log('Datos recibidos:', { ...campaignData, imageFile: imageFile ? `${imageFile.name} (${imageFile.size} bytes)` : 'No hay imagen' });
 
@@ -200,11 +187,10 @@ export const createCampaign = async (
 
   // Crear la campaña con la URL de la imagen
   console.log('Enviando datos de campaña al servidor con imageUrl:', imageUrl);
-  const response = await fetch(`${API_URL}/campaigns`, {
+  const response = await authFetch(`${API_URL}/campaigns`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
       ...campaignData,
@@ -224,15 +210,11 @@ export const createCampaign = async (
 };
 
 export const updateCampaign = async (id: string, campaignData: Partial<Campaign>) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/campaigns/${id}`, {
+    const response = await authFetch(`${API_URL}/campaigns/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(campaignData),
     });
@@ -244,15 +226,9 @@ export const updateCampaign = async (id: string, campaignData: Partial<Campaign>
 };
 
 export const deleteCampaign = async (id: string) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/campaigns/${id}`, {
+    const response = await authFetch(`${API_URL}/campaigns/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
     return handleResponse(response);
   } catch (error) {
@@ -262,15 +238,11 @@ export const deleteCampaign = async (id: string) => {
 };
 
 export const updateCampaignStatus = async (id: string, status: 'draft' | 'active' | 'closed') => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/campaigns/${id}/status`, {
+    const response = await authFetch(`${API_URL}/campaigns/${id}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ status }),
     });
@@ -297,15 +269,11 @@ export const applyToCampaign = async (campaignId: string, applicationData: {
   socialMediaLinks: string[];
   proposedFee?: number;
 }) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/applications/campaign/${campaignId}`, {
+    const response = await authFetch(`${API_URL}/applications/campaign/${campaignId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(applicationData),
     });
@@ -317,15 +285,8 @@ export const applyToCampaign = async (campaignId: string, applicationData: {
 };
 
 export const getCampaignApplications = async (campaignId: string) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/applications/campaign/${campaignId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await authFetch(`${API_URL}/applications/campaign/${campaignId}`);
     return handleResponse(response);
   } catch (error) {
     console.error(`Error fetching applications for campaign with ID ${campaignId}:`, error);
@@ -334,15 +295,8 @@ export const getCampaignApplications = async (campaignId: string) => {
 };
 
 export const getApplicationById = async (applicationId: string) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/applications/${applicationId}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await authFetch(`${API_URL}/applications/${applicationId}`);
     return handleResponse(response);
   } catch (error) {
     console.error(`Error fetching application with ID ${applicationId}:`, error);
@@ -351,15 +305,11 @@ export const getApplicationById = async (applicationId: string) => {
 };
 
 export const updateApplicationStatus = async (applicationId: string, status: 'pending' | 'accepted' | 'rejected') => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/applications/${applicationId}/status`, {
+    const response = await authFetch(`${API_URL}/applications/${applicationId}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ status }),
     });
@@ -371,15 +321,8 @@ export const updateApplicationStatus = async (applicationId: string, status: 'pe
 };
 
 export const getUserApplications = async () => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   try {
-    const response = await fetch(`${API_URL}/applications/user/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
+    const response = await authFetch(`${API_URL}/applications/user/me`);
     return handleResponse(response);
   } catch (error) {
     console.error('Error fetching user applications:', error);

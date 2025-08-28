@@ -5,21 +5,23 @@ import { useAuthStore } from '../stores';
 export const useAuthRedirect = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const user = useAuthStore(state => state.user);
+    const isAuthenticated = useAuthStore(state => state.isAuthenticated);
     const isLoading = useAuthStore(state => state.isLoading);
+    const isValidating = useAuthStore(state => state.isValidating);
 
     useEffect(() => {
-        if (isLoading) return;
+        // No redirigir mientras se está cargando o validando
+        if (isLoading || isValidating) return;
 
         const publicRoutes = ['/login', '/register', '/reset-password', '/basic-data', '/register-data', '/data-seller', '/data-influencer', '/success', '/role-configuration'];
         const isPublicRoute = publicRoutes.includes(location.pathname);
 
-        if (!user && !isPublicRoute) {
-            // Si no hay usuario y no es una ruta pública, redirigir a login
+        if (!isAuthenticated && !isPublicRoute) {
+            // Si no está autenticado y no es una ruta pública, redirigir a login
             navigate('/login');
-        } else if (user && isPublicRoute) {
-            // Si hay usuario y es una ruta pública, redirigir a home
+        } else if (isAuthenticated && isPublicRoute) {
+            // Si está autenticado y es una ruta pública, redirigir a home
             navigate('/');
         }
-    }, [user, isLoading, navigate, location]);
+    }, [isAuthenticated, isLoading, isValidating, navigate, location]);
 };

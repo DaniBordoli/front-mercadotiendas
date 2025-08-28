@@ -282,10 +282,14 @@ const Dashboard: React.FC = () => {
                         {isLoadingCategories ? (
                             <div className="grid grid-cols-2 gap-4">
                                 {[...Array(6)].map((_, index) => (
-                                    <div key={index} className="bg-white rounded-xl p-4 text-center animate-pulse">
-                                        <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3"></div>
-                                        <div className="h-5 bg-gray-200 rounded mb-1"></div>
-                                        <div className="h-3 bg-gray-200 rounded"></div>
+                                    <div key={index} className="bg-white rounded-xl p-4 text-center animate-pulse flex flex-col justify-between min-h-[120px]">
+                                        <div className="flex-1 flex flex-col items-center justify-center">
+                                            <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-3"></div>
+                                        </div>
+                                        <div className="flex flex-col items-center justify-end">
+                                            <div className="h-5 bg-gray-200 rounded mb-1 w-20"></div>
+                                            <div className="h-3 bg-gray-200 rounded w-16"></div>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -294,44 +298,48 @@ const Dashboard: React.FC = () => {
                                 {categoryCounts.map((category, index) => (
                                     <div 
                                         key={category.name}
-                                        className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow cursor-pointer" 
+                                        className="bg-white rounded-xl p-4 text-center hover:shadow-md transition-shadow cursor-pointer flex flex-col justify-between min-h-[120px]" 
                                         onClick={() => handleCategorySearch(category.name)}
                                     >
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3`} 
-                                             style={{ backgroundColor: `${category.color}10` }}>
+                                        <div className="flex-1 flex flex-col items-center justify-center">
+                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3`} 
+                                                 style={{ backgroundColor: `${category.color}10` }}>
                                             {category.icon === 'laptop' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 640 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 640 512" style={{ color: category.color }}>
                                                     <path d="M128 32C92.7 32 64 60.7 64 96V352h64V96H512V352h64V96c0-35.3-28.7-64-64-64H128zM19.2 384C8.6 384 0 392.6 0 403.2C0 445.6 34.4 480 76.8 480H563.2c42.4 0 76.8-34.4 76.8-76.8c0-10.6-8.6-19.2-19.2-19.2H19.2z"/>
                                                 </svg>
                                             )}
                                             {category.icon === 'shirt' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 640 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 640 512" style={{ color: category.color }}>
                                                     <path d="M211.8 0c7.8 0 14.3 5.7 16.7 13.2C240.8 51.9 277.1 80 320 80s79.2-28.1 91.5-66.8C413.9 5.7 420.4 0 428.2 0h12.6c22.5 0 44.2 7.9 61.5 22.3L628.5 127.4c6.6 5.5 10.7 13.5 11.4 22.1s-2.1 17.1-7.8 23.6l-56 64c-11.4 13.1-31.2 14.6-44.6 3.5L480 197.7V448c0 35.3-28.7 64-64 64H224c-35.3 0-64-28.7-64-64V197.7l-51.5 42.9c-13.3 11.1-33.1 9.6-44.6-3.5l-56-64c-5.7-6.5-8.5-15-7.8-23.6s4.8-16.6 11.4-22.1L137.7 22.3C155 7.9 176.7 0 199.2 0h12.6z"/>
                                                 </svg>
                                             )}
                                             {category.icon === 'house' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 576 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 576 512" style={{ color: category.color }}>
                                                     <path d="M575.8 255.5c0 18-15 32.1-32 32.1h-32l.7 160.2c0 2.7-.2 5.4-.5 8.1V472c0 22.1-17.9 40-40 40H456c-1.1 0-2.2 0-3.3-.1c-1.4 .1-2.8 .1-4.2 .1H416 392c-22.1 0-40-17.9-40-40V448 384c0-17.7-14.3-32-32-32H256c-17.7 0-32 14.3-32 32v64 24c0 22.1-17.9 40-40 40H160 128.1c-1.5 0-3-.1-4.5-.2c-1.2 .1-2.4 .2-3.6 .2H104c-22.1 0-40-17.9-40-40V360c0-.9 0-1.9 .1-2.8V287.6H32c-18 0-32-14-32-32.1c0-9 3-17 10-24L266.4 8c7-7 15-8 22-8s15 2 21 7L564.8 231.5c8 7 12 15 11 24z"/>
                                                 </svg>
                                             )}
                                             {category.icon === 'dumbbell' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 640 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 640 512" style={{ color: category.color }}>
                                                     <path d="M96 64c0-17.7 14.3-32 32-32h32c17.7 0 32 14.3 32 32V224v64V448c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32V384H64c-17.7 0-32-14.3-32-32V288c-17.7 0-32-14.3-32-32s14.3-32 32-32V160c0-17.7 14.3-32 32-32H96V64zm448 0v64h32c17.7 0 32 14.3 32 32v64c17.7 0 32 14.3 32 32s-14.3 32-32 32v64c0 17.7-14.3 32-32 32H544v64c0 17.7-14.3 32-32 32H480c-17.7 0-32-14.3-32-32V288 224 64c0-17.7 14.3-32 32-32h32c17.7 0 32 14.3 32 32zM416 224v64H224V224H416z"/>
                                                 </svg>
                                             )}
                                             {category.icon === 'gamepad' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 640 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 640 512" style={{ color: category.color }}>
                                                     <path d="M192 64C86 64 0 150 0 256S86 448 192 448H448c106 0 192-86 192-192s-86-192-192-192H192zM496 168a40 40 0 1 1 0 80 40 40 0 1 1 0-80zM392 304a40 40 0 1 1 80 0 40 40 0 1 1 -80 0zM168 200c0-13.3 10.7-24 24-24s24 10.7 24 24v32h32c13.3 0 24 10.7 24 24s-10.7 24-24 24H216v32c0 13.3-10.7 24-24 24s-24-10.7-24-24V280H136c-13.3 0-24-10.7-24-24s10.7-24 24-24h32V200z"/>
                                                 </svg>
                                             )}
                                             {category.icon === 'utensils' && (
-                                                <svg className="w-6 h-6" style={{ color: category.color }} fill="currentColor" viewBox="0 0 448 512">
+                                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 448 512" style={{ color: category.color }}>
                                                     <path d="M416 0C400 0 288 32 288 176V288c0 35.3 28.7 64 64 64h32V480c0 17.7 14.3 32 32 32s32-14.3 32-32V352 240 32c0-17.7-14.3-32-32-32zM64 16C64 7.8 57.9 1 49.7 .1S34.2 4.6 32.4 12.5L2.1 148.8C.7 155.1 0 161.5 0 167.9c0 45.9 35.1 83.6 80 87.7V480c0 17.7 14.3 32 32 32s32-14.3 32-32V255.6c44.9-4.1 80-41.8 80-87.7c0-6.4-.7-12.8-2.1-19.1L191.6 12.5c-1.8-8-9.3-13.3-17.4-12.4S160 7.8 160 16V150.2c0 5.4-4.4 9.8-9.8 9.8c-5.1 0-9.3-3.9-9.8-9L127.9 14.6C127.2 6.3 120.3 0 112 0s-15.2 6.3-15.9 14.6L83.7 151c-.5 5.1-4.7 9-9.8 9c-5.4 0-9.8-4.4-9.8-9.8V16zm48.3 152l-.3 0-.3 0 .3-.7 .3 .7z"/>
                                                 </svg>
                                             )}
+                                            </div>
                                         </div>
-                                        <h3 className="text-base font-semibold text-[#1c1c1e] mb-1">{category.name}</h3>
-                                        <p className="text-xs text-[#666666]">{formatProductCount(category.count)}</p>
+                                        <div className="flex flex-col items-center justify-end">
+                                            <h3 className="text-base font-semibold text-[#1c1c1e] mb-1 text-center leading-tight">{category.name}</h3>
+                                            <p className="text-xs text-[#666666] text-center">{formatProductCount(category.count)}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -371,15 +379,15 @@ const Dashboard: React.FC = () => {
                     </section>
 
                     {/* Sección CTA Final - Móvil */}
-                    <section className="py-16 bg-gradient-to-r from-[#ff4f41] to-[#ff4f41]/80 px-4">
-                        <div className="text-center">
+                    <section className="py-20 bg-gradient-to-r from-[#ff4f41] to-[#ff4f41]/80 px-6">
+                        <div className="text-center max-w-lg mx-auto">
                             <h2 className="text-4xl font-bold font-space text-white mb-6">¿Listo para empezar?</h2>
                             <p className="text-lg text-white/90 mb-8">Únete a miles de tiendas, influencers y compradores que ya forman parte de nuestra comunidad</p>
                             
-                            <div className="flex flex-col gap-4 items-center">
+                            <div className="flex flex-col gap-6 items-center w-full py-4">
                                 <button 
                                     onClick={() => navigate('/register')}
-                                    className="w-full max-w-xs px-8 py-4 bg-white text-[#ff4f41] rounded-lg hover:bg-gray-100 transition-colors font-medium text-lg"
+                                    className="px-8 py-0 bg-white text-[#ff4f41] rounded-lg hover:bg-gray-100 transition-colors font-medium text-lg flex items-center justify-center min-h-[48px]"
                                 >
                                     Registrate gratis
                                 </button>

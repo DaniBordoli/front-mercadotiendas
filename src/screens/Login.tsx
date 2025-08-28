@@ -133,7 +133,7 @@ function Login() {
           
           <div className="mt-4 md:mt-8">
             <DesignButton
-             className='w-full'
+             className='w-full [&>span]:self-end md:[&>span]:self-center [&>svg]:self-end md:[&>svg]:self-center'
               type="submit"
               disabled={isLoading}
               variant='primary'
@@ -159,7 +159,7 @@ function Login() {
           <div className="flex justify-center space-x-2 md:space-x-4 mt-4 md:mt-6">
             <div className="w-1/2">
               <DesignButton 
-              className='w-full'
+              className='w-full [&>span]:self-end md:[&>span]:self-center [&>svg]:self-center'
               variant='neutral'
                 icon={FaGoogle}
                 iconPosition="left"
@@ -172,7 +172,7 @@ function Login() {
             </div>
             <div className="w-1/2">
               <DesignButton
-              className='w-full'
+              className='w-full [&>span]:self-end md:[&>span]:self-center [&>svg]:self-center'
               variant='neutral'
                 icon={BsFacebook}
                 iconPosition="left"

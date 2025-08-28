@@ -27,9 +27,6 @@ export const useShopStore = create<ShopState>((set, get) => ({
     error: null,
 
     updateShopInfo: async (shopId: string, data: any, imageFile?: File) => {
-        const token = getStorageItem('token');
-        if (!token) throw new Error('No authentication token found');
-
         set({ loading: true, error: null });
 
         try {
@@ -43,9 +40,6 @@ export const useShopStore = create<ShopState>((set, get) => ({
 
                 const response = await authFetch(`${API_URL}/shops/${shopId}`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
                     body: formData,
                 });
 
@@ -74,7 +68,6 @@ export const useShopStore = create<ShopState>((set, get) => ({
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
                     },
                     body: JSON.stringify(data),
                 });
@@ -107,18 +100,13 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     createShop: async (data: any) => {
-        const token = getStorageItem('token');
-        if (!token) throw new Error('No authentication token found');
-        
         set({ loading: true, error: null });
         
         try {
             console.log("Sending data to backend for shop creation:", data);
             
             let body;
-            let headers: any = {
-                'Authorization': `Bearer ${token}`
-            };
+            let headers: any = {};
 
             // Manejar subida de imagen de forma más estable
             if (data.image) {
@@ -194,17 +182,11 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     getShop: async () => {
-        const token = getStorageItem('token');
-        if (!token) throw new Error('No authentication token found');
-
         set({ loading: true, error: null });
 
         try {
             const response = await authFetch(`${API_URL}/shops/me`, {
                 method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
             });
 
             if (!response.ok) {
@@ -221,18 +203,11 @@ export const useShopStore = create<ShopState>((set, get) => ({
     },
 
     updateShopStatus: async (shopId: string, active: boolean) => {
-        const token = getStorageItem('token');
-        if (!token) throw new Error('No authentication token found');
-
         set({ loading: true, error: null });
 
         try {
             const response = await authFetch(`${API_URL}/shops/${shopId}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({ active }),
             });
 

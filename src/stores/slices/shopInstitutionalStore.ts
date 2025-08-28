@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { getStorageItem } from '../../utils/storage';
 import { authFetch } from '../../utils/authFetch';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -38,9 +37,6 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
   error: null,
 
   getShopInstitutional: async () => {
-    const token = getStorageItem('token');
-    if (!token) throw new Error('No authentication token found');
-
     set({ loading: true, error: null });
 
     try {
@@ -59,9 +55,6 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
   },
 
   getShopInstitutionalByShopId: async (shopId: string) => {
-    const token = getStorageItem('token');
-    if (!token) throw new Error('No authentication token found');
-
     set({ loading: true, error: null });
 
     try {
@@ -80,18 +73,11 @@ export const useShopInstitutionalStore = create<ShopInstitutionalState>((set, ge
   },
 
   updateShopInstitutional: async (data) => {
-    const token = getStorageItem('token');
-    if (!token) throw new Error('No authentication token found');
-
     set({ loading: true, error: null });
 
     try {
       const response = await authFetch(`${API_URL}/shop-institutional/me`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
         body: JSON.stringify(data),
       });
 

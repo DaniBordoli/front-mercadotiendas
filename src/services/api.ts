@@ -1,4 +1,4 @@
-import { getStorageItem } from '../utils/storage';
+import { authFetch } from '../utils/authFetch';
 export const API_URL = process.env.REACT_APP_API_URL;
 
 const handleResponse = async (response: Response) => {
@@ -40,20 +40,11 @@ interface AiChatResponse {
 }
 
 export const sendChatMessageToAI = async (messages: AiChatMessage[], currentTemplate: any): Promise<AiChatResponse> => {
-  const token = getStorageItem('token');
-  if (!token) {
-      throw new Error('No authentication token found');
-  }
-
   const requestBody: AiChatRequestBody = { messages, currentTemplate };
 
   try {
-      const response = await fetch(`${API_URL}/ai/chat`, {
+      const response = await authFetch(`${API_URL}/ai/chat`, {
           method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-          },
           body: JSON.stringify(requestBody),
       });
 
@@ -81,44 +72,26 @@ export const sendChatMessageToAI = async (messages: AiChatMessage[], currentTemp
 };
 
 export const updateShopTemplate = async (templateUpdate: any) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  const response = await fetch(`${API_URL}/shops/template`, {
+  const response = await authFetch(`${API_URL}/shops/template`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
     body: JSON.stringify({ templateUpdate }),
   });
   return handleResponse(response);
 };
 
 export const fetchShopTemplate = async () => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  const response = await fetch(`${API_URL}/shops/template`, {
+  const response = await authFetch(`${API_URL}/shops/template`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
   });
   return handleResponse(response);
 };
 
 export const uploadShopLogo = async (file: File) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No authentication token found');
-  
   const formData = new FormData();
   formData.append('image', file);
   
-  const response = await fetch(`${API_URL}/shop/logo`, {
+  const response = await authFetch(`${API_URL}/shop/logo`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
     body: formData,
   });
   return handleResponse(response);

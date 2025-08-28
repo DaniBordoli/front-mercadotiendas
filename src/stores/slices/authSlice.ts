@@ -1,6 +1,42 @@
 import { create } from 'zustand';
 import { getStorageItem, setStorageItem, removeStorageItem } from '../../utils/storage';
-import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, AuthStore, UserWithLoading } from '../../types/auth';
+import { LoginCredentials, RegisterData, CreateShopData, User, AuthState, UserWithLoading } from '../../types/auth';
+
+interface AuthStore {
+  user: UserWithLoading | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  currentUserMode: string | null;
+  isValidating: boolean;
+  loadProfile: () => Promise<UserWithLoading | null>;
+  forceLoadProfile: () => Promise<UserWithLoading | null>;
+  loginWithGoogle: () => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<UserWithLoading>;
+  createShop: (data: CreateShopData) => Promise<void>;
+  createProduct: (data: any) => Promise<any>;
+  fetchProducts: () => Promise<any[]>;
+  fetchActiveProducts: () => Promise<any[]>;
+  fetchAllProducts: () => Promise<any[]>;
+  fetchProductsByShop: (shopId: string) => Promise<any[]>;
+  deleteProduct: (id: string) => Promise<void>;
+  updateProduct: (id: string, data: any) => Promise<any>;
+  fetchProductById: (id: string) => Promise<any>;
+  logout: () => void;
+  clearError: () => void;
+  setToken: (token: string) => void;
+  clearToken: () => void;
+  startAutoLogout: (timeoutMs?: number) => void;
+  clearAutoLogout: () => void;
+  setUser: (user: UserWithLoading | null) => void;
+  validateToken: () => Promise<boolean>;
+  startPeriodicValidation: () => void;
+  stopPeriodicValidation: () => void;
+  setCurrentUserMode: (mode: string) => void;
+  getCurrentUserMode: () => string | null;
+}
 import { 
   signInWithPopup, 
   signInWithEmailAndPassword, 
@@ -95,20 +131,12 @@ export const fetchUserProfile = async () => {
   const apiUrl = `${API_URL}/users/profile`;
   console.log('[Auth] Obteniendo perfil de usuario desde:', apiUrl);
   
-  const token = getStorageItem('token');
-
-  if (!token) {
-    console.error('[Auth] No se proporcionó token para obtener el perfil');
-    throw new Error('No token provided');
-  }
-
   try {
 
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
       },
     });
 
@@ -136,18 +164,11 @@ export const fetchUserProfile = async () => {
 
 export const updateUserProfile = async (profileData: Record<string, any>): Promise<void> => {
   const apiUrl = `${API_URL}/users/profile`;
-  const token = getStorageItem('token');
 
-  if (!token) {
-    console.error('No token provided');
-    throw new Error('No token provided');
-  }
-
-  const response = await fetch(apiUrl, {
+  const response = await authFetch(apiUrl, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(profileData),
   });
@@ -162,19 +183,11 @@ export const updateUserProfile = async (profileData: Record<string, any>): Promi
 };
 
 export const updateAvatar = async (avatarFile: File): Promise<void> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
   const formData = new FormData();
   formData.append('avatar', avatarFile);
 
-  const response = await fetch(`${API_URL}/users/avatar`, {
+  const response = await authFetch(`${API_URL}/users/avatar`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    
-    },
     body: formData,
   });
 
@@ -185,19 +198,11 @@ export const updateAvatar = async (avatarFile: File): Promise<void> => {
 };
 
 export const updateProductImage = async (productId: string, imageFile: File): Promise<string> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
   const formData = new FormData();
   formData.append('productImage', imageFile); 
 
-  const response = await fetch(`${API_URL}/products/${productId}/image`, {
+  const response = await authFetch(`${API_URL}/products/${productId}/image`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      
-    },
     body: formData,
   });
 
@@ -213,20 +218,13 @@ export const updateProductImage = async (productId: string, imageFile: File): Pr
  * Sube una o varias imágenes al producto.
  */
 export const addProductImages = async (productId: string, imageFiles: File[]): Promise<string[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
   const formData = new FormData();
   imageFiles.forEach(file => {
     formData.append('productImages', file); // backend espera 'productImages'
   });
 
-  const response = await fetch(`${API_URL}/products/${productId}/images`, {
+  const response = await authFetch(`${API_URL}/products/${productId}/images`, {
     method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-    },
     body: formData,
   });
 
@@ -242,14 +240,9 @@ export const addProductImages = async (productId: string, imageFiles: File[]): P
  * Elimina una imagen específica del producto.
  */
 export const deleteProductImage = async (productId: string, imageUrl: string): Promise<string[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  const response = await fetch(`${API_URL}/products/${productId}/images`, {
+  const response = await authFetch(`${API_URL}/products/${productId}/images`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ imageUrl }),
@@ -282,7 +275,7 @@ const checkInitialAuthState = () => {
     }
   }
 
-  // isAuthenticated SIEMPRE false tras reload, solo se marca true tras validación backend
+  // No establecer isAuthenticated automáticamente - será establecido por validateToken
   return {
     token: token || null,
     user: user || null,
@@ -296,6 +289,7 @@ const checkInitialAuthState = () => {
 const initialState = checkInitialAuthState();
 
 let logoutTimer: ReturnType<typeof setTimeout> | null = null;
+let validationTimer: ReturnType<typeof setInterval> | null = null;
 
 /**
  * Inicia un temporizador para desloguear al usuario después de `timeoutMs` milisegundos.
@@ -322,6 +316,9 @@ export const clearAutoLogoutTimer = () => {
 export const useAuthStore = create<AuthStore>((set, get) => ({
   // Estado para el modo actual del usuario
   currentUserMode: null as string | null,
+  
+  // Estado de validación
+  isValidating: false,
   
   // Función para establecer el modo actual del usuario
   setCurrentUserMode: (mode: string) => {
@@ -727,28 +724,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   ): Promise<any> => {
     set({ isLoading: true, error: null });
     try {
-      const token = getStorageItem('token');
-      if (!token) {
-        throw new Error('No hay token de autenticación');
-      }
-
       const apiUrl = `${API_URL}/products`;
       let response;
       if (data instanceof FormData) {
-        response = await fetch(apiUrl, {
+        response = await authFetch(apiUrl, {
           method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // No poner 'Content-Type' aquí
-          },
           body: data,
         });
       } else {
-        response = await fetch(apiUrl, {
+        response = await authFetch(apiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(data),
         });
@@ -775,16 +762,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    * Usado para el panel de administración.
    */
   fetchProducts: async (): Promise<any[]> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products`;
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
     const responseData = await response.json();
@@ -801,16 +783,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    * Usado para mostrar productos en la tienda.
    */
   fetchActiveProducts: async (): Promise<any[]> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products/active`;
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
     const responseData = await response.json();
@@ -865,16 +842,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
    * Elimina un producto por su ID.
    */
   deleteProduct: async (id: string): Promise<void> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products/${id}`;
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
     const responseData = await response.json();
@@ -898,16 +870,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       variantes?: { tipo: string; valores: string[] }[];
     }
   ): Promise<any> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products/${id}`;
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(data),
     });
@@ -920,17 +887,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   fetchProductById: async (id: string): Promise<any> => {
-    const token = getStorageItem('token');
-    if (!token) {
-      throw new Error('No hay token de autenticación');
-    }
     const apiUrl = `${API_URL}/products/${id}`;
     console.log('fetchProductById URL:', apiUrl, 'id:', id);
-    const response = await fetch(apiUrl, {
+    const response = await authFetch(apiUrl, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
     });
     const responseData = await response.json();
@@ -946,6 +908,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     removeStorageItem('user');
     set({ token: null, isAuthenticated: false, user: null });
     clearAutoLogoutTimer();
+    get().stopPeriodicValidation();
   },
 
   clearError: () => {
@@ -987,6 +950,86 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       setStorageItem('user', JSON.stringify(user));
     } else {
       removeStorageItem('user');
+    }
+  },
+
+  /**
+   * Valida el token actual con el backend
+   * @returns Promise<boolean> - true si el token es válido, false si no
+   */
+  validateToken: async (): Promise<boolean> => {
+    const { token } = get();
+    if (!token) {
+      return false;
+    }
+
+    set({ isValidating: true });
+
+    try {
+      const response = await fetch(`${API_URL}/users/profile`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const user = data.data;
+        
+        // Actualizar usuario y marcar como autenticado
+        set({ 
+          user, 
+          isAuthenticated: true, 
+          isValidating: false 
+        });
+        setStorageItem('user', JSON.stringify(user));
+        return true;
+      } else {
+        // Token inválido, limpiar estado
+        get().logout();
+        set({ isValidating: false });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error validating token:', error);
+      get().logout();
+      set({ isValidating: false });
+      return false;
+    }
+  },
+
+  /**
+   * Inicia la validación periódica del token cada 5 minutos
+   */
+  startPeriodicValidation: () => {
+    // Limpiar cualquier validación anterior
+    get().stopPeriodicValidation();
+    
+    // Validar cada 5 minutos (300000 ms)
+    validationTimer = setInterval(async () => {
+      const { token, isAuthenticated } = get();
+      if (token && isAuthenticated) {
+        console.log('[Auth] Validación periódica del token...');
+        const isValid = await get().validateToken();
+        if (!isValid) {
+          console.warn('[Auth] Token inválido en validación periódica, cerrando sesión.');
+        }
+      }
+    }, 300000); // 5 minutos
+    
+    console.log('[Auth] Validación periódica iniciada (cada 5 minutos)');
+  },
+
+  /**
+   * Detiene la validación periódica del token
+   */
+  stopPeriodicValidation: () => {
+    if (validationTimer) {
+      clearInterval(validationTimer);
+      validationTimer = null;
+      console.log('[Auth] Validación periódica detenida');
     }
   },
 }));
@@ -1054,16 +1097,10 @@ export const createCategory = async (data: {
   status?: 'Active' | 'Pending' | 'Inactive';
   parent?: string | null;
 }) => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
- 
-  const response = await fetch(`${API_URL}/categories`, {
+  const response = await authFetch(`${API_URL}/categories`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -1077,13 +1114,9 @@ export const createCategory = async (data: {
 
 
 export const fetchCategories = async () => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No token provided');
-  
-  const response = await fetch(`${API_URL}/categories`, {
+  const response = await authFetch(`${API_URL}/categories`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -1094,14 +1127,8 @@ export const fetchCategories = async () => {
 
 
 export const deleteCategory = async (id: string) => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No token provided');
-  const response = await fetch(`${API_URL}/categories/${id}`, {
+  const response = await authFetch(`${API_URL}/categories/${id}`, {
     method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
   });
   const responseData = await response.json();
   if (!response.ok) throw new Error(responseData.message || 'Error al eliminar la categoría');
@@ -1113,13 +1140,10 @@ export const updateCategory = async (
   id: string,
   data: { name?: string; description?: string; status?: string; image?: string; parent?: string }
 ): Promise<any> => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No autenticado');
-  const response = await fetch(`${API_URL}/categories/${id}`, {
+  const response = await authFetch(`${API_URL}/categories/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
@@ -1141,12 +1165,9 @@ export interface ShopSocial {
 }
 
 export const getShopSocial = async (shopId: string): Promise<ShopSocial | null> => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No token provided');
-  const response = await fetch(`${API_URL}/shopsocial/${shopId}`, {
+  const response = await authFetch(`${API_URL}/shopsocial/${shopId}`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -1157,12 +1178,9 @@ export const getShopSocial = async (shopId: string): Promise<ShopSocial | null> 
 };
 
 export const updateShopSocial = async (shopId: string, socialData: ShopSocial): Promise<ShopSocial> => {
-  const token = getStorageItem('token');
-  if (!token) throw new Error('No token provided');
-  const response = await fetch(`${API_URL}/shopsocial/${shopId}`, {
+  const response = await authFetch(`${API_URL}/shopsocial/${shopId}`, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(socialData),
@@ -1184,15 +1202,9 @@ export interface Currency {
 }
 
 export const fetchCurrencies = async (): Promise<Currency[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/currencies`, {
+  const response = await authFetch(`${API_URL}/currencies`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -1210,15 +1222,9 @@ export const createCurrency = async (currencyData: {
   symbol: string;
   code: string;
 }): Promise<Currency> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/currencies`, {
+  const response = await authFetch(`${API_URL}/currencies`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(currencyData),
@@ -1236,15 +1242,9 @@ export const updateCurrency = async (
   id: string,
   currencyData: { name?: string; symbol?: string; code?: string }
 ): Promise<Currency> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/currencies/${id}`, {
+  const response = await authFetch(`${API_URL}/currencies/${id}`, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(currencyData),
@@ -1259,15 +1259,9 @@ export const updateCurrency = async (
 };
 
 export const deleteCurrency = async (id: string): Promise<void> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/currencies/${id}`, {
+  const response = await authFetch(`${API_URL}/currencies/${id}`, {
     method: 'DELETE',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -1280,15 +1274,9 @@ export const deleteCurrency = async (id: string): Promise<void> => {
 
 // --- CATEGORY HELPER FUNCTIONS ---
 export const fetchMainCategories = async (): Promise<any[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/categories`, {
+  const response = await authFetch(`${API_URL}/categories`, {
     method: 'GET',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   });
@@ -1303,24 +1291,22 @@ export const fetchMainCategories = async (): Promise<any[]> => {
 };
 
 export const fetchSubcategoriesByParent = async (parentId: string): Promise<any[]> => {
-  const token = getStorageItem('token');
-  if (!token) {
-    throw new Error('No token provided');
-  }
-  
-  const response = await fetch(`${API_URL}/categories`, {
+  // Evitar respuestas 304 (No Modified) que vienen sin cuerpo y rompen el parseo JSON
+  // Añadimos un parámetro de cache-buster y forzamos cabeceras sin caché
+  const cacheBuster = Date.now();
+  const response = await authFetch(`${API_URL}/categories/${parentId}/subcategories?cb=${cacheBuster}`, {
     method: 'GET',
+    cache: 'no-store',
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache',
     },
   });
-  
+
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.message || 'Error al obtener categorías');
+    throw new Error(data.message || 'Error al obtener subcategorías');
   }
-  
-  // Filtrar solo subcategorías que pertenecen al parent especificado
-  return data.data.filter((category: any) => category.parent === parentId);
+
+  return data.data; // el backend ya devuelve solo las subcategorías
 };

@@ -794,7 +794,7 @@ export const Navbar: React.FC = () => {
               ) : (
                 <div className="space-y-2">
                   <button 
-                    className="w-full bg-[#ff4f41] text-white py-2 rounded-md"
+                    className="w-full bg-[#ff4f41] text-white py-2 rounded-md h-10 flex items-center justify-center"
                     onClick={() => {
                       setIsUserDropdownVisible(false);
                       navigate('/login');
@@ -803,7 +803,7 @@ export const Navbar: React.FC = () => {
                     Iniciar Sesión
                   </button>
                   <button 
-                    className="w-full border border-[#ff4f41] text-[#ff4f41] py-2 rounded-md"
+                    className="w-full border border-[#ff4f41] text-[#ff4f41] py-2 rounded-md h-10 flex items-center justify-center"
                     onClick={() => {
                       setIsUserDropdownVisible(false);
                       navigate('/register');

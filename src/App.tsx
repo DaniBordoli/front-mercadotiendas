@@ -8,9 +8,11 @@ function App() {
   const [isInitialized, setIsInitialized] = useState(false);
   
   // Obtener funciones y estado del store de autenticación
-  const loadProfile = useAuthStore(state => state.loadProfile);
+  const validateToken = useAuthStore(state => state.validateToken);
   const setToken = useAuthStore(state => state.setToken);
   const setUser = useAuthStore(state => state.setUser);
+  const isValidating = useAuthStore(state => state.isValidating);
+  const startPeriodicValidation = useAuthStore(state => state.startPeriodicValidation);
 
   // Efecto único de inicialización
   useEffect(() => {
@@ -35,18 +37,20 @@ function App() {
           }
         }
         
-        // Cargar perfil si hay token
+        // Validar token si existe
         if (localToken) {
           try {
-            console.log('[App] Intentando cargar perfil con token:', localToken.substring(0, 10) + '...');
-            const loadedUser = await loadProfile();
-            if (loadedUser) {
-              console.log('[App] Perfil cargado correctamente.');
+            console.log('[App] Validando token:', localToken.substring(0, 10) + '...');
+            const isValid = await validateToken();
+            if (isValid) {
+              console.log('[App] Token válido, usuario autenticado.');
+              // Iniciar validación periódica para mantener la sesión activa
+              startPeriodicValidation();
             } else {
-              console.warn('[App] No se pudo cargar el perfil del usuario.');
+              console.warn('[App] Token inválido, usuario no autenticado.');
             }
           } catch (error) {
-            console.error('[App] Error al cargar perfil:', error);
+            console.error('[App] Error al validar token:', error);
           }
         }
       } catch (error) {
@@ -57,15 +61,17 @@ function App() {
     };
     
     initApp();
-  }, [loadProfile, setToken, setUser]); // Solo se ejecuta una vez al montar
+  }, [validateToken, setToken, setUser, startPeriodicValidation]); // Solo se ejecuta una vez al montar
 
-  // Mostrar un indicador de carga mientras se inicializa la aplicación
-  if (!isInitialized) {
+  // Mostrar un indicador de carga mientras se inicializa la aplicación o se valida el token
+  if (!isInitialized || isValidating) {
     return (
       <div className="flex items-center justify-center h-screen w-screen bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <p className="mt-4 text-gray-600">
+            {isValidating ? 'Validando autenticación...' : 'Cargando...'}
+          </p>
         </div>
       </div>
     );
