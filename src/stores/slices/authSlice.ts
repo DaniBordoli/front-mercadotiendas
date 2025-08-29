@@ -1294,7 +1294,7 @@ export const fetchSubcategoriesByParent = async (parentId: string): Promise<any[
   // Evitar respuestas 304 (No Modified) que vienen sin cuerpo y rompen el parseo JSON
   // Añadimos un parámetro de cache-buster y forzamos cabeceras sin caché
   const cacheBuster = Date.now();
-  const response = await authFetch(`${API_URL}/categories/${parentId}/subcategories?cb=${cacheBuster}`, {
+  const response = await authFetch(`${API_URL}/subcategories/category/${parentId}?cb=${cacheBuster}`, {
     method: 'GET',
     cache: 'no-store',
     headers: {
@@ -1309,4 +1309,102 @@ export const fetchSubcategoriesByParent = async (parentId: string): Promise<any[
   }
 
   return data.data; // el backend ya devuelve solo las subcategorías
+};
+
+// --- SUBCATEGORY FUNCTIONS ---
+export const createSubcategory = async (data: {
+  name: string;
+  description?: string;
+  category: string;
+  order?: number;
+}) => {
+  const response = await authFetch(`${API_URL}/subcategories`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al crear la subcategoría');
+  }
+  return responseData.data;
+};
+
+export const fetchAllSubcategories = async () => {
+  const response = await authFetch(`${API_URL}/subcategories`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message || 'Error al obtener subcategorías');
+  return responseData.data;
+};
+
+export const fetchSubcategoryById = async (id: string) => {
+  const response = await authFetch(`${API_URL}/subcategories/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  const responseData = await response.json();
+  if (!response.ok) throw new Error(responseData.message || 'Error al obtener subcategoría');
+  return responseData.data;
+};
+
+export const updateSubcategory = async (id: string, data: {
+  name?: string;
+  description?: string;
+  category?: string;
+  order?: number;
+  isActive?: boolean;
+}) => {
+  const response = await authFetch(`${API_URL}/subcategories/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al actualizar la subcategoría');
+  }
+  return responseData.data;
+};
+
+export const deleteSubcategory = async (id: string) => {
+  const response = await authFetch(`${API_URL}/subcategories/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al eliminar la subcategoría');
+  }
+  return responseData.data;
+};
+
+export const reactivateSubcategory = async (id: string) => {
+  const response = await authFetch(`${API_URL}/subcategories/${id}/reactivate`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  const responseData = await response.json();
+  if (!response.ok) {
+    throw new Error(responseData.message || 'Error al reactivar la subcategoría');
+  }
+  return responseData.data;
 };
